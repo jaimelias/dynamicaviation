@@ -98,7 +98,7 @@ class Dynamic_Aviation_Admin {
 		 * class.
 		 */
 		global $typenow;
-		if(!is_customize_preview() && ('jet' == $typenow || 'destinations' == $typenow))
+		if(!is_customize_preview() && ('aircrafts' == $typenow))
 		{
 			
 			wp_enqueue_script( 'handsontableJS', plugin_dir_url( __FILE__ ) . 'js/handsontable.full.min.js', array('jquery'), $this->version, true );
@@ -142,7 +142,7 @@ class Dynamic_Aviation_Admin {
 			$language_list = implode('|', $language_list);
 			
 			add_rewrite_rule('('.$language_list.')/fly/([^/]*)/?', 'index.php?fly=$matches[2]','top');
-			add_rewrite_rule('('.$language_list.')/jet/([^/]*)/?', 'index.php?jet=$matches[2]','top');
+			add_rewrite_rule('('.$language_list.')/aircraft/([^/]*)/?', 'index.php?aircraft=$matches[2]','top');
 			add_rewrite_rule('('.$language_list.')/instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[2]','top');
 			add_rewrite_rule('('.$language_list.')/request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[2]','top');
 		}				
@@ -152,7 +152,7 @@ class Dynamic_Aviation_Admin {
 	{
 		add_rewrite_tag('%fly%', '([^&]+)');
 		add_rewrite_tag('%cacheimg%', '([^&]+)');
-		add_rewrite_tag('%jet%', '([^&]+)');
+		add_rewrite_tag('%aircraft%', '([^&]+)');
 		add_rewrite_tag('%instant_quote%', '([^&]+)');
 		add_rewrite_tag('%request_submitted%', '([^&]+)');
 	}	
@@ -161,7 +161,7 @@ class Dynamic_Aviation_Admin {
 	{
 		if(function_exists('pll_register_string'))
 		{
-			pll_register_string('jet_charter', 'Private Jet Charter');			
+			pll_register_string('aircraft_charter', 'Private Jet Charter');			
 		}
 	}	
 

@@ -1,9 +1,9 @@
 <?php 
 
 $first_name = sanitize_text_field($_POST['lead_name']);
-$jet_pax = sanitize_text_field($_POST['jet_pax']);
+$aircraft_pax = sanitize_text_field($_POST['aircraft_pax']);
 $hello = sprintf(__('Hello %s,', 'dynamicaviation'), $first_name);
-$passengers = sprintf(__('Passengers: %s', 'dynamicaviation'), $jet_pax);
+$passengers = sprintf(__('Passengers: %s', 'dynamicaviation'), $aircraft_pax);
 $greeting = sprintf(__('Thank you for contacting %s!', 'dynamicaviation'), get_bloginfo('name'));
 $message = __('There are some questions we will have in order to better focus our attention on the right aircraft for the mission. Please expect a call and/or email soon to discuss your preferences. Feel free to ask any question.', 'dynamicaviation');
 $aircraft = (isset($_POST['aircraft_name'])) ? sprintf(__('Aircraft: %s', 'dynamicaviation'), sanitize_text_field($_POST['aircraft_name'])) : null;

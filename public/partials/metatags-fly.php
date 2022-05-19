@@ -44,6 +44,6 @@ foreach ($translations as $k => $v)
 
 ?>
 
-<meta name="description" content="<?php echo esc_html(__('Private Charter Flight', 'dynamicaviation')); ?> <?php echo esc_html($address); ?>. <?php echo esc_html(__('Airplanes and helicopter rides in', 'dynamicaviation')); ?> <?php echo esc_html($airport.', '.$city); ?>." />
+<meta name="description" content="<?php esc_html_e(__('Private Charter Flight', 'dynamicaviation')); ?> <?php esc_html_e($address); ?>. <?php esc_html_e(__('Airplanes and helicopter rides in', 'dynamicaviation')); ?> <?php esc_html_e($airport.', '.$city); ?>." />
 
-<link rel="canonical" href="<?php echo esc_url(home_lang()); ?>fly/<?php echo esc_html(Dynamic_Aviation_Public::cleanURL($airport)); ?>/" />
+<link rel="canonical" href="<?php echo esc_url(home_lang()); ?>fly/<?php esc_html_e(Dynamic_Aviation_Public::cleanURL($airport)); ?>/" />

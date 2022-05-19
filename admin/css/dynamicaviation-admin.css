@@ -39,13 +39,13 @@
   font-weight: bold;
   font-style: normal;
 }
-.jet_rates_table_container
+.aircraft_rates_table_container
 {
 	width: 100%;
 	display: block;
 	overflow: hidden;
 }
-#jet_rates_table
+#aircraft_rates_table
 {
 	width: 100%;
 	position: relative;

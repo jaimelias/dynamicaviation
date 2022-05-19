@@ -13,45 +13,45 @@ $labels = array(__('Type', 'dynamicaviation'),
 	 __('Base Airport', 'dynamicaviation'),
 	 __('Base Location', 'dynamicaviation')
 	 );
-$keys = array('jet_type',
-	 'jet_manufacturer',
-	 'jet_model',
-	 'jet_year_of_construction',
-	 'jet_passengers',
-	 'jet_range',
-	 'jet_cruise_speed',
-	 'jet_max_altitude',
-	 'jet_takeoff_field',
-	 'jet_base_iata',
-	 'jet_base_city'
+$keys = array('aircraft_type',
+	 'aircraft_manufacturer',
+	 'aircraft_model',
+	 'aircraft_year_of_construction',
+	 'aircraft_passengers',
+	 'aircraft_range',
+	 'aircraft_cruise_speed',
+	 'aircraft_max_altitude',
+	 'aircraft_takeoff_field',
+	 'aircraft_base_iata',
+	 'aircraft_base_city'
 	 );
 
 for($x = 0; $x < count($keys); $x++)
 {
 	$key = $keys[$x];
-	$value = Charterflights_Meta_Box::jet_get_meta($key);
+	$value = aviation_field($key);
 	
 	if($value)
 	{
-		if($key == 'jet_type')
+		if($key == 'aircraft_type')
 		{
-			$value = Dynamic_Aviation_Public::jet_type($value);
+			$value = Dynamic_Aviation_Public::aircraft_type($value);
 		}
-		else if($key == 'jet_range')
+		else if($key == 'aircraft_range')
 		{
 			$value = $value.__('nm', 'dynamicaviation').' | '.round(intval($value)*1.15078).__('mi', 'dynamicaviation').' | '.round(intval($value)*1.852).__('km', 'dynamicaviation');
 		}
-		else if($key == 'jet_cruise_speed')
+		else if($key == 'aircraft_cruise_speed')
 		{
 			$value = $value.__('kn', 'dynamicaviation').' | '.round(intval($value)*1.15078).__('mph', 'dynamicaviation').' | '.round(intval($value)*1.852).__('kph', 'dynamicaviation');			
 		}
-		else if($key == 'jet_max_altitude')
+		else if($key == 'aircraft_max_altitude')
 		{
 			$value = $value.__('ft', 'dynamicaviation').' | '.round(intval($value)*0.3048).__('m', 'dynamicaviation');
 		}
-		else if($key == 'jet_base_iata')
+		else if($key == 'aircraft_base_iata')
 		{
-			$value = Charterflights_Meta_Box::jet_get_meta('jet_base_name');
+			$value = aviation_field('aircraft_base_name');
 		}
 		
 		$table .= '<tr>';
@@ -81,7 +81,7 @@ global $post;
 
 <hr/>
 
-<?php echo Dynamic_Aviation_Public::get_destination_table(Charterflights_Meta_Box::jet_get_meta('jet_base_iata')); ?>
+<?php echo Dynamic_Aviation_Public::get_destination_table(aviation_field('aircraft_base_iata')); ?>
 
 
 <h2><?php esc_html_e(__('Instant Quotes', 'dynamicaviation')); ?></h2>

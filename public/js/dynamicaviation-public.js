@@ -5,25 +5,25 @@ jQuery(() => {
 	validate_instant_quote();
 	country_dropdown();
 	dynamicaviation_cookies();
-	jet_datepicker();
-	jet_timepicker();
-	validate_jet_form();
+	aircraft_datepicker();
+	aircraft_timepicker();
+	validate_aircraft_form();
 });
 
-const jet_timepicker = () =>	{
-	jQuery('form.jet_calculator').find('input.timepicker').each(function(){
+const aircraft_timepicker = () =>	{
+	jQuery('form.aircraft_calculator').find('input.timepicker').each(function(){
 		jQuery(this).pickatime();
 	});
 }
 
-const jet_datepicker = () =>	{
+const aircraft_datepicker = () =>	{
 	
 	const args = {
 		format: 'yyyy-mm-dd',
 		min: true
 	};
 
-	jQuery('form.jet_calculator').find('input.datepicker').each(function(){
+	jQuery('form.aircraft_calculator').find('input.datepicker').each(function(){
 		
 		if(jQuery(this).attr('type') == 'text')
 		{
@@ -40,15 +40,15 @@ const jet_datepicker = () =>	{
 const country_dropdown = () => {
 	if(typeof jsonsrc !== typeof undefined)
 	{
-		if(jQuery('form#jet_booking_request').find('.countrylist').length > 0)
+		if(jQuery('form#aircraft_booking_request').find('.countrylist').length > 0)
 		{
-			jet_country_dropdown(jsonsrc(), jQuery('html').attr('lang').slice(0, -3));
+			aircraft_country_dropdown(jsonsrc(), jQuery('html').attr('lang').slice(0, -3));
 		}
 	}	
 }
 
 const dynamicaviation_cookies = () => {
-	const thisForm = jQuery('#jet_booking_request');
+	const thisForm = jQuery('#aircraft_booking_request');
 	const landing = ['channel', 'device', 'landing_domain', 'landing_path'];
 	let warnings = 0;
 	const getCookie = (cname) => {
@@ -101,7 +101,7 @@ function validate_request_quote (token) {
 	return new Promise((resolve, reject) => { 
 
 		let count = 0;
-		const thisForm = jQuery('#jet_booking_request');
+		const thisForm = jQuery('#aircraft_booking_request');
 		const getUrlParameter = (sParam) => {
 			const sPageURL = decodeURIComponent(window.location.search.substring(1));
 			const sURLVariables = sPageURL.split('&');
@@ -119,9 +119,9 @@ function validate_request_quote (token) {
 		jQuery(thisForm).find('input').add('select').add('textarea').each(function(){			
 			if(jQuery(this).val() == '' && jQuery(this).attr('name') != 'g-recaptcha-response')
 			{
-				if(getUrlParameter('jet_flight') == 0)
+				if(getUrlParameter('aircraft_flight') == 0)
 				{
-					if(jQuery(this).attr('name') == 'jet_return_date' || jQuery(this).attr('name') == 'jet_return_hour' || jQuery(this).attr('name') == 'return_itinerary')
+					if(jQuery(this).attr('name') == 'aircraft_return_date' || jQuery(this).attr('name') == 'aircraft_return_hour' || jQuery(this).attr('name') == 'return_itinerary')
 					{
 						jQuery(this).removeClass('invalid_field');
 						console.log(jQuery(this).attr('name'));
@@ -177,7 +177,7 @@ const validate_instant_quote = () =>
 {
 	jQuery('button[data-aircraft]').click(function(){
 		
-		const aircraft_fields = jQuery('#jet_booking_request').find('#aircraft_fields');
+		const aircraft_fields = jQuery('#aircraft_booking_request').find('#aircraft_fields');
 		let inputs = jQuery(this).attr('data-aircraft');
 		
 
@@ -189,25 +189,25 @@ const validate_instant_quote = () =>
 			jQuery(aircraft_fields).append(jQuery('<input>').attr({'type': 'text', 'name': k, 'value': inputs[k]}));
 		}
 		
-		jQuery('#jet_booking_container').removeClass('hidden');
+		jQuery('#aircraft_booking_container').removeClass('hidden');
 		jQuery('.instant_quote_table').addClass('hidden');			
-		jQuery('#jet_booking_request').attr({'data-form-ready': 'true'});
-		jQuery('#jet_booking_request').find('input[name="lead_name"]').focus();
+		jQuery('#aircraft_booking_request').attr({'data-form-ready': 'true'});
+		jQuery('#aircraft_booking_request').find('input[name="lead_name"]').focus();
 	});
 	
-	jQuery('#jet_booking_container').find('.close').click(function(){
-		jQuery('#jet_booking_container').addClass('hidden');
+	jQuery('#aircraft_booking_container').find('.close').click(function(){
+		jQuery('#aircraft_booking_container').addClass('hidden');
 		jQuery('.instant_quote_table').removeClass('hidden');
 	});
 	
 	
 }
-const validate_jet_form = () => {
-	jQuery('.jet_calculator').each(function(){
+const validate_aircraft_form = () => {
+	jQuery('.aircraft_calculator').each(function(){
 		
 		const thisForm = jQuery(this);
 		
-		jQuery(thisForm).find('#jet_submit').click(function(){
+		jQuery(thisForm).find('#aircraft_submit').click(function(){
 			
 			let invalid_field = 0;
 			
@@ -215,7 +215,7 @@ const validate_jet_form = () => {
 				
 				if(jQuery(this).val() == '')
 				{
-					if(jQuery('#jet_flight').val() == 0 && (jQuery(this).attr('name') == 'jet_return_date' || jQuery(this).attr('name') == 'jet_return_hour' || jQuery(this).attr('name') == 'jet_return_date_submit' || jQuery(this).attr('name') == 'jet_return_hour_submit'))
+					if(jQuery('#aircraft_flight').val() == 0 && (jQuery(this).attr('name') == 'aircraft_return_date' || jQuery(this).attr('name') == 'aircraft_return_hour' || jQuery(this).attr('name') == 'aircraft_return_date_submit' || jQuery(this).attr('name') == 'aircraft_return_hour_submit'))
 					{
 						jQuery(this).removeClass('invalid_field');
 					}
@@ -227,9 +227,9 @@ const validate_jet_form = () => {
 				}
 				else
 				{
-					if(jQuery(this).hasClass('jet_list'))
+					if(jQuery(this).hasClass('aircraft_list'))
 					{
-						if(!jQuery(this).hasClass('jet_selected'))
+						if(!jQuery(this).hasClass('aircraft_selected'))
 						{
 							invalid_field++;
 							jQuery(this).addClass('invalid_field');
@@ -248,21 +248,21 @@ const validate_jet_form = () => {
 
 			if(invalid_field == 0)
 			{
-				const hash = sha512(jQuery(thisForm).find('input[name="jet_pax"]').val()+jQuery(thisForm).find('input[name="jet_departure_date"]').val());
-				const departure = Date.parse(jQuery('input[name="jet_departure_date"]').val());
+				const hash = sha512(jQuery(thisForm).find('input[name="aircraft_pax"]').val()+jQuery(thisForm).find('input[name="aircraft_departure_date"]').val());
+				const departure = Date.parse(jQuery('input[name="aircraft_departure_date"]').val());
 				let today = new Date();
 				today.setDate(today.getDate() - 2);
 				today = Date.parse(today);
 				const days_between = Math.round((departure-today)/(1000*60*60*24));				
-				const itinerary = jQuery('#jet_origin').val()+'/'+jQuery('#jet_destination').val();
+				const itinerary = jQuery('#aircraft_origin').val()+'/'+jQuery('#aircraft_destination').val();
 				
 				if(typeof gtag !== 'undefined')
 				{	
 					gtag('event', 'search_flight', {
 						itinerary,
 						days_between,
-						departure: jQuery('#jet_departure_date').val(),
-						pax: jQuery('#jet_pax').val()
+						departure: jQuery('#aircraft_departure_date').val(),
+						pax: jQuery('#aircraft_pax').val()
 					});
 				}
 				else
@@ -292,31 +292,31 @@ const country_name = (lang, country_name, country_code) => {
 }
 
 const one_way_round_trip = () => {
-	if(jQuery('#jet_flight').val() == 1)
+	if(jQuery('#aircraft_flight').val() == 1)
 	{
-		jQuery('.jet_return').fadeIn();
+		jQuery('.aircraft_return').fadeIn();
 	}
-	jQuery('#jet_flight').change(function(){
+	jQuery('#aircraft_flight').change(function(){
 		if(jQuery(this).val() == 1)
 		{
-			jQuery('.jet_return').fadeIn();
+			jQuery('.aircraft_return').fadeIn();
 		}
 		else
 		{
-			jQuery('.jet_return').fadeOut();
-			jQuery('#jet_return_date').val('');
-			jQuery('#jet_return_hour').val('');
+			jQuery('.aircraft_return').fadeOut();
+			jQuery('#aircraft_return_date').val('');
+			jQuery('#aircraft_return_hour').val('');
 		}
 	});		
 }
 
 const algolia_execute = () => {
 
-jQuery('.jet_calculator').each(function(){
+jQuery('.aircraft_calculator').each(function(){
 
 	const thisForm = jQuery(this);
 	
-	jQuery(this).find('.jet_list').each(function(){
+	jQuery(this).find('.aircraft_list').each(function(){
 		
 		const this_field = jQuery(this);
 		
@@ -376,17 +376,17 @@ jQuery('.jet_calculator').each(function(){
 				'data-iata': suggestion.iata,
 				'data-lat': suggestion._geoloc.lat,
 				'data-lon': suggestion._geoloc.lng
-			}).addClass('jet_selected').val(selectedAirport);	
+			}).addClass('aircraft_selected').val(selectedAirport);	
 
 			jQuery(this_field).blur(() => {
-				if (jQuery(this_field).hasClass('jet_selected'))
+				if (jQuery(this_field).hasClass('aircraft_selected'))
 				{
 					jQuery(this_field).val(selectedAirport);
 				}
 				else
 				{
 					jQuery(this_field).val('');
-					jQuery(this_field).removeClass('jet_selected');
+					jQuery(this_field).removeClass('aircraft_selected');
 					jQuery(this_field).addClass('invalid_field');
 					jQuery(this_field).removeAttr('data-iata');
 					jQuery(this_field).removeAttr('data-lat');
@@ -396,20 +396,20 @@ jQuery('.jet_calculator').each(function(){
 				
 			jQuery(this_field).focus(() => {
 				jQuery(this_field).val('');
-				jQuery(this_field).removeClass('jet_selected');
+				jQuery(this_field).removeClass('aircraft_selected');
 				jQuery(this_field).removeClass('invalid_field');
 				jQuery(this_field).removeAttr('data-iata');
 				jQuery(this_field).removeAttr('data-lat');
 				jQuery(this_field).removeAttr('data-lon');
 			});					
 					
-			if(jQuery(thisForm).find('.jet_selected').length == 1)
+			if(jQuery(thisForm).find('.aircraft_selected').length == 1)
 			{
-				jQuery('.jet_list').not('.jet_selected').focus();
+				jQuery('.aircraft_list').not('.aircraft_selected').focus();
 			}
-			if(jQuery(thisForm).find('.jet_selected').length == 2)
+			if(jQuery(thisForm).find('.aircraft_selected').length == 2)
 			{
-				jQuery(thisForm).find('input[name="jet_pax"]').focus();
+				jQuery(thisForm).find('input[name="aircraft_pax"]').focus();
 			}
 			else
 			{
@@ -422,19 +422,19 @@ jQuery('.jet_calculator').each(function(){
 
 }
 
-const jet_country_dropdown = (pluginurl, htmllang) => {
+const aircraft_country_dropdown = (pluginurl, htmllang) => {
 	$.getJSON( pluginurl + 'countries/'+htmllang+'.json')
 		.done(data => {
-			jetCountryOptions(data);
+			aircraftCountryOptions(data);
 		})
 		.fail(() => {
 			$.getJSON(pluginurl + 'countries/en.json', data => {
-				jetCountryOptions(data);
+				aircraftCountryOptions(data);
 			});				
 		});			
 }	
 
-const jetCountryOptions = data => {
+const aircraftCountryOptions = data => {
 	jQuery('.countrylist').each(function() {
 		for (let x = 0; x < data.length; x++) 
 		{

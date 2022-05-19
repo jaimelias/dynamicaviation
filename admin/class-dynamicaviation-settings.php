@@ -1,6 +1,6 @@
 <?php
 
-class Jetcharter_Settings
+class Dynamic_Aviation_Settings
 {
 	public function __construct()
 	{
@@ -13,17 +13,17 @@ class Jetcharter_Settings
 	}
 	public function add_settings_page()
 	{
-		add_submenu_page('edit.php?post_type=destinations', 'Dynamic Aviation - Settings', 'Settings', 'manage_options', 'dynamicaviation', array(&$this, 'settings_page'));
+		add_submenu_page('edit.php?post_type=aircrafts', 'Dynamic Aviation - Settings', 'Settings', 'manage_options', 'dynamicaviation', array(&$this, 'settings_page'));
 	}
 	public function settings_page()
 		 { 
 		?><div class="wrap">
 		<form action="options.php" method="post">
 			
-			<h2><?php esc_html_e(__("Dynamic Aviation", "dynamicaviation")); ?></h2>	
+			<h2><?php esc_html_e(__('Dynamic Aviation', 'dynamicaviation')); ?></h2>	
 			<?php
-			settings_fields( 'jet_settings' );
-			do_settings_sections( 'jet_settings' );
+			settings_fields( 'aircraft_settings' );
+			do_settings_sections( 'aircraft_settings' );
 			submit_button();
 			?>			
 		</form>
@@ -33,119 +33,156 @@ class Jetcharter_Settings
 	
 	public function settings_init(  ) { 
 
-		register_setting( 'jet_settings', 'mapbox_token', 'sanitize_text_field');
-		register_setting( 'jet_settings', 'mapbox_map_id', 'sanitize_text_field');
-		register_setting( 'jet_settings', 'mapbox_map_zoom', 'intval');
-		register_setting( 'jet_settings', 'mapbox_base_lat', 'sanitize_text_field');
-		register_setting( 'jet_settings', 'mapbox_base_lon', 'sanitize_text_field');
-		register_setting( 'jet_settings', 'algolia_token', 'sanitize_text_field');
-		register_setting( 'jet_settings', 'algolia_index', 'sanitize_text_field');
-		register_setting( 'jet_settings', 'algolia_id', 'sanitize_text_field');		
-		register_setting( 'jet_settings', 'jet_webhook', 'esc_url');		
+		register_setting( 'aircraft_settings', 'mapbox_token', 'sanitize_text_field');
+		register_setting( 'aircraft_settings', 'mapbox_map_id', 'sanitize_text_field');
+		register_setting( 'aircraft_settings', 'mapbox_map_zoom', 'intval');
+		register_setting( 'aircraft_settings', 'mapbox_base_lat', 'sanitize_text_field');
+		register_setting( 'aircraft_settings', 'mapbox_base_lon', 'sanitize_text_field');
+		register_setting( 'aircraft_settings', 'algolia_token', 'sanitize_text_field');
+		register_setting( 'aircraft_settings', 'algolia_index', 'sanitize_text_field');
+		register_setting( 'aircraft_settings', 'algolia_id', 'sanitize_text_field');		
+		register_setting( 'aircraft_settings', 'aircraft_webhook', 'esc_url');		
 
 		add_settings_section(
-			'jet_settings_section', 
+			'aircraft_settings_section', 
 			esc_html(__( 'General Settings', 'dynamicaviation' )), 
 			'', 
-			'jet_settings'
+			'aircraft_settings'
 		);
 
 		add_settings_field( 
 			'mapbox_token', 
 			esc_html(__( 'Mapbox Token', 'dynamicaviation' )), 
-			array(&$this, 'settings_input'), 
-			'jet_settings', 
-			'jet_settings_section',
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
 			array('name' => 'mapbox_token', 'type' => 'text')
 		);
+
+		$mapbox_map_id_args = array(
+			'name' => 'mapbox_map_id',
+			'options' => array(
+				array(
+					'text' => __('Streets', 'dynamicpackages'),
+					'value' => 'mapbox.streets'
+				),
+				array(
+					'text' => __('Light', 'dynamicpackages'),
+					'value' => 'mapbox.light'
+				),
+				array(
+					'text' => __('Dark', 'dynamicpackages'),
+					'value' => 'mapbox.dark'
+				),
+				array(
+					'text' => __('Outdoors', 'dynamicpackages'),
+					'value' => 'mapbox.outdoors'
+				),
+			)
+		);
+
 		add_settings_field( 
 			'mapbox_map_id', 
 			esc_html(__( 'Map ID', 'dynamicaviation' )), 
-			array(&$this, 'render_map_id'), 
-			'jet_settings', 
-			'jet_settings_section' 
+			array(&$this, 'select'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
+			$mapbox_map_id_args
 		);
+
 		add_settings_field( 
 			'mapbox_map_zoom', 
 			esc_html(__( 'Mapbox Map Zoom', 'dynamicaviation' )), 
-			array(&$this, 'settings_input'), 
-			'jet_settings', 
-			'jet_settings_section',
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
 			array('name' => 'mapbox_map_zoom', 'type' => 'number')
 		);
+
 		add_settings_field( 
 			'mapbox_base_lat', 
 			esc_html(__( 'Base Latitud', 'dynamicaviation' )), 
-			array(&$this, 'settings_input'), 
-			'jet_settings', 
-			'jet_settings_section',
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
 			array('name' => 'mapbox_base_lat', 'type' => 'text')
 		);
+
 		add_settings_field( 
 			'mapbox_base_lon', 
 			esc_html(__( 'Base Longitud', 'dynamicaviation' )), 
-			array(&$this, 'settings_input'), 
-			'jet_settings', 
-			'jet_settings_section',
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
 			array('name' => 'mapbox_base_lon', 'type' => 'text')
 		);	
-
 
 		add_settings_field( 
 			'algolia_token', 
 			esc_html(__( 'Algolia Api Key', 'dynamicaviation' )), 
-			array(&$this, 'settings_input'), 
-			'jet_settings', 
-			'jet_settings_section',
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
 			array('name' => 'algolia_token', 'type' => 'text')
 		);
 
 		add_settings_field( 
 			'algolia_index', 
 			esc_html(__( 'Algolia Index Name', 'dynamicaviation' )), 
-			array(&$this, 'settings_input'), 
-			'jet_settings', 
-			'jet_settings_section',
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
 			array('name' => 'algolia_index', 'type' => 'text')
 		);		
 		add_settings_field( 
 			'algolia_id', 
 			esc_html(__( 'Algolia Api Id', 'dynamicaviation' )), 
-			array(&$this, 'settings_input'), 
-			'jet_settings', 
-			'jet_settings_section',
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
 			array('name' => 'algolia_id', 'type' => 'text')
 		);	
 
 		add_settings_field( 
-			'jet_webhook', 
+			'aircraft_webhook', 
 			esc_html(__( 'Webhook', 'dynamicaviation' )), 
-			array(&$this, 'settings_input'), 
-			'jet_settings', 
-			'jet_settings_section',
-			array('name' => 'jet_webhook', 'type' => 'text')
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
+			array('name' => 'aircraft_webhook', 'type' => 'text')
 		);
 	}
 	
-	public function settings_input($arr){
+	public function input_text($arr){
 			$name = $arr['name'];
 			$url = (array_key_exists('url', $arr)) ? '<a href="'.esc_url($arr['url']).'">?</a>' : null;
 			$type = (array_key_exists('type', $arr)) ? $arr['type'] : 'text';
 		?>
-		<input type="<?php echo $type; ?>" name="<?php echo esc_html($name); ?>" id="<?php echo $name; ?>" value="<?php echo esc_html(get_option($name)); ?>" /> <span><?php echo $url; ?></span>
+		<input type="<?php echo $type; ?>" name="<?php esc_html_e($name); ?>" id="<?php echo $name; ?>" value="<?php esc_html_e(get_option($name)); ?>" /> <span><?php echo $url; ?></span>
 
-	<?php }
-	
-	public function render_map_id(  ) { 
-		$value = get_option( 'mapbox_map_id' );
+		<?php 
+	}
+
+	public function select($args) {
+		
+		$name = $args['name'];
+		$options = $args['options'];
+		$value = get_option($name);
+		$render_options = '';
+		
+		for($x = 0; $x < count($options); $x++)
+		{
+			$this_value = $options[$x]['value'];
+			$this_text = $options[$x]['text'];
+			$selected = ($value === $this_value) ? ' selected ' : '';
+			$render_options .= '<option value="'.esc_attr($this_value).'" '.esc_attr($selected).'>'.esc_html($this_text).'</option>';
+		}
+
 		?>
-		<select type='text' name='mapbox_map_id'>
-			<option value="mapbox.streets" <?php selected($value, 'mapbox.streets'); ?>>Streets</option>
-			<option value="mapbox.light" <?php selected($value, 'mapbox.light'); ?>>Light</option>
-			<option value="mapbox.dark" <?php selected($value, 'mapbox.dark'); ?>>Dark</option>
-			<option value="mapbox.outdoors" <?php selected($value, 'mapbox.outdoors'); ?>>Outdoors</option>
-		</select>
-		<?php
+			<select name="<?php echo esc_attr($name); ?>">
+				<?php echo $render_options; ?>
+			</select>
+		<?php 
 	}
 }
 

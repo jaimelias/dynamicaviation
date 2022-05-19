@@ -1,24 +1,24 @@
 (function($) {
     'use strict';
 
-	$(document).ready(function(){
+	jQuery(() => {
 	
-		if($('.jet_list').length > 0)
+		if(jQuery('.aircraft_list').length > 0)
 		{
 			algolia_execute();
 		}
-		if($('#jet_rates').length > 0)
+		if(jQuery('#aircraft_rates').length > 0)
 		{
 			min_rows();
 			
 			//textareas, container, number of rows
-			register_grid($('#jet_rates'), $('#jet_rates_table'));			
+			register_grid(jQuery('#aircraft_rates'), jQuery('#aircraft_rates_table'));			
 		}
-		if($('#jet_payment').length > 0)
+		if(jQuery('#aircraft_payment').length > 0)
 		{
-			$('#jet_payment, #jet_last_minute').change(function(){
-				$('#post').attr({'action': $('#post').attr('action')+'#jet-last-minute'});
-				$('#post').submit();
+			jQuery('#aircraft_payment, #aircraft_last_minute').change(function(){
+				jQuery('#post').attr({'action': jQuery('#post').attr('action')+'#aircraft-last-minute'});
+				jQuery('#post').submit();
 			});
 		}
 	});
@@ -26,11 +26,11 @@
 	
 	function register_grid(textareas, container)
 	{
-		var max_num = parseInt($('#jet_flights').val());
+		var max_num = parseInt(jQuery('#aircraft_flights').val());
 		
-		if(isJson($(textareas).val()))
+		if(isJson(jQuery(textareas).val()))
 		{
-			var data = JSON.parse($(textareas).val());
+			var data = JSON.parse(jQuery(textareas).val());
 		}
 		else
 		{
@@ -38,9 +38,9 @@
 			console.log(['initial_grid', data]);
 		}
 		
-		var grid = $(container);
-		var headers = get_headers($(container));
-		var columns = get_col_type($(container));	
+		var grid = jQuery(container);
+		var headers = get_headers(jQuery(container));
+		var columns = get_col_type(jQuery(container));	
 
 		console.log(data);
 		
@@ -60,18 +60,18 @@
 			{
 				if (source !== 'loadData')
 				{
-					$(textareas).text(JSON.stringify(update_grid(textareas, grid.handsontable('getData'), container)));
+					jQuery(textareas).text(JSON.stringify(update_grid(textareas, grid.handsontable('getData'), container)));
 				}
 			}
 		}
 		
 		grid.handsontable(args);
 		
-	$('#jet_flights').on('change blur click', function(){
+	jQuery('#aircraft_flights').on('change blur click', function(){
 		
 		min_rows();
 		var row_num = parseInt(grid.handsontable('countRows'));
-		var max_num = parseInt($('#jet_flights').val());
+		var max_num = parseInt(jQuery('#aircraft_flights').val());
 		var instance = grid.handsontable('getInstance');
 		
 		if(row_num != max_num)
@@ -87,7 +87,7 @@
 				instance.alter('remove_row', (row_num-diff), diff);				
 			}
 
-			$(textareas).text(JSON.stringify(update_grid(textareas, grid.handsontable('getData'), container)));
+			jQuery(textareas).text(JSON.stringify(update_grid(textareas, grid.handsontable('getData'), container)));
 		}
 		
 		instance.updateSettings({maxRows: max_num, data: grid.handsontable('getData')});
@@ -98,12 +98,12 @@
 	
 	function update_grid(textareas, data, container)
 	{
-		var grid_id_name = $(container).attr('id');
+		var grid_id_name = jQuery(container).attr('id');
 		var textareas_data = [];
 		
-		if(isJson($(textareas).val()))
+		if(isJson(jQuery(textareas).val()))
 		{
-			var textareas_data = JSON.parse($(textareas).text());
+			var textareas_data = JSON.parse(jQuery(textareas).text());
 		}
 		else
 		{
@@ -117,7 +117,7 @@
 	function get_headers(container)
 	{
 		var headers = [];
-		headers = $(container).attr('data-sensei-headers');
+		headers = jQuery(container).attr('data-sensei-headers');
 		//headers = headers.replace(/\s+/g, '');
 		headers = headers.split(',');
 		return headers;
@@ -125,7 +125,7 @@
 function get_col_type(container)
 {
 	var columns = [];
-	columns = $(container).attr('data-sensei-type');
+	columns = jQuery(container).attr('data-sensei-type');
 	columns = columns.replace(/\s+/g, '');
 	columns = columns.split(',');
 	var select_option = [];
@@ -154,7 +154,7 @@ function get_col_type(container)
 		else if(columns[x] == 'dropdown')
 		{
 			
-			select_option = $(container).attr('data-sensei-dropdown');
+			select_option = jQuery(container).attr('data-sensei-dropdown');
 			select_option = select_option.replace(/\s+/g, '');
 			select_option = select_option.split(',');
 			row.type = 'dropdown';
@@ -181,11 +181,11 @@ function get_col_type(container)
 
 	function initial_grid(textareas, container)
 	{
-		var headers = get_headers($(container));
-		var max_num = parseInt($('#jet_flights').val());  
+		var headers = get_headers(jQuery(container));
+		var max_num = parseInt(jQuery('#aircraft_flights').val());  
 		var scale = {};
 		var new_grid = [];
-		var grid_id_name = $(container).attr('id');
+		var grid_id_name = jQuery(container).attr('id');
 		
 		for(var x = 0; x < max_num; x++)
 		{
@@ -198,16 +198,16 @@ function get_col_type(container)
 			new_grid.push(row);
 		}
 		
-		$(textareas).text(JSON.stringify(new_grid));
+		jQuery(textareas).text(JSON.stringify(new_grid));
 		
 		return new_grid;
 	}
 	
 	function min_rows()
 	{
-		if(parseInt($('#jet_flights').val()) < 10 || $('#jet_flights').val() == '')
+		if(parseInt(jQuery('#aircraft_flights').val()) < 10 || jQuery('#aircraft_flights').val() == '')
 		{
-			$('#jet_flights').val(10);
+			jQuery('#aircraft_flights').val(10);
 		}
 	}
 
@@ -223,9 +223,9 @@ function get_col_type(container)
 	function algolia_execute()
 	{
 
-		$('.jet_list').each(function() {
+		jQuery('.aircraft_list').each(function() {
 
-			var this_id = $(this).attr('id');
+			var this_id = jQuery(this).attr('id');
 			this_id = '#' + this_id;
 
 			autocomplete(this_id, {
@@ -237,7 +237,7 @@ function get_col_type(container)
 				displayKey: 'iata',
 				templates: {
 					suggestion: function(suggestion) {
-						var htmllang = $("html").attr("lang");
+						var htmllang = jQuery("html").attr("lang");
 						htmllang = htmllang.slice(0, 2);
 						htmllang.toLowerCase();
 						
@@ -263,7 +263,7 @@ function get_col_type(container)
 						
 						//console.log(suggestion);
 
-						var result = $('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> (<span class="iata"></span>)</div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
+						var result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> (<span class="iata"></span>)</div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
 						result.find('.sairport > .airport').html(suggestion._highlightResult.airport.value);
 						result.find('.sairport > .iata').html(suggestion._highlightResult.iata.value);
 						result.find('.slocation > .city').html(suggestion._highlightResult.city.value);
@@ -273,26 +273,26 @@ function get_col_type(container)
 					}
 				}
 			}]).on('autocomplete:selected', function(event, suggestion, dataset) {
-				$('.jet_lat').val(suggestion._geoloc.lat);
-				$('.jet_lon').val(suggestion._geoloc.lng);
-				$('.jet_base_name').val(suggestion.airport);
-				$('.jet_base_city').val(suggestion.city+', '+suggestion.country_code);
+				jQuery('.aircraft_lat').val(suggestion._geoloc.lat);
+				jQuery('.aircraft_lon').val(suggestion._geoloc.lng);
+				jQuery('.aircraft_base_name').val(suggestion.airport);
+				jQuery('.aircraft_base_city').val(suggestion.city+', '+suggestion.country_code);
 			});
 			
-			$(this).focus(function(){
-				$(this).val('');
-				$('.jet_lon').val('');
-				$('.jet_lat').val('');
-				$('.jet_base_name').val('');
-				$('.jet_base_city').val('');
+			jQuery(this).focus(function(){
+				jQuery(this).val('');
+				jQuery('.aircraft_lon').val('');
+				jQuery('.aircraft_lat').val('');
+				jQuery('.aircraft_base_name').val('');
+				jQuery('.aircraft_base_city').val('');
 			});
 			
-			$(this).blur(function(){
-				if($(this).val().length < 3)
+			jQuery(this).blur(function(){
+				if(jQuery(this).val().length < 3)
 				{
-					$(this).val('').attr({'placeholder': 'error'});
-					$('.jet_lon').val('');
-					$('.jet_lat').val('');					
+					jQuery(this).val('').attr({'placeholder': 'error'});
+					jQuery('.aircraft_lon').val('');
+					jQuery('.aircraft_lat').val('');					
 				}
 			});
 			

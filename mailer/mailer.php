@@ -113,7 +113,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_web_api_key', 
 				'Web API Key', 
-				array(&$this, 'settings_input'), 
+				array(&$this, 'input_text'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_web_api_key') 
@@ -122,7 +122,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_email', 
 				'Email', 
-				array(&$this, 'settings_input'), 
+				array(&$this, 'input_text'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_email', 'type' => 'email') 
@@ -131,7 +131,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_email_bcc', 
 				'Bcc', 
-				array(&$this, 'settings_input'), 
+				array(&$this, 'input_text'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_email_bcc', 'type' => 'email') 
@@ -140,7 +140,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_name', 
 				'Name', 
-				array(&$this, 'settings_input'), 
+				array(&$this, 'input_text'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_name') 
@@ -149,7 +149,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_smtp_api_key', 
 				'SMTP API Key', 
-				array(&$this, 'settings_input'), 
+				array(&$this, 'input_text'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_smtp_api_key') 
@@ -157,7 +157,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_smtp_username', 
 				'SMTP Username', 
-				array(&$this, 'settings_input'), 
+				array(&$this, 'input_text'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_smtp_username') 
@@ -165,12 +165,12 @@ if(!class_exists('Sendgrid_Mailer'))
 			
 		}
 		
-		public function settings_input($arr){
+		public function input_text($arr){
 				$name = $arr['name'];
 				$url = (array_key_exists('url', $arr)) ? '<a href="'.esc_url($arr['url']).'">?</a>' : null;
 				$type = (array_key_exists('type', $arr)) ? $arr['type'] : 'text';
 			?>
-			<input type="<?php echo $type; ?>" name="<?php echo esc_html($name); ?>" id="<?php echo $name; ?>" value="<?php echo esc_html(get_option($name)); ?>" /> <span><?php echo $url; ?></span>
+			<input type="<?php echo $type; ?>" name="<?php esc_html_e($name); ?>" id="<?php echo $name; ?>" value="<?php esc_html_e(get_option($name)); ?>" /> <span><?php echo $url; ?></span>
 
 		<?php }		
 

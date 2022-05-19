@@ -17,7 +17,7 @@
  {
 	font-weight: 800;
  }
- .jet_price_list
+ .aircraft_price_list
  {
 	margin: 0 0 40px 0;
  }
@@ -80,11 +80,11 @@
 {
 	margin: 10px 0 0 0;
 }
-.jet_return
+.aircraft_return
 {
 	display: none;
 }
- .jet_calculator
+ .aircraft_calculator
  {
 	font-weight: normal;
 	margin: 0 !important;
@@ -128,7 +128,7 @@
   font-weight: 800;
   font-style: normal;
 }
-.jet_selected
+.aircraft_selected
 {
 	border-color: #1e5162 !important;
 	background-color: #3692b0 !important;
@@ -159,7 +159,7 @@
 	color: #262626;
 	background-color: #f7f7f7;
 }
-button#jet_submit
+button#aircraft_submit
 {
 	margin-top: 20px;
 }

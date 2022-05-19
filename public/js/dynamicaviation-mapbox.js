@@ -36,19 +36,19 @@ jQuery(() => {
 			
 			const thisForm = jQuery(this);
 			
-			jQuery(thisForm).find('.jet_list').blur(function(){			
+			jQuery(thisForm).find('.aircraft_list').blur(function(){			
 				
-				if(jQuery(this).hasClass('jet_selected') && jQuery(thisForm).find('.jet_selected').length == 1)
+				if(jQuery(this).hasClass('aircraft_selected') && jQuery(thisForm).find('.aircraft_selected').length == 1)
 				{
 					const getLatLng = [jQuery(this).attr('data-lat'), jQuery(this).attr('data-lon')];
 					map.fitBounds([getLatLng, getLatLng]);
 					map.setZoom(13);
 				}
-				else if(jQuery(thisForm).find('.jet_selected').length == 2)
+				else if(jQuery(thisForm).find('.aircraft_selected').length == 2)
 				{
 					const cardinals = [];
 					
-					jQuery(thisForm).find('.jet_selected').each(function(){
+					jQuery(thisForm).find('.aircraft_selected').each(function(){
 						const row = [];
 						row.push(jQuery(this).attr('data-lat'));
 						row.push(jQuery(this).attr('data-lon'));

@@ -92,3 +92,32 @@ if ( ! function_exists('write_log')) {
 		}
 	}
 }
+
+
+function aviation_field($name, $this_id = null)
+{
+	if($this_id == null)
+	{		
+		global $polylang;		
+		global $post;
+		
+		if(isset($post))
+		{
+			$this_id = $post->ID;
+		}
+	}
+	
+	$which_var = $name.'_'.$this_id;
+	global $$which_var; 
+	
+	if(isset($$which_var))
+	{
+		return $$which_var;
+	}
+	else
+	{
+		$package_field = get_post_meta($this_id, $name, true);
+		$GLOBALS[$which_var] = $package_field;
+		return $package_field;
+	}	
+}

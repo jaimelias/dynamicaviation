@@ -26,7 +26,6 @@ class Dynamic_Aviation {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-dynamicaviation-settings.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-post-type.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-meta-box.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-yoastseo.php';
 		$this->loader = new Dynamic_Aviation_Loader();
 	}
 
@@ -42,17 +41,15 @@ class Dynamic_Aviation {
 		$plugin_admin = new Dynamic_Aviation_Admin( $this->get_plugin_name(), $this->get_version() );
 		$plugin_public = new Dynamic_Aviation_Public( $this->get_plugin_name(), $this->get_version() );
 		
-		$plugin_settings = new Jetcharter_Settings();
+		$plugin_settings = new Dynamic_Aviation_Settings();
 		$plugin_post_type = new Charterflights_Post_Type();
 		$plugin_meta_box = new Charterflights_Meta_Box();
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles', 11);
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'init', $plugin_post_type, 'fly_post_type', 0);
-		$this->loader->add_action( 'init', $plugin_post_type, 'jet_post_type', 0 );			
-		$this->loader->add_action( 'save_post', $plugin_meta_box, 'jet_save' );
-		$this->loader->add_action( 'add_meta_boxes',$plugin_meta_box, 'jet_add_meta_box' );
-		$this->loader->add_action( 'add_meta_boxes',$plugin_meta_box, 'destinations_add_meta_box' );
+		$this->loader->add_action( 'init', $plugin_post_type, 'aircraft_post_type', 0 );			
+		$this->loader->add_action( 'save_post', $plugin_meta_box, 'aircraft_save' );
+		$this->loader->add_action( 'add_meta_boxes',$plugin_meta_box, 'aircraft_add_meta_box' );
 		$this->loader->add_action('init', $plugin_admin, 'custom_rewrite_basic');
 		$this->loader->add_action('init', $plugin_admin, 'custom_rewrite_tag', 10, 0);	
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_pll_strings' );		
@@ -64,7 +61,6 @@ class Dynamic_Aviation {
 		global $wp_version;
 		
 		$plugin_public = new Dynamic_Aviation_Public( $this->get_plugin_name(), $this->get_version() );
-		$plugin_yoast =  new Dynamic_Aviation_YoastSEO_Fix();
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_filter("wp_head", $plugin_public, 'meta_tags');
@@ -78,12 +74,10 @@ class Dynamic_Aviation {
 		$this->loader->add_filter( 'wp_title', $plugin_public, 'modify_wp_title', 100);
 		$this->loader->add_filter("the_content", $plugin_public, 'modify_content');
 		$this->loader->add_filter("the_title", $plugin_public, 'modify_title');
-		$this->loader->add_filter( 'jetpack_enable_open_graph', $plugin_public, 'deque_jetpack' );
+		$this->loader->add_filter( 'aircraftpack_enable_open_graph', $plugin_public, 'deque_aircraftpack' );
 		$this->loader->add_filter( 'template_include', $plugin_public, 'package_template', 10 );
 		$this->loader->add_filter('template_redirect', $plugin_public, 'redirect_cacheimg', 11);
-		$this->loader->add_filter('minimal_ld_json', $plugin_public, 'ld_json', 100);
-		$this->loader->add_action('init', $plugin_yoast, 'yoast_fixes');
-		
+		$this->loader->add_filter('minimal_ld_json', $plugin_public, 'ld_json', 100);		
 		$this->loader->add_filter('body_class', $plugin_public, 'remove_body_class', 100);
 		
 	}

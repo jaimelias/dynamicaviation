@@ -72,11 +72,11 @@ msgstr ""
 msgid "All Items"
 msgstr "Todos los elementos"
 
-#: public/partials/jet_search.php:50 public/partials/jet_search.php:62
+#: public/partials/aircraft_search.php:50 public/partials/aircraft_search.php:62
 msgid "at"
 msgstr "a las"
 
-#: public/partials/dynamicaviation-jet-single.php:13
+#: public/partials/dynamicaviation-aircraft-single.php:13
 msgid "Base Airport"
 msgstr "Aeropuerto base"
 
@@ -98,7 +98,7 @@ msgstr ""
 msgid "Base Latitude"
 msgstr "Latitud base"
 
-#: public/partials/dynamicaviation-jet-single.php:14
+#: public/partials/dynamicaviation-aircraft-single.php:14
 msgid "Base Location"
 msgstr "Ubicación base"
 
@@ -115,7 +115,7 @@ msgstr "Longitud base"
 msgid "Base Name"
 msgstr "Nombre de base"
 
-#: public/partials/jet_search.php:14
+#: public/partials/aircraft_search.php:14
 msgid "Call us at our 24/7 phone number"
 msgstr "Llámanos a nuestro teléfono 24 horas"
 
@@ -136,11 +136,11 @@ msgstr "Ciudad"
 
 #: public/class-dynamicaviation-public.php:1185
 #: includes/class-dynamicaviation-meta-box.php:58
-#: public/partials/jet_search.php:127
+#: public/partials/aircraft_search.php:127
 msgid "Commercial Flight"
 msgstr "Vuelo comercial"
 
-#: public/partials/jet_search.php:258
+#: public/partials/aircraft_search.php:258
 #: public/partials/dynamicaviation-public-display.php:58
 msgid "Country"
 msgstr "País"
@@ -150,7 +150,7 @@ msgstr "País"
 msgid "country / city / airport"
 msgstr "país, ciudad, aeropuerto"
 
-#: public/partials/dynamicaviation-jet-single.php:10
+#: public/partials/dynamicaviation-aircraft-single.php:10
 msgid "Cruise Speed"
 msgstr "Velocidad crucero"
 
@@ -170,7 +170,7 @@ msgstr "Fecha de regreso"
 msgid "days prior departure"
 msgstr "días antes de la partida"
 
-#: public/partials/jet_search.php:66
+#: public/partials/aircraft_search.php:66
 msgid "Departure"
 msgstr "Partida"
 
@@ -213,7 +213,7 @@ msgstr "Descuento del deposito"
 msgid "Discount from total price"
 msgstr "Precio total con descuento"
 
-#: public/partials/jet_search.php:207
+#: public/partials/aircraft_search.php:207
 msgid "Duration"
 msgstr "Duración"
 
@@ -223,7 +223,7 @@ msgid "Edit Item"
 msgstr ""
 
 #: includes/class-dynamicaviation-meta-box.php:203
-#: public/partials/jet_search.php:244
+#: public/partials/aircraft_search.php:244
 msgid "Email"
 msgstr "Email"
 
@@ -240,14 +240,14 @@ msgstr ""
 msgid "Feel free to contact us using Whatsapp"
 msgstr "Escribe a nuestro Whatsapp"
 
-#: public/class-dynamicaviation-public.php:1224 public/partials/jet_search.php:145
-#: public/partials/jet_search.php:162
+#: public/class-dynamicaviation-public.php:1224 public/partials/aircraft_search.php:145
+#: public/partials/aircraft_search.php:162
 msgid "Fees per pers."
 msgstr "Cargos por pers."
 
 #: public/class-dynamicaviation-public.php:1189
 #: includes/class-dynamicaviation-meta-box.php:59
-#: public/partials/jet_search.php:131
+#: public/partials/aircraft_search.php:131
 msgid "Ferry"
 msgstr "Ferry"
 
@@ -271,7 +271,7 @@ msgstr "Vuelo"
 
 #: public/class-dynamicaviation-public.php:1265
 #: includes/class-dynamicaviation-meta-box.php:14
-#: public/partials/jet_search.php:204
+#: public/partials/aircraft_search.php:204
 msgid "Flights"
 msgstr "Vuelos"
 
@@ -283,7 +283,7 @@ msgstr "Vuelos a"
 msgid "from"
 msgstr "desde"
 
-#: public/partials/dynamicaviation-jet-single.php:49
+#: public/partials/dynamicaviation-aircraft-single.php:49
 msgid "ft"
 msgstr "ft"
 
@@ -297,7 +297,7 @@ msgstr "Configuración general"
 
 #: public/class-dynamicaviation-public.php:1193
 #: includes/class-dynamicaviation-meta-box.php:60
-#: public/partials/jet_search.php:135
+#: public/partials/aircraft_search.php:135
 msgid "Ground Transport"
 msgstr "Transporte Terrestre"
 
@@ -327,14 +327,14 @@ msgid "http://jaimelias.com"
 msgstr ""
 
 #. URI of the plugin
-msgid "http://www.panamajethub.com"
+msgid "http://www.panamaaircrafthub.com"
 msgstr ""
 
 #: includes/class-dynamicaviation-post-type.php:31
 msgid "Insert into item"
 msgstr ""
 
-#: public/partials/dynamicaviation-jet-single.php:81
+#: public/partials/dynamicaviation-aircraft-single.php:81
 #, fuzzy
 msgid "Instant Quotes"
 msgstr "Cotizaciones instantaneas"
@@ -375,22 +375,22 @@ msgstr "Vuelos privados"
 
 #: includes/class-dynamicaviation-post-type.php:66
 #: includes/class-dynamicaviation-post-type.php:67
-msgid "Jets"
-msgstr "Jets"
+msgid "Aircrafts"
+msgstr "Aircrafts"
 
-#: public/class-dynamicaviation-public.php:1174 public/partials/jet_search.php:114
+#: public/class-dynamicaviation-public.php:1174 public/partials/aircraft_search.php:114
 msgid "kg"
 msgstr "kg"
 
-#: public/partials/dynamicaviation-jet-single.php:41
+#: public/partials/dynamicaviation-aircraft-single.php:41
 msgid "km"
 msgstr "km"
 
-#: public/partials/dynamicaviation-jet-single.php:45
+#: public/partials/dynamicaviation-aircraft-single.php:45
 msgid "kn"
 msgstr "kn"
 
-#: public/partials/dynamicaviation-jet-single.php:45
+#: public/partials/dynamicaviation-aircraft-single.php:45
 msgid "kph"
 msgstr "kph"
 
@@ -402,7 +402,7 @@ msgstr "Descuento de último minuto"
 msgid "Last Minute Extends to"
 msgstr ""
 
-#: public/partials/jet_search.php:236
+#: public/partials/aircraft_search.php:236
 msgid "Last Name"
 msgstr "Apellido"
 
@@ -427,12 +427,12 @@ msgstr "Ubicación"
 msgid "Longitude"
 msgstr "Longitud"
 
-#: public/partials/dynamicaviation-jet-single.php:49
+#: public/partials/dynamicaviation-aircraft-single.php:49
 msgid "m"
 msgstr "m"
 
 #: includes/class-dynamicaviation-meta-box.php:148
-#: public/partials/dynamicaviation-jet-single.php:5
+#: public/partials/dynamicaviation-aircraft-single.php:5
 msgid "Manufacturer"
 msgstr "Fabricante"
 
@@ -452,7 +452,7 @@ msgstr ""
 msgid "Mapbox Token"
 msgstr "Token de Mapbox"
 
-#: public/partials/dynamicaviation-jet-single.php:11
+#: public/partials/dynamicaviation-aircraft-single.php:11
 msgid "Max Altitude"
 msgstr "Altitud máxima"
 
@@ -460,7 +460,7 @@ msgstr "Altitud máxima"
 msgid "Max. Altitude (feet)"
 msgstr "Altitud Máxima"
 
-#: public/partials/dynamicaviation-jet-single.php:41
+#: public/partials/dynamicaviation-aircraft-single.php:41
 msgid "mi"
 msgstr "mi"
 
@@ -469,15 +469,15 @@ msgid "Mid-size Jet"
 msgstr "Jet medio"
 
 #: includes/class-dynamicaviation-meta-box.php:151
-#: public/partials/dynamicaviation-jet-single.php:6
+#: public/partials/dynamicaviation-aircraft-single.php:6
 msgid "Model"
 msgstr "Modelo"
 
-#: public/partials/dynamicaviation-jet-single.php:45
+#: public/partials/dynamicaviation-aircraft-single.php:45
 msgid "mph"
 msgstr "mph"
 
-#: public/partials/jet_search.php:230
+#: public/partials/aircraft_search.php:230
 msgid "Name"
 msgstr "Nombre"
 
@@ -486,11 +486,11 @@ msgstr "Nombre"
 msgid "New Item"
 msgstr "Nuevo elemento"
 
-#: public/partials/dynamicaviation-jet-single.php:41
+#: public/partials/dynamicaviation-aircraft-single.php:41
 msgid "nm"
 msgstr "mn"
 
-#: public/partials/jet_search.php:266
+#: public/partials/aircraft_search.php:266
 msgid "No"
 msgstr ""
 
@@ -512,11 +512,11 @@ msgstr ""
 msgid "Number of Flights"
 msgstr "Número de vuelos"
 
-#: public/partials/jet_search.php:48 public/partials/jet_search.php:60
+#: public/partials/aircraft_search.php:48 public/partials/aircraft_search.php:60
 msgid "on"
 msgstr "el"
 
-#: public/class-dynamicaviation-public.php:1269 public/partials/jet_search.php:36
+#: public/class-dynamicaviation-public.php:1269 public/partials/aircraft_search.php:36
 msgid "One Way"
 msgstr "Una vía"
 
@@ -540,8 +540,8 @@ msgid "Parent Item:"
 msgstr "Elementos pricipales"
 
 #: includes/class-dynamicaviation-meta-box.php:133
-#: public/partials/jet_search.php:76 public/partials/price-calculator.php:15
-#: public/partials/dynamicaviation-jet-single.php:8
+#: public/partials/aircraft_search.php:76 public/partials/price-calculator.php:15
+#: public/partials/dynamicaviation-aircraft-single.php:8
 msgid "Passengers"
 msgstr "Pasajeros"
 
@@ -554,15 +554,15 @@ msgstr "Pasajeros: %s"
 msgid "Payment"
 msgstr "Pago"
 
-#: public/class-dynamicaviation-public.php:1213 public/partials/jet_search.php:138
+#: public/class-dynamicaviation-public.php:1213 public/partials/aircraft_search.php:138
 msgid "Per Person"
 msgstr "Por persona"
 
-#: public/partials/jet_search.php:250
+#: public/partials/aircraft_search.php:250
 msgid "Phone"
 msgstr "Teléfono"
 
-#: public/class-dynamicaviation-public.php:1174 public/partials/jet_search.php:114
+#: public/class-dynamicaviation-public.php:1174 public/partials/aircraft_search.php:114
 msgid "pounds"
 msgstr "libras"
 
@@ -578,11 +578,11 @@ msgstr "Precios por vuelo"
 #: public/class-dynamicaviation-public.php:205
 #: public/class-dynamicaviation-public.php:339
 #: public/class-dynamicaviation-public.php:1177 public/partials/metatags-fly.php:47
-#: public/partials/metatags-jet.php:4
+#: public/partials/metatags-aircraft.php:4
 msgid "Private Charter Flight"
 msgstr "Vuelo charter privado"
 
-#: public/partials/jet_search.php:179
+#: public/partials/aircraft_search.php:179
 msgid "Quote"
 msgstr "Cotizar"
 
@@ -590,7 +590,7 @@ msgstr "Cotizar"
 msgid "Quote Charter Flight to"
 msgstr "Cotizar vuelo privado a"
 
-#: public/partials/dynamicaviation-jet-single.php:9
+#: public/partials/dynamicaviation-aircraft-single.php:9
 msgid "Range"
 msgstr "Rango"
 
@@ -602,7 +602,7 @@ msgstr "Rango en millas nauticas"
 msgid "Remove featured image"
 msgstr ""
 
-#: public/partials/jet_search.php:223
+#: public/partials/aircraft_search.php:223
 msgid "Request a Quote"
 msgstr "Solicitar cotización"
 
@@ -615,7 +615,7 @@ msgstr "Solicitud recibida. Nuestro equipo de ventas en contácto muy pronto."
 msgid "Request Submitted"
 msgstr "Solicitar cotización"
 
-#: public/partials/jet_search.php:71
+#: public/partials/aircraft_search.php:71
 msgid "Return"
 msgstr "Regreso"
 
@@ -624,7 +624,7 @@ msgstr "Regreso"
 msgid "Return: %s"
 msgstr "Retorno: %s"
 
-#: public/partials/jet_search.php:40
+#: public/partials/aircraft_search.php:40
 msgid "Round Trip"
 msgstr "Viaje redondo"
 
@@ -637,7 +637,7 @@ msgstr "Ida y Vuelta"
 msgid "Search Item"
 msgstr ""
 
-#: public/partials/jet_search.php:302
+#: public/partials/aircraft_search.php:302
 msgid "Send Request"
 msgstr "Enviar solicitud"
 
@@ -649,7 +649,7 @@ msgstr ""
 msgid "Show Price"
 msgstr "Mostrar precio"
 
-#: public/partials/dynamicaviation-jet-single.php:12
+#: public/partials/dynamicaviation-aircraft-single.php:12
 msgid "Takeoff Field"
 msgstr "Capacidad despegue"
 
@@ -666,7 +666,7 @@ msgstr "Teléfono"
 msgid "Thank you for contacting %s!"
 msgstr "¡Gracias por contactar a %s!"
 
-#: public/partials/jet_search.php:10
+#: public/partials/aircraft_search.php:10
 msgid ""
 "The requested quote is not available in our website yet. Please contact our "
 "sales team for an immediate answer."
@@ -703,7 +703,7 @@ msgstr "hasta"
 msgid "To speak immediately to a Charter Specialist standing by, please call"
 msgstr "Para hablar de inmediato con un especialista llame al"
 
-#: public/partials/jet_search.php:264
+#: public/partials/aircraft_search.php:264
 msgid "Traveling With Children"
 msgstr "Viajas con niños"
 
@@ -712,7 +712,7 @@ msgid "Turbo Prop"
 msgstr "Avioneta"
 
 #: includes/class-dynamicaviation-meta-box.php:121
-#: public/partials/dynamicaviation-jet-single.php:4
+#: public/partials/dynamicaviation-aircraft-single.php:4
 msgid "Type"
 msgstr "Tipo"
 
@@ -743,10 +743,10 @@ msgid "Webhook"
 msgstr ""
 
 #: includes/class-dynamicaviation-meta-box.php:154
-#: public/partials/dynamicaviation-jet-single.php:7
+#: public/partials/dynamicaviation-aircraft-single.php:7
 msgid "Year of Construction"
 msgstr "Año de construcción"
 
-#: public/partials/jet_search.php:267
+#: public/partials/aircraft_search.php:267
 msgid "Yes"
 msgstr ""
