@@ -1,0 +1,54 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+ .pull-left{
+	 float: left;
+ }
+ .sflag img
+ {
+	 border: solid 1px #999;
+	 vertical-align: bottom;
+	 margin: 0 10px 0 0;
+ }
+ .algolia-autocomplete {
+	color: #444;
+  width: 100%;
+  font-size: 85%;
+}
+.algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
+  width: 100%;
+}
+.algolia-autocomplete .aa-hint {
+  color: #444;
+}
+.algolia-autocomplete .aa-dropdown-menu {
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #444;
+  border-top: none;
+}
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
+  cursor: pointer;
+  padding: 5px 4px;
+}
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion.aa-cursor {
+  background-color: #B2D7FF;
+}
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
+  font-weight: bold;
+  font-style: normal;
+}
+.jet_rates_table_container
+{
+	width: 100%;
+	display: block;
+	overflow: hidden;
+}
+#jet_rates_table
+{
+	width: 100%;
+	position: relative;
+	height: 300px;
+	overflow: hidden;
+}

@@ -1,0 +1,165 @@
+/**
+ * All of the CSS for your public-facing functionality should be
+ * included in this file.
+ */
+ ul#quote-sidebar
+ {
+	margin: 0 !important;
+	padding: 0 !important;
+	list-style-type: none;
+ }
+ ul#quote-sidebar > li
+ {
+	margin: 0;
+	padding: 0;
+ }
+ ul#quote-sidebar > .widget-title
+ {
+	font-weight: 800;
+ }
+ .jet_price_list
+ {
+	margin: 0 0 40px 0;
+ }
+#booking_form
+{
+	padding: 20px;
+	margin: 0 0 20px 0;
+}
+.map-container
+{
+	width: 100%;
+	position: relative;
+	height: 100%;
+}
+ .map
+ {
+	position:absolute; top:0; bottom:0; width:100%;
+ }
+ .mapbox_img
+ {
+	max-width: 100%;
+	height: auto;
+ }
+ .leaflet-bottom.leaflet-left, .leaflet-bottom.leaflet-right, .leaflet-top.leaflet-left, .leaflet-top.leaflet-right
+ {
+	 z-index: 1 !important;
+ }
+ .ais-stats
+ {
+	text-align: right;
+	margin: 0 0 20px 0;
+	font-style: italic;
+	font-size: 120%;
+ }
+ .ais-hits
+ {
+	margin: 20px 0 20px 0;
+	padding: 10px;
+	border: 1px solid #262626;
+	background-color: #fff;
+	color: #262626;
+ }
+ .ais-hits--item
+ {
+	margin: 0 0 10px 0;
+	padding: 10px;
+	border: 1px solid #444;
+	background-color: #f7f7f7;	
+}
+ .ais-hits--item:after {
+	visibility: hidden;
+	display: block;
+	content: "";
+	clear: both;
+	height: 0;
+	}
+* html .ais-hits--item             { zoom: 1; } /* IE6 */
+*:first-child+html .ais-hits--item { zoom: 1; } /* IE7 */
+.sbutton
+{
+	margin: 10px 0 0 0;
+}
+.jet_return
+{
+	display: none;
+}
+ .jet_calculator
+ {
+	font-weight: normal;
+	margin: 0 !important;
+ }
+ .sflag img
+ {
+	border: solid 1px #999;
+	vertical-align: bottom;
+	margin: 0 10px 0 0;
+	background-color: #ddd;
+ }
+ .algolia-autocomplete {
+	color: #262626;
+  width: 100%;
+  font-size: 85%;
+  line-height: 1.5;
+}
+.algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
+  width: 100%;
+}
+.algolia-autocomplete .aa-hint {
+  color: #262626;
+}
+.algolia-autocomplete .aa-dropdown-menu {
+  width: 100%;
+  background-color: #f7f7f7;
+  border: 1px solid #3692b0;
+  border-top: none;
+}
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
+  cursor: pointer;
+  padding: 5px 4px;
+  font-weight: normal;
+  border-bottom: 1px solid #ccc;
+}
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion.aa-cursor {
+  background-color: #1e5162;
+  color: #ffffff;
+}
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
+  font-weight: 800;
+  font-style: normal;
+}
+.jet_selected
+{
+	border-color: #1e5162 !important;
+	background-color: #3692b0 !important;
+	color: #eee !important;
+}
+
+
+.ais-pagination
+{
+	background-color: #fff;
+	border: 1px solid rgba(0,0,0,0.5);
+	margin: 0px 0px 40px 0px !important; 
+	padding: 10px !important;
+	text-align: center;
+}
+.ais-pagination > .ais-pagination--item__active > .ais-pagination--link
+{
+	border-color: rgba(0,0,0,0.1) !important;
+	background-color: #fff;
+}
+.ais-pagination > .ais-pagination--item > .ais-pagination--link
+{
+	display: inline-block;
+	padding: 5px;
+	padding: 4px 15px;
+	border: 1px solid rgba(0,0,0,0.5);
+	text-decoration: none;
+	color: #262626;
+	background-color: #f7f7f7;
+}
+button#jet_submit
+{
+	margin-top: 20px;
+}
