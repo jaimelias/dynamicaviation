@@ -1,6 +1,6 @@
 <?php 
 
-$first_name = sanitize_text_field($_POST['lead_name']);
+$first_name = sanitize_text_field($_POST['first_name']);
 $aircraft_pax = sanitize_text_field($_POST['aircraft_pax']);
 $hello = sprintf(__('Hello %s,', 'dynamicaviation'), $first_name);
 $passengers = sprintf(__('Passengers: %s', 'dynamicaviation'), $aircraft_pax);

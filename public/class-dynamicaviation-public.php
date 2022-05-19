@@ -82,13 +82,13 @@ class Dynamic_Aviation_Public {
 						}
 					}
 					
-					$subject = sprintf(__('%s, Your request was Sent to our Charter Experts!', 'dynamicaviation'), $data['lead_name']);
+					$subject = sprintf(__('%s, Your request was Sent to our Charter Experts!', 'dynamicaviation'), $data['first_name']);
 
 					require_once('email_template.php');
 					
 					$args = array(
 						'subject' => $subject,
-						'to' => sanitize_email($_POST['lead_email']),
+						'to' => sanitize_email($_POST['email']),
 						'message' => $email_template
 					);
 					
@@ -451,7 +451,7 @@ class Dynamic_Aviation_Public {
 			if(Dynamic_Aviation_Validators::validate_hash())
 			{
 				ob_start();
-				require_once(plugin_dir_path( __FILE__ ).'partials/aircraft_search.php');
+				require_once(plugin_dir_path( __FILE__ ).'partials/aircraft-search.php');
 				$output = ob_get_contents();
 				ob_end_clean();
 				return $output;				

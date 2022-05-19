@@ -40,41 +40,40 @@ if ($wp_aircraft_search->have_posts())
 		$legs = __('Round Trip', 'dynamicaviation');
 	}
 
+	
 	$aircraft_departure_date = strtotime(sanitize_text_field($_GET['aircraft_departure_date']));
 	$depdate_format = date_i18n(get_option( 'date_format' ), $aircraft_departure_date);	
-	$departure_flight = esc_html(sanitize_text_field($_GET['aircraft_origin']));
-	$departure_flight .= '-';
-	$departure_flight .= esc_html(sanitize_text_field($_GET['aircraft_destination']));
-	$departure_flight .= ' '.esc_html(__('on', 'dynamicaviation')).' ';
-	$departure_flight .= esc_html($depdate_format);
-	$departure_flight .= ' '.esc_html(__('at', 'dynamicaviation')).' ';
-	$departure_flight .= esc_html(sanitize_text_field($_GET['aircraft_departure_hour']));
+	$departure_flight = sanitize_text_field($_GET['aircraft_origin_l']);
+	$departure_flight .= ' &rsaquo;&rsaquo;&rsaquo; ';
+	$departure_flight .= sanitize_text_field($_GET['aircraft_destination_l']);
+	$departure_flight .= ' '.__('on', 'dynamicaviation').' ';
+	$departure_flight .= $depdate_format;
+	$departure_flight .= ' '.__('at', 'dynamicaviation').' ';
+	$departure_flight .= sanitize_text_field($_GET['aircraft_departure_hour']);
 	$return_flight = null;
 	
 	if(intval($_GET['aircraft_flight']) == 1)
 	{
 		$retdate_format = date_i18n(get_option( 'date_format' ), strtotime(sanitize_text_field($_GET['aircraft_return_date'])));
-		$return_flight = esc_html(sanitize_text_field($_GET['aircraft_destination']));
-		$return_flight .= '-';
-		$return_flight .= esc_html(sanitize_text_field($_GET['aircraft_origin']));
+		$return_flight = esc_html(sanitize_text_field($_GET['aircraft_destination_l']));
+		$return_flight .= ' &rsaquo;&rsaquo;&rsaquo; ';
+		$return_flight .= esc_html(sanitize_text_field($_GET['aircraft_origin_l']));
 		$return_flight .= ' '.esc_html(__('on', 'dynamicaviation')).' ';
 		$return_flight .= esc_html($retdate_format);
 		$return_flight .= ' '.esc_html(__('at', 'dynamicaviation')).' ';
 		$return_flight .= esc_html(sanitize_text_field($_GET['aircraft_return_hour']));		
 	}
 	
-	$request = '<h3>'.esc_html(__('Departure', 'dynamicaviation')).': <span class="linkcolor">';
-	$request .= $departure_flight;
+	$request = '<p class="large"><strong>'.esc_html(__('Passengers', 'dynamicaviation')).':</strong> <span class="linkcolor">'.esc_html(sanitize_text_field($_GET['aircraft_pax'])).'</span></p>';
+
+	$request .= '<p class="large"><strong>'.esc_html(__('Departure', 'dynamicaviation')).':</strong> <span class="linkcolor">'.$departure_flight.'</span></p>';
 	
 	if(intval($_GET['aircraft_flight']) == 1) 
 	{
-		$request .= '</span></h3><h3>'.esc_html(__('Return', 'dynamicaviation')).': <span class="linkcolor"> '.$return_flight;
+		$request .= '<p class="large"><strong>'.esc_html(__('Return', 'dynamicaviation')).':</strong> <span class="linkcolor"> '.$return_flight.'</span></p>';
 	}
 	
-	$request .= '</span>';	
-	$request .= '</h3>';
-	$request .= '<h3>'.esc_html(__('Passengers', 'dynamicaviation')).': <span class="linkcolor">'.esc_html(sanitize_text_field($_GET['aircraft_pax'])).'</span></h3>';
-	$table = null;
+	$table = '';
 	
 	while ($wp_aircraft_search->have_posts())
 	{
@@ -219,28 +218,28 @@ if ($wp_aircraft_search->have_posts())
 					<div class="pure-g gutters">
 						<div class="pure-u-1 pure-u-md-1-2">
 							<div class="bottom-20">
-								<label for="lead_name"><?php esc_html_e(__('Name', 'dynamicaviation')); ?></label>
-								<input type="text" name="lead_name" />								
+								<label for="first_name"><?php esc_html_e(__('Name', 'dynamicaviation')); ?></label>
+								<input type="text" name="first_name" />								
 							</div>
 						</div>
 						<div class="pure-u-1 pure-u-md-1-2">
 							<div class="bottom-20">
-								<label for="lead_lastname"><?php esc_html_e(__('Last Name', 'dynamicaviation')); ?></label>
-								<input type="text" name="lead_lastname" />			
+								<label for="lastname"><?php esc_html_e(__('Last Name', 'dynamicaviation')); ?></label>
+								<input type="text" name="lastname" />			
 							</div>
 						</div>
 					</div>
 					<div class="pure-g gutters">
 						<div class="pure-u-1 pure-u-md-1-2">
 							<div class="bottom-20">
-								<label for="lead_email"><?php esc_html_e(__('Email', 'dynamicaviation')); ?></label>
-								<input type="email" name="lead_email" />								
+								<label for="email"><?php esc_html_e(__('Email', 'dynamicaviation')); ?></label>
+								<input type="email" name="email" />								
 							</div>
 						</div>
 						<div class="pure-u-1 pure-u-md-1-2">
 							<div class="bottom-20">
-								<label for="lead_phone"><?php esc_html_e(__('Phone', 'dynamicaviation')); ?></label>
-								<input type="text" name="lead_phone" />								
+								<label for="phone"><?php esc_html_e(__('Phone', 'dynamicaviation')); ?></label>
+								<input type="text" name="phone" />								
 							</div>
 						</div>
 					</div>
@@ -248,17 +247,11 @@ if ($wp_aircraft_search->have_posts())
 						<div class="pure-u-1 pure-u-md-1-2">
 							<div class="bottom-20">
 								<label for="country"><?php esc_html_e(__('Country', 'dynamicaviation')); ?></label>
-								<select name="lead_country" class="countrylist"><option>--</option></select>								
+								<select name="country" class="countrylist"><option>--</option></select>								
 							</div>
 						</div>
 						<div class="pure-u-1 pure-u-md-1-2">
-							<div class="bottom-20">
-								<label for="lead_children"><?php esc_html_e(__('Traveling With Children', 'dynamicaviation')); ?>?</label>
-								<select name="lead_children">
-									<option value="no"><?php esc_html_e(__('No', 'dynamicaviation')); ?></option>
-									<option value="yes"><?php esc_html_e(__('Yes', 'dynamicaviation')); ?></option>
-								</select>								
-							</div>
+							<! -- empty col -->
 						</div>
 					</div>				
 								

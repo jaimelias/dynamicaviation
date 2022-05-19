@@ -192,7 +192,7 @@ const validate_instant_quote = () =>
 		jQuery('#aircraft_booking_container').removeClass('hidden');
 		jQuery('.instant_quote_table').addClass('hidden');			
 		jQuery('#aircraft_booking_request').attr({'data-form-ready': 'true'});
-		jQuery('#aircraft_booking_request').find('input[name="lead_name"]').focus();
+		jQuery('#aircraft_booking_request').find('input[name="first_name"]').focus();
 	});
 	
 	jQuery('#aircraft_booking_container').find('.close').click(function(){
