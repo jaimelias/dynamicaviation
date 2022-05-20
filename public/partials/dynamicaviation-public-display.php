@@ -39,7 +39,7 @@ if($lang)
 <div class="pure-g gutters">
 
 	<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3">
-	<img class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php esc_html_e($airport).", ".esc_html($city); ?>" title="<?php esc_html_e($airport); ?>"/>
+	<img class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php esc_html_e($airport).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
 	
 	</div>
 	<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">

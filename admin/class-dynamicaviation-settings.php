@@ -9,8 +9,46 @@ class Dynamic_Aviation_Settings
 	public function init()
 	{
 		add_action('admin_menu', array(&$this, 'add_settings_page'));
-		add_action('admin_init', array(&$this, 'settings_init'));			
+		add_action('admin_init', array(&$this, 'settings_init'));
 	}
+	public function get_languages()
+	{
+		global $polylang;
+		$language_list = array();
+
+		if(isset($polylang))
+		{
+			$languages = PLL()->model->get_languages_list();
+
+			for($x = 0; $x < count($languages); $x++)
+			{
+				foreach($languages[$x] as $key => $value)
+				{
+					if($key == 'slug')
+					{
+						array_push($language_list, $value);
+					}
+				}	
+			}
+		}
+
+		if(count($language_list) === 0)
+		{
+			$locale_str = get_locale();
+
+			if(strlen($locale_str) === 5)
+			{
+				array_push($language_list, substr($locale_str, 0, -3));
+			}
+			else if(strlen($locale_str) === 2)
+			{
+				array_push($language_list, $locale_str);
+			}
+		}
+
+		return $language_list;
+	}
+
 	public function add_settings_page()
 	{
 		add_submenu_page('edit.php?post_type=aircrafts', 'Dynamic Aviation - Settings', 'Settings', 'manage_options', 'dynamicaviation', array(&$this, 'settings_page'));
@@ -31,8 +69,15 @@ class Dynamic_Aviation_Settings
 		<?php
 	}
 	
-	public function settings_init(  ) { 
+	public function settings_init()
+	{ 
+		$languages = $this->get_languages();
 
+		register_setting( 'aircraft_settings', 'dy_email', 'sanitize_email');
+		register_setting( 'aircraft_settings', 'dy_whatsapp', 'intval');
+		register_setting( 'aircraft_settings', 'dy_phone', 'intval');
+		register_setting( 'aircraft_settings', 'dy_address', 'sanitize_text_field');
+		register_setting( 'aircraft_settings', 'dy_address', 'sanitize_text_field');
 		register_setting( 'aircraft_settings', 'mapbox_token', 'sanitize_text_field');
 		register_setting( 'aircraft_settings', 'mapbox_map_id', 'sanitize_text_field');
 		register_setting( 'aircraft_settings', 'mapbox_map_zoom', 'intval');
@@ -49,6 +94,67 @@ class Dynamic_Aviation_Settings
 			'', 
 			'aircraft_settings'
 		);
+
+		add_settings_field( 
+			'dy_email', 
+			esc_html(__( 'Company Email', 'dynamicaviation' )), 
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
+			array('name' => 'dy_email', 'type' => 'text')
+		);
+
+		add_settings_field( 
+			'dy_whatsapp', 
+			esc_html(__( 'Company Whatsapp', 'dynamicaviation' )), 
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
+			array('name' => 'dy_whatsapp', 'type' => 'text')
+		);
+
+		add_settings_field( 
+			'dy_phone', 
+			esc_html(__( 'Company Phone', 'dynamicaviation' )), 
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
+			array('name' => 'dy_phone', 'type' => 'text')
+		);
+
+		add_settings_field( 
+			'dy_address', 
+			esc_html(__( 'Company Address', 'dynamicaviation' )), 
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
+			array('name' => 'dy_address', 'type' => 'text')
+		);
+
+		add_settings_field( 
+			'dy_tax_id', 
+			esc_html(__( 'Company Tax ID', 'dynamicaviation' )), 
+			array(&$this, 'input_text'), 
+			'aircraft_settings', 
+			'aircraft_settings_section',
+			array('name' => 'dy_tax_id', 'type' => 'text')
+		);
+
+		for($x = 0; $x < count($languages); $x++)
+		{
+			$estimate_note_name = 'dy_aviation_estimate_note_'.$languages[$x];
+			register_setting( 'aircraft_settings', $estimate_note_name, 'sanitize_textarea_field');
+
+			add_settings_field( 
+				$estimate_note_name, 
+				esc_html(sprintf(__( 'Estimate Notes in %s language', 'dynamicaviation' ), strtoupper($languages[$x]))), 
+				array(&$this, 'textarea'), 
+				'aircraft_settings', 
+				'aircraft_settings_section',
+				array('name' => $estimate_note_name, 'rows' => 4, 'cols' => 50)
+			);
+
+		}
 
 		add_settings_field( 
 			'mapbox_token', 
@@ -151,6 +257,12 @@ class Dynamic_Aviation_Settings
 			'aircraft_settings_section',
 			array('name' => 'aircraft_webhook', 'type' => 'text')
 		);
+
+
+		
+		
+
+
 	}
 	
 	public function input_text($arr){
@@ -158,9 +270,20 @@ class Dynamic_Aviation_Settings
 			$url = (array_key_exists('url', $arr)) ? '<a href="'.esc_url($arr['url']).'">?</a>' : null;
 			$type = (array_key_exists('type', $arr)) ? $arr['type'] : 'text';
 		?>
-		<input type="<?php echo $type; ?>" name="<?php esc_html_e($name); ?>" id="<?php echo $name; ?>" value="<?php esc_html_e(get_option($name)); ?>" /> <span><?php echo $url; ?></span>
+		<input type="<?php echo $type; ?>" name="<?php esc_attr_e($name); ?>" id="<?php echo $name; ?>" value="<?php esc_attr_e(get_option($name)); ?>" /> <span><?php echo $url; ?></span>
 
 		<?php 
+	}
+
+	public function textarea($arr)
+	{
+		$name = $arr['name'];
+		$rows = $arr['rows'];
+		$cols = $arr['cols'];
+
+		?>
+			<textarea cols="<?php esc_attr_e($cols); ?>" rows="<?php esc_attr_e($rows); ?>" name="<?php esc_attr_e($name); ?>"><?php echo esc_textarea(get_option($name)); ?></textarea>
+		<?php
 	}
 
 	public function select($args) {

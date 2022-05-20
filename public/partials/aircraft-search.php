@@ -116,6 +116,7 @@ if ($wp_aircraft_search->have_posts())
 				$flight_array['aircraft_id'] = intval(esc_html($post->ID));
 				$flight_array['aircraft_seats'] = intval(esc_html($seats));
 				$flight_array['aircraft_weight'] = esc_html($weight_allowed);
+				$flight_array['aircraft_url'] = esc_url($aircraft_url);
 				
 				$flight_desc = '';
 				

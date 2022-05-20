@@ -123,7 +123,8 @@ class Dynamic_Aviation_Admin {
 		add_rewrite_rule('^instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[1]','top');
 		add_rewrite_rule('^request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[1]','top');
 
-		global $polylang;		
+		global $polylang;
+		
 		if(isset($polylang))
 		{
 			$languages = PLL()->model->get_languages_list();

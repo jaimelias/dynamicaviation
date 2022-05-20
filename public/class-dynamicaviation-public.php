@@ -56,7 +56,42 @@ class Dynamic_Aviation_Public {
 		add_shortcode( 'destination', array('Dynamic_Aviation_Public', 'filter_destination_table') );
 		add_action( 'parse_query', array( &$this, 'on_quote_submit' ), 1);
 		add_filter('minimal_sitemap', array(&$this, 'sitemap'), 10);
+		add_filter('dy_aviation_estimate_notes', array(&$this, 'estimate_notes'));
 	}
+
+
+	public function current_language()
+	{
+		global $polylang;
+		$lang = '';
+
+		if(isset($polylang))
+		{
+			$lang = pll_current_language();
+		}
+		else
+		{
+			$locale_str = get_locale();
+
+			if(strlen($locale_str) === 5)
+			{
+				$lang = substr($locale_str, 0, -3);
+			}
+			if(strlen($locale_str) === 2)
+			{
+				$lang = $locale_str;
+			}			
+		}
+
+		return $lang;
+	}
+
+	public function estimate_notes()
+	{
+		$current_language = $this->current_language();
+		return get_option('dy_aviation_estimate_note_'.$current_language);
+	}
+
 	
 	public static function on_quote_submit()
 	{
@@ -92,6 +127,10 @@ class Dynamic_Aviation_Public {
 						'message' => $email_template
 					);
 					
+
+					echo $email_template;
+					exit();
+
 					sg_mail($args);
 
 					self::webhook(json_encode($data));
@@ -814,7 +853,7 @@ class Dynamic_Aviation_Public {
 			wp_add_inline_script('mapbox', self::get_inline_js('dynamicaviation-mapbox'), 'after');
 			wp_enqueue_script('sha512', plugin_dir_url( __FILE__ ) . 'js/sha512.js', array(), 'async_defer', true );
 			self::datepickerJS();			
-			wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, '', true );
+			wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, time(), true );
 		}
 		
 		if(Dynamic_Aviation_Validators::valid_aircraft_search())
@@ -840,7 +879,7 @@ class Dynamic_Aviation_Public {
 				array_push($dep, 'invisible-recaptcha');
 			}
 			
-			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, $this->version, true );
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, time(), true );
 			wp_add_inline_script($this->plugin_name, self::json_src_url(), 'before');
 		}
 	}
@@ -1041,7 +1080,7 @@ class Dynamic_Aviation_Public {
 		$iata_list = array();
 		
 		//aircrafts
-		$args22 = array(
+		$query_args = array(
 			'post_type' => 'aircrafts',
 			'posts_per_page' => 200, 
 			'post_parent' => 0, 
@@ -1052,20 +1091,20 @@ class Dynamic_Aviation_Public {
 		
 		if(is_singular('aircrafts'))
 		{
-			$args22['p'] = get_the_ID();
+			$query_args['p'] = get_the_ID();
 		}
 		
-		$wp_query22 = new WP_Query( $args22 );
+		$wp_query = new WP_Query( $query_args );
 		
 		//aircraft
-		if ( $wp_query22->have_posts() )
+		if ( $wp_query->have_posts() )
 		{
 			
 			$algolia_full = self::algolia_full();
 			
-			while ( $wp_query22->have_posts() )
+			while ( $wp_query->have_posts() )
 			{
-				$wp_query22->the_post();
+				$wp_query->the_post();
 				global $post;
 				$base_iata = aviation_field( 'aircraft_base_iata' );
 				$table_price = aviation_field( 'aircraft_rates' );
