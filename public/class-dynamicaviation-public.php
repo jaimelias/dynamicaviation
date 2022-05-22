@@ -22,41 +22,38 @@
  */
 class Dynamic_Aviation_Public {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
-	private $plugin_name;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
+	private $plugin_name;
 	private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of the plugin.
-	 * @param      string    $version    The version of this plugin.
-	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( $plugin_name, $version, $utilities ) {
 
+		global $wp_version;
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-		add_shortcode( 'mapbox_airports', array('Dynamic_Aviation_Public', 'mapbox_airports') );
-		add_shortcode( 'aircraftlist', array('Dynamic_Aviation_Public', 'aircraftlist') );
-		add_shortcode( 'destination', array('Dynamic_Aviation_Public', 'filter_destination_table') );
+		$this->utilities =  $utilities;
+
 		add_action( 'parse_query', array( &$this, 'on_quote_submit' ), 1);
 		add_filter('minimal_sitemap', array(&$this, 'sitemap'), 10);
 		add_filter('dy_aviation_estimate_notes', array(&$this, 'estimate_notes'));
+		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
+		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
+		add_filter('wp_head', array(&$this, 'meta_tags'));
+		add_action('pre_get_posts', array(&$this, 'main_wp_query'), 100);		
+		
+		if($wp_version >= 4.4)
+		{
+			add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);
+		}
+
+		add_filter('wp_title', array(&$this, 'modify_wp_title'), 100);
+		add_filter('the_content', array(&$this, 'modify_content'));
+		add_filter('the_title', array(&$this, 'modify_title'));
+		add_filter('aircraftpack_enable_open_graph', array(&$this, 'dequeue_canonical'));
+		add_filter('template_include', array(&$this, 'package_template'), 10 );
+		add_filter('template_redirect', array(&$this, 'redirect_cacheimg'), 11);
+		add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);		
+		add_filter('body_class', array(&$this, 'remove_body_class'), 100);
 	}
 
 
@@ -140,7 +137,7 @@ class Dynamic_Aviation_Public {
 		}
 	}	
 	
-	public static function deque_aircraftpack()
+	public function dequeue_canonical()
 	{
 		if(get_query_var('fly'))
 		{	
@@ -148,7 +145,7 @@ class Dynamic_Aviation_Public {
 			return false;
 		}
 	}
-	public static function ld_json($arr)
+	public function ld_json($arr)
 	{
 		if(get_query_var('fly'))
 		{
@@ -314,35 +311,7 @@ class Dynamic_Aviation_Public {
 		
 		return $content;
 	}
-	public static function algoliasearch_after()
-	{
-		$output = null;
-		if(get_option('algolia_token') && get_option('algolia_index') && get_option('algolia_id'))
-		{
-			$output .= 'const algoliaClient = algoliasearch(getAlgoliaId, getAlgoliaToken);';
-			$output .= 'const algoliaIndex = algoliaClient.initIndex(getAlgoliaIndex);';
-		}
-		return $output;
-	}
-	public static function algoliasearch_before()
-	{
-		$output = null;
-		$algolia_token = get_option('algolia_token');
-		$algolia_index = get_option('algolia_index');
-		$algolia_id = get_option('algolia_id');
-		
-		if($algolia_token && $algolia_index && $algolia_id)
-		{
-			$output .= 'const getAlgoliaToken = "'.esc_html($algolia_token).'";';	
-			$output .= 'const getAlgoliaIndex = "'.esc_html($algolia_index).'";';
-			$output .= 'const getAlgoliaId = "'.esc_html($algolia_id).'";';
-		}
-		return $output;
-	}
-	public static function json_src_url()
-	{
-		return 'const jsonsrc = () => { return "'.esc_url(plugin_dir_url( __FILE__ )).'";}';
-	}
+
 
 	public static function aircraft_calculator()
 	{
@@ -352,7 +321,7 @@ class Dynamic_Aviation_Public {
 			ob_end_clean();
 			return $output;
 	}
-	public static function modify_wp_title($title)
+	public function modify_wp_title($title)
 	{	 
 		if(get_query_var( 'fly' ))
 		{
@@ -408,7 +377,7 @@ class Dynamic_Aviation_Public {
 		}
 		return $title;
 	}
-	public static function modify_title($title)
+	public function modify_title($title)
 	{	
 			if(in_the_loop() && is_singular('aircrafts'))
 			{
@@ -450,7 +419,7 @@ class Dynamic_Aviation_Public {
 			}
 		return $title;
 	}
-	public static function modify_content($content)
+	public function modify_content($content)
 	{	if(in_the_loop() && get_query_var( 'fly' ))
 		{
 			global $airport_array;
@@ -512,7 +481,7 @@ class Dynamic_Aviation_Public {
 	}
 
 
-	public static function mapbox_vars()
+	public function mapbox_vars()
 	{
 		$mapbox_vars = array(
 			'mapbox_token' => esc_html(get_option('mapbox_token')),
@@ -525,7 +494,7 @@ class Dynamic_Aviation_Public {
 
 		return 'function mapbox_vars(){return '.json_encode($mapbox_vars).';}';
 	}
-	public static function meta_tags()
+	public function meta_tags()
 	{	if(get_query_var( 'fly' ))
 		{
 			global $airport_array;
@@ -560,7 +529,7 @@ class Dynamic_Aviation_Public {
 			echo $output;			
 		}
 	}	
-	public static function main_wp_query($query)
+	public function main_wp_query($query)
 	{
 		if(get_query_var( 'fly' ) && $query->is_main_query())
 		{
@@ -609,7 +578,7 @@ class Dynamic_Aviation_Public {
 		return 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/600x400?access_token='.esc_html($mapbox_token);				
 	}
 	
-	public static function redirect_cacheimg()
+	public function redirect_cacheimg()
 	{
 		if(get_query_var( 'cacheimg' ) && !in_the_loop())
 		{
@@ -785,54 +754,20 @@ class Dynamic_Aviation_Public {
 		
 	}
 	
-	
-
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Dynamic_Aviation_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Dynamic_Aviation_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-		
-		self::css();
-		self::datepickerCSS();
-		self::mapboxCSS();
+		$this->css();
+		$this->datepickerCSS();
+		$this->mapboxCSS();
+
 	}
 
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Dynamic_Aviation_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Dynamic_Aviation_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		global $post;
-		self::cf7_dequeue_recaptcha();
+
 		$dep = array('jquery', 'landing-cookies');
+
 		wp_enqueue_script( 'landing-cookies', plugin_dir_url( __FILE__ ).'js/cookies.js', array('jquery'), $this->version, true );		
 		
 		if(((is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'mapbox_airports')) || is_singular('aircrafts')) && !isset($_GET['fl_builder']))
@@ -840,17 +775,17 @@ class Dynamic_Aviation_Public {
 			array_push($dep, 'algolia', 'mapbox', 'markercluster', 'sha512', 'picker-date-js', 'picker-time-js');
 			
 			wp_enqueue_script('algolia', plugin_dir_url( __FILE__ ).'js/algoliasearch.min.js', array( 'jquery' ), '3.32.0', true );
-			wp_add_inline_script('algolia', self::json_src_url(), 'before');
-			wp_add_inline_script('algolia', self::algoliasearch_before(), 'before');
-			wp_add_inline_script('algolia', self::algoliasearch_after(), 'after');
+			wp_add_inline_script('algolia', $this->utilities->json_src_url(), 'before');
+			wp_add_inline_script('algolia', $this->utilities->algoliasearch_before(), 'before');
+			wp_add_inline_script('algolia', $this->utilities->algoliasearch_after(), 'after');
 			wp_enqueue_script('algolia_autocomplete', plugin_dir_url( __FILE__ ).'js/autocomplete.jquery.min.js', array( 'jquery' ), '0.36.0', true );
 			
 			wp_enqueue_script( 'mapbox', 'https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js', array( 'jquery', 'algolia'), '3.3.1', true );
 			
 			wp_enqueue_script( 'markercluster', 'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js', array( 'jquery', 'mapbox' ), $this->version, true );		
-			wp_add_inline_script('mapbox', self::get_inline_js('dynamicaviation-arc'), 'after');
-			wp_add_inline_script('mapbox', self::mapbox_vars(), 'after');
-			wp_add_inline_script('mapbox', self::get_inline_js('dynamicaviation-mapbox'), 'after');
+			wp_add_inline_script('mapbox', $this->get_inline_js('dynamicaviation-arc'), 'after');
+			wp_add_inline_script('mapbox', $this->mapbox_vars(), 'after');
+			wp_add_inline_script('mapbox', $this->get_inline_js('dynamicaviation-mapbox'), 'after');
 			wp_enqueue_script('sha512', plugin_dir_url( __FILE__ ) . 'js/sha512.js', array(), 'async_defer', true );
 			self::datepickerJS();			
 			wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, time(), true );
@@ -879,32 +814,13 @@ class Dynamic_Aviation_Public {
 				array_push($dep, 'invisible-recaptcha');
 			}
 			
-			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, time(), true );
-			wp_add_inline_script($this->plugin_name, self::json_src_url(), 'before');
+			wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, time(), true );
+			wp_add_inline_script($this->plugin_name, $this->utilities->json_src_url(), 'before');
 		}
 	}
 	
-	public static function cf7_dequeue_recaptcha()
-	{
-		$dequeu = true;
-		
-		if(is_singular())
-		{
-			global $post;
-			
-			if(has_shortcode($post->post_content, 'contact-form-7'))
-			{
-				$dequeu = false;
-			}
-		}
-		
-		if($dequeu === true)
-		{
-			wp_dequeue_script('google-recaptcha-js');
-		}
-	}	
-	
-	public static function css()
+
+	public function css()
 	{
 		global $post;
 
@@ -913,39 +829,39 @@ class Dynamic_Aviation_Public {
 		
 		if(get_query_var('fly'))
 		{
-			wp_add_inline_style('minimalLayout', self::get_inline_css('dynamicpackages-public'));
+			wp_add_inline_style('minimalLayout', $this->get_inline_css('dynamicpackages-public'));
 		}
-		if(is_singular('aircrafts') || (is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'mapbox_airports') || has_shortcode( $post->post_content, 'jc_calculator') || has_shortcode( $post->post_content, 'aircraftlist'))))
+		if(is_singular('aircrafts') || (is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'mapbox_airports') || has_shortcode( $post->post_content, 'jc_calculator'))))
 		{
-			wp_add_inline_style('minimalLayout', self::get_inline_css('dynamicaviation-public'));
+			wp_add_inline_style('minimalLayout', $this->get_inline_css('dynamicaviation-public'));
 		}
 	}
 	
-	public static function datepickerCSS()
+	public function datepickerCSS()
 	{
 		global $post;
 		
 		if(is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'mapbox_airports') || has_shortcode( $post->post_content, 'jc_calculator')) || is_singular('aircrafts'))
 		{
 			wp_enqueue_style( 'picker-css', plugin_dir_url( __FILE__ ) . 'css/picker/default.css', array(), 'dynamicaviation', 'all' );
-			wp_add_inline_style('picker-css', self::get_inline_css('picker/default.date'));
-			wp_add_inline_style('picker-css', self::get_inline_css('picker/default.time'));				
+			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.date'));
+			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.time'));				
 		}		
 	}
 	
-	public static function mapboxCSS()
+	public function mapboxCSS()
 	{
 		global $post;
 		
 		if(is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'mapbox_airports') && !isset($_GET['fl_builder']))
 		{
 			wp_enqueue_style('mapbox', 'https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css', array(), '3.1.1', 'all' );
-			wp_add_inline_style('mapbox', self::get_inline_css('MarkerCluster'));
-			wp_add_inline_style('mapbox', self::get_inline_css('MarkerCluster.Default'));
+			wp_add_inline_style('mapbox', $this->get_inline_css('MarkerCluster'));
+			wp_add_inline_style('mapbox', $this->get_inline_css('MarkerCluster.Default'));
 		}		
 	}
 	
-	public static function datepickerJS()
+	public function datepickerJS()
 	{
 		//pikadate
 		wp_enqueue_script( 'picker-js', plugin_dir_url( __FILE__ ) . 'js/picker/picker.js', array('jquery'), '3.5.6', true);
@@ -978,46 +894,45 @@ class Dynamic_Aviation_Public {
 			return $miles;
 		  }
 	}
-	public static function convertTime($dec)
+
+	public static function convertNumberToTime($dec)
 	{
-		// start by converting to seconds
 		$seconds = ($dec * 3600);
-		// we're given hours, so let's get those the easy way
 		$hours = floor($dec);
-		// since we've "calculated" hours, let's remove them from the seconds variable
 		$seconds -= $hours * 3600;
-		// calculate minutes left
 		$minutes = floor($seconds / 60);
-		// return the time formatted HH:MM
 		return self::lz($hours).":".self::lz($minutes);
-	}	
+	}
+
 	public static function lz($num)
 	{
 		return (strlen($num) < 2) ? "0{$num}" : $num;
 	}
 	public static function aircraft_type($type)
 	{
-		if($type == 0)
+		$type = intval($type);
+
+		if($type === 0)
 		{
 			return __('Turbo Prop', 'dynamicaviation');
 		}
-		elseif($type == 1)
+		elseif($type === 1)
 		{
 			return __('Light Jet', 'dynamicaviation');			
 		}
-		elseif($type == 2)
+		elseif($type === 2)
 		{
 			return __('Mid-size Jet', 'dynamicaviation');			
 		}
-		elseif($type == 3)
+		elseif($type === 3)
 		{
 			return __('Heavy Jet', 'dynamicaviation');			
 		}
-		elseif($type == 4)
+		elseif($type === 4)
 		{
 			return __('Airliner', 'dynamicaviation');		
 		}
-		elseif($type == 5)
+		elseif($type === 5)
 		{
 			return __('Helicopter', 'dynamicaviation');		
 		}		
@@ -1058,17 +973,7 @@ class Dynamic_Aviation_Public {
 			}
 		}
 	}
-	public static function filter_destination_table($attr, $content = '')
-	{
-		if($attr)
-		{
-			if(array_key_exists('iata', $attr))
-			{
-				$content = self::get_destination_table($attr['iata']);
-			}
-		}
-		return $content;
-	}
+
 	public static function get_destination_table($iata)
 	{
 		$output = null;
@@ -1192,7 +1097,7 @@ class Dynamic_Aviation_Public {
 							$table_row .= esc_html(__('Fees per pers.', 'dynamicaviation').' '.'$'.number_format($fees, 2, '.', ','));
 							$table_row .= '</span>';
 						}						
-						$table_row .= '<br/><span class="small text-muted"><i class="fas fa-clock" ></i> '.esc_html(self::convertTime($table_price[$x][2])).'</span>';
+						$table_row .= '<br/><span class="small text-muted"><i class="fas fa-clock" ></i> '.esc_html(self::convertNumberToTime($table_price[$x][2])).'</span>';
 						
 						$table_row .= '</td></tr>';
 						$aircraft_count++;	
@@ -1308,7 +1213,7 @@ class Dynamic_Aviation_Public {
 		}
 	}
 
-	public static function get_inline_js($file)
+	public function get_inline_js($file)
 	{
 		ob_start();
 		require_once(dirname( __FILE__ ) . '/js/'.$file.'.js');
@@ -1317,7 +1222,7 @@ class Dynamic_Aviation_Public {
 		return $output;			
 	}
 	
-	public static function get_inline_css($file)
+	public function get_inline_css($file)
 	{
 		ob_start();
 		require_once(dirname( __FILE__ ) . '/css/'.$file.'.css');
@@ -1326,7 +1231,7 @@ class Dynamic_Aviation_Public {
 		return $output;			
 	}
 	
-	public static function remove_body_class($classes)
+	public function remove_body_class($classes)
 	{
 		if(get_query_var('fly') || get_query_var('instant_quote') || get_query_var('request_submitted'))
 		{

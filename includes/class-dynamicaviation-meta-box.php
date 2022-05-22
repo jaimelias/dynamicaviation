@@ -2,19 +2,26 @@
 
 class Charterflights_Meta_Box
 {
-	public static function aircraft_add_meta_box() {
+
+	public function __construct()
+	{
+		add_action( 'save_post', array(&$this, 'aircraft_save') );
+		add_action( 'add_meta_boxes', array(&$this, 'aircraft_add_meta_box') );
+	}
+
+	public function aircraft_add_meta_box() {
 		
 		add_meta_box(
 			'aircraft_settings',
 			__( 'Flights', 'dynamicaviation' ),
-			array('Charterflights_Meta_Box', 'aircraft_settings'),
+			array(&$this, 'aircraft_settings'),
 			'aircrafts',
 			'normal',
 			'default'
 		);
 	}
 
-	public static function aircraft_settings( $post) {
+	public function aircraft_settings($post) {
 	wp_nonce_field( '_aircraft_nonce', 'aircraft_nonce' ); ?>
 		<p><label for="aircraft_commercial"><?php _e( 'Type of Transport', 'dynamicaviation' ); ?></label><br>
 			<select name="aircraft_commercial" id="aircraft_commercial">
@@ -99,7 +106,7 @@ class Charterflights_Meta_Box
 	<?php
 	}
 
-	public static function aircraft_save( $post_id ) {
+	public  function aircraft_save( $post_id ) {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
 		if ( ! isset( $_POST['aircraft_nonce'] ) || ! wp_verify_nonce( $_POST['aircraft_nonce'], '_aircraft_nonce' ) ) return;
 		if ( ! current_user_can( 'edit_post', $post_id ) ) return;

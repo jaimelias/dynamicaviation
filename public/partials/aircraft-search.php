@@ -162,7 +162,7 @@ if ($wp_aircraft_search->have_posts())
 				
 				if(!wp_is_mobile())
 				{
-					$row .= '<td><i class="fas fa-clock" aria-hidden="true"></i> '.esc_html(Dynamic_Aviation_Public::convertTime($duration)).'</td>';
+					$row .= '<td><i class="fas fa-clock" aria-hidden="true"></i> '.esc_html(Dynamic_Aviation_Public::convertNumberToTime($duration)).'</td>';
 				}
 				
 				$row .= $price_row;

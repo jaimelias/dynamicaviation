@@ -47,31 +47,15 @@ class Dynamic_Aviation_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( $plugin_name, $version, $utilities ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
+		$this->utilities = $utilities;
 	}
 
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Dynamic_Aviation_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Dynamic_Aviation_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
 
 		wp_enqueue_style( 'handsontableCss', plugin_dir_url( __FILE__ ) . 'css/handsontable.full.min.css', array(), $this->version, 'all' );		 
 		 
@@ -79,25 +63,11 @@ class Dynamic_Aviation_Admin {
 
 	}
 
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Dynamic_Aviation_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Dynamic_Aviation_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+
 		global $typenow;
+
 		if(!is_customize_preview() && ('aircrafts' == $typenow))
 		{
 			
@@ -109,9 +79,9 @@ class Dynamic_Aviation_Admin {
 			
 			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-admin.js', array( 'jquery', 'algolia', 'algolia_autocomplete', 'handsontableJS'), time(), false );
 
-			wp_add_inline_script('dynamicaviation', Dynamic_Aviation_Public::json_src_url(), 'before');
-			wp_add_inline_script('dynamicaviation', Dynamic_Aviation_Public::algoliasearch_before(), 'before');
-			wp_add_inline_script('dynamicaviation', Dynamic_Aviation_Public::algoliasearch_after(), 'before');
+			wp_add_inline_script('dynamicaviation', $this->utilities->json_src_url(), 'before');
+			wp_add_inline_script('dynamicaviation', $this->utilities->algoliasearch_before(), 'before');
+			wp_add_inline_script('dynamicaviation', $this->utilities->algoliasearch_after(), 'before');
 		
 		}
 	}
