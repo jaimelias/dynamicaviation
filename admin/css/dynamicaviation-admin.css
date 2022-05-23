@@ -1,17 +1,20 @@
-/**
- * All of the CSS for your admin-specific functionality should be
- * included in this file.
- */
- .pull-left{
+.hot
+{
+	overflow: hidden;
+	width: 100%;
+	height: 300px;
+	position: relative;
+}
+.pull-left{
 	 float: left;
- }
- .sflag img
- {
+}
+.sflag img
+{
 	 border: solid 1px #999;
 	 vertical-align: bottom;
 	 margin: 0 10px 0 0;
- }
- .algolia-autocomplete {
+}
+.algolia-autocomplete {
 	color: #444;
   width: 100%;
   font-size: 85%;
@@ -38,17 +41,4 @@
 .algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
   font-weight: bold;
   font-style: normal;
-}
-.aircraft_rates_table_container
-{
-	width: 100%;
-	display: block;
-	overflow: hidden;
-}
-#aircraft_rates_table
-{
-	width: 100%;
-	position: relative;
-	height: 300px;
-	overflow: hidden;
 }
