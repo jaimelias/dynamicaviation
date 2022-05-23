@@ -32,6 +32,7 @@ class Dynamic_Aviation {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-price-table.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-aircraft-single.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-aircrafts-table.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-mapbox.php';
 
 		$this->loader = new Dynamic_Aviation_Loader();
 	}
@@ -46,18 +47,10 @@ class Dynamic_Aviation {
 	private function define_admin_hooks() {
 
 		$utilities = new Dynamic_Aviation_Utilities();
-		$plugin_admin = new Dynamic_Aviation_Admin( $this->get_plugin_name(), $this->get_version(),  $utilities);
-		
-		new Dynamic_Aviation_Settings();
+		new Dynamic_Aviation_Admin( $this->get_plugin_name(), $this->get_version(),  $utilities);
+		new Dynamic_Aviation_Settings($utilities);
 		new Dynamic_Aviation_Post_Type();
-		new Dynamic_Aviation_Meta_Box();
-
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles', 11);
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');		
-		$this->loader->add_action('init', $plugin_admin, 'custom_rewrite_basic');
-		$this->loader->add_action('init', $plugin_admin, 'custom_rewrite_tag', 10, 0);	
-		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_pll_strings' );		
-		
+		new Dynamic_Aviation_Meta_Box();	
 	}
 
 	private function define_public_hooks() 
@@ -74,6 +67,8 @@ class Dynamic_Aviation {
 		new Dynamic_Aviation_Aircraft_Single($utilities);
 
 		new Dynamic_Aviation_Aircrafts_Table($utilities);
+
+		new Dynamic_Aviation_Mapbox($utilities);
 	}
 
 	public function run() {

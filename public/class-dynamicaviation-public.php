@@ -37,35 +37,9 @@ class Dynamic_Aviation_Public {
 	}
 
 
-	public function current_language()
-	{
-		global $polylang;
-		$lang = '';
-
-		if(isset($polylang))
-		{
-			$lang = pll_current_language();
-		}
-		else
-		{
-			$locale_str = get_locale();
-
-			if(strlen($locale_str) === 5)
-			{
-				$lang = substr($locale_str, 0, -3);
-			}
-			if(strlen($locale_str) === 2)
-			{
-				$lang = $locale_str;
-			}			
-		}
-
-		return $lang;
-	}
-
 	public function estimate_notes()
 	{
-		$current_language = $this->current_language();
+		$current_language = $this->utilities->current_language();
 		return get_option('dy_aviation_estimate_note_'.$current_language);
 	}
 
@@ -215,7 +189,7 @@ class Dynamic_Aviation_Public {
 						'category' => esc_html(__('Charter Flights', 'dynamicaviation')),
 						'name' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$airport),
 						'description' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$address.'. '.__('Airplanes and helicopter rides in', 'dynamicaviation').' '.$airport.', '.$city),
-						'image' => esc_url(Dynamic_Aviation_Public::airport_img_url($airport_array, true)),
+						'image' => esc_url($this->airport_img_url($airport_array, true)),
 						'sku' => md5($iata),
 						'gtin8' => substr(md5($iata), 0, 8)
 					);
@@ -417,26 +391,57 @@ class Dynamic_Aviation_Public {
 	{	if(get_query_var( 'fly' ))
 		{
 			global $airport_array;
-			//jaimelias
 			
 			if(is_array($airport_array))
 			{
 				if(count($airport_array) > 0)
 				{
-					ob_start();
-					require_once(plugin_dir_path( __FILE__ ).'partials/metatags-fly.php');
-					$output = ob_get_contents();
-					ob_end_clean();
-					echo $output;				
-				}
-				else
-				{
 					$output = '';
-				}				
-			}
-			else
-			{
-				$output = '';
+					$json = $airport_array;
+					$airport = $json['airport'];
+					$iata  = $json['iata'];
+					$icao = $json['icao'];
+					$codes = '('.$iata.')';
+					$city = $json['city'];
+					$country_name = $json['country_names'];
+					$lang = $this->utilities->current_language();
+					
+					if($lang)
+					{
+						if(array_key_exists($lang, $country_name))
+						{
+							$country_lang = $country_name[$lang];
+						}
+						else
+						{
+							$country_lang = $country_name['en'];
+						}
+					}
+					
+					$addressArray = array(($airport.' '.$codes), $city, $country_lang);
+					$address = implode(', ', $addressArray);
+					$translations = pll_the_languages(array('raw'=>1));
+					
+					foreach ($translations as $k => $v)
+					{
+						if($v['slug'] == pll_default_language())
+						{
+							$hreflang = $v['slug'].'" href="'.$v['url'].'fly/'.$this->utilities->sanitize_pathname($airport);
+							$output .= '<link rel="alternate" hreflang="'.($hreflang).'/" />';	
+						}
+						else
+						{
+							$hreflang = $v['slug'].'" href="'.home_url('/').$v['slug'].'/fly/'.$this->utilities->sanitize_pathname($airport);
+							$output .= '<link rel="alternate" hreflang="'.($hreflang).'/" />';				
+						}
+					}
+					
+					$content = __('Private Charter Flight', 'dynamicaviation').' '.$address.' '.__('Airplanes and helicopter rides in', 'dynamicaviation') .' '. $airport;
+					$output .= '<meta name="description" content="'.esc_attr($content).'" />';
+					$output .= '<link rel="canonical" href="'.esc_url(home_lang().'fly/'.$this->utilities->sanitize_pathname($airport)).'" />';
+				
+					echo $output;			
+				}			
 			}
 		}
 		if(is_singular('aircrafts'))
@@ -452,7 +457,7 @@ class Dynamic_Aviation_Public {
 	{
 		if(get_query_var( 'fly' ) && $query->is_main_query())
 		{
-			$GLOBALS['airport_array'] = json_decode(self::return_json(), true); 
+			$GLOBALS['airport_array'] = json_decode($this->utilities->return_json(), true); 
 						
 			global $polylang;
 			//removes alternate to home
@@ -474,13 +479,12 @@ class Dynamic_Aviation_Public {
 			}
 		}
 	}
-	public static function airport_img_url($json, $redirect_mobile)
+	public function airport_img_url($json, $redirect_mobile)
 	{
 		//$json, $redirect_mobile
 		$airport = $json['airport'];
-		$url = home_url('cacheimg/'.self::cleanURL($airport).'.jpg');		
+		$url = home_url('cacheimg/'.$this->utilities->sanitize_pathname($airport).'.jpg');		
 		return $url;
-		
 	}
 	
 	public static function airport_url_string($json)
@@ -501,13 +505,14 @@ class Dynamic_Aviation_Public {
 	{
 		if(get_query_var( 'cacheimg' ) && !in_the_loop())
 		{
-			$json = json_decode(self::return_json(), true);
+			$json = json_decode($this->utilities->return_json(), true);
 			$static_map = self::airport_url_string($json);
 			wp_redirect(esc_url($static_map));
 			exit;
 		}
-	}	
-	public static function sitemap($sitemap)
+	}
+
+	public function sitemap($sitemap)
 	{
 		if(isset($_GET['minimal-sitemap']))
 		{
@@ -516,31 +521,28 @@ class Dynamic_Aviation_Public {
 				global $polylang;
 				if(isset($polylang))
 				{
-					$languages = PLL()->model->get_languages_list();
+					$languages = $this->utilities->get_languages();
 					$language_list = array();
 					
 					for($x = 0; $x < count($languages); $x++)
 					{
-						foreach($languages[$x] as $key => $value)
+						if($languages[$x] != pll_default_language())
 						{
-							if($key == 'slug' && $value != pll_default_language())
-							{
-								array_push($language_list, $value);
-							}
-						}	
+							array_push($language_list, $languages[$x]);
+						}
 					}					
 				}
 				
 				$urllist = null;
-				$browse_json = self::return_json();
+				$browse_json = $this->utilities->return_json();
 				$browse_json = $browse_json['hits'];
 				
 				for($x = 0; $x < count($browse_json); $x++)
 				{
 					$url = '<url>';
-					$url .= '<loc>'.esc_url(home_url().'/fly/'.self::cleanURL($browse_json[$x]['airport'])).'/</loc>';
+					$url .= '<loc>'.esc_url(home_url().'/fly/'.$this->utilities->sanitize_pathname($browse_json[$x]['airport'])).'/</loc>';
 					$url .= '<image:image>';
-					$url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.self::cleanURL($browse_json[$x]['airport'])).'.jpg</image:loc>';
+					$url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.$this->utilities->sanitize_pathname($browse_json[$x]['airport'])).'.jpg</image:loc>';
 					$url .= '</image:image>';
 					$url .= '<mobile:mobile/>';
 					$url .= '<changefreq>weekly</changefreq>';
@@ -553,9 +555,9 @@ class Dynamic_Aviation_Public {
 					for($y = 0; $y < count($browse_json); $y++)
 					{
 						$pll_url = '<url>';
-						$pll_url .= '<loc>'.esc_url(home_url().'/'.$language_list[0].'/fly/'.self::cleanURL($browse_json[$y]['airport'])).'/</loc>';
+						$pll_url .= '<loc>'.esc_url(home_url().'/'.$language_list[0].'/fly/'.$this->utilities->sanitize_pathname($browse_json[$y]['airport'])).'/</loc>';
 						$pll_url .= '<image:image>';
-						$pll_url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.self::cleanURL($browse_json[$y]['airport'])).'.jpg</image:loc>';
+						$pll_url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.$this->utilities->sanitize_pathname($browse_json[$y]['airport'])).'.jpg</image:loc>';
 						$pll_url .= '</image:image>';
 						$pll_url .= '<mobile:mobile/>';
 						$pll_url .= '<changefreq>weekly</changefreq>';
@@ -574,29 +576,7 @@ class Dynamic_Aviation_Public {
 		}
 		return $sitemap;
 	}
-	public static function cleanURL($url)
-	{
-		// Lowercase the URL
-		$url = strtolower($url);
-		// Additional Swedish filters
-		
-		$unwanted_array = array('Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E','Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss', 'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
-		
-		$url = strtr( $url, $unwanted_array );
-		
-		// Remove any character that is not alphanumeric, white-space, or a hyphen 
-		$url = preg_replace("/[^a-z0-9\s\-]/i", "", $url);
-		// Replace multiple instances of white-space with a single space
-		$url = preg_replace("/\s\s+/", " ", $url);
-		// Replace all spaces with hyphens
-		$url = preg_replace("/\s/", "-", $url);
-		// Replace multiple hyphens with a single hyphen
-		$url = preg_replace("/\-\-+/", "-", $url);
-		// Remove leading and trailing hyphens
-		$url = trim($url, "-");
 
-		return $url;
-	}
 	public function package_template($template)
 	{
 		if(Dynamic_Aviation_Validators::valid_aircraft_quote())
@@ -612,69 +592,6 @@ class Dynamic_Aviation_Public {
 		return $template;
 	}
 	
-	public static function return_json() {
-		
-		$algolia_token = get_option('algolia_token');
-		$algolia_index = get_option('algolia_index');
-		$algolia_id = get_option('algolia_id');
-		
-		$curl = curl_init();
-		
-		$headers = array();
-		$headers[] = 'X-Algolia-API-Key: '.$algolia_token;
-		$headers[] = 'X-Algolia-Application-Id: '.$algolia_id;
-
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-		
-		if(get_query_var( 'fly' ) != '')
-		{
-			$new_query_var = get_query_var( 'fly' );
-			$query_param = '?query='.$new_query_var.'&hitsPerPage=1';
-		}
-		if(get_query_var( 'cacheimg' ) != '')
-		{
-			$new_query_var = get_query_var( 'cacheimg' );
-			$query_param = '?query='.$new_query_var.'&hitsPerPage=1';
-		}
-		else
-		{
-			$query_param = 'browse?cursor=';
-		}
-		
-		curl_setopt_array($curl, array(
-		CURLOPT_RETURNTRANSFER => 1,
-		CURLOPT_REFERER => esc_url(home_url()),
-		CURLOPT_URL => 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param,
-		));
-		$resp = curl_exec($curl);
-		$resp = json_decode($resp, true);
-			
-		
-		if(get_query_var( 'fly' ) != '' || get_query_var( 'cacheimg' ) != '')
-		{
-			if(array_key_exists('hits', $resp))
-			{
-				$hits = $resp['hits'];
-				
-				if(is_array($hits))
-				{
-					for($x = 0; $x < count($hits); $x++)
-					{
-						if($new_query_var === self::cleanURL($hits[$x]['airport']))
-						{
-							return json_encode($hits[$x]);
-						}
-					}			
-					
-				}
-			}
-		}
-		else
-		{
-			return $resp;
-		}
-		
-	}
 	
 	public function enqueue_styles() {
 
@@ -698,7 +615,6 @@ class Dynamic_Aviation_Public {
 			
 			wp_enqueue_script('algolia', plugin_dir_url( __FILE__ ).'js/algoliasearch.min.js', array( 'jquery' ), '3.32.0', true );
 			wp_add_inline_script('algolia', $this->utilities->json_src_url(), 'before');
-			wp_add_inline_script('algolia', $this->utilities->algoliasearch_before(), 'before');
 			wp_add_inline_script('algolia', $this->utilities->algoliasearch_after(), 'after');
 			wp_enqueue_script('algolia_autocomplete', plugin_dir_url( __FILE__ ).'js/autocomplete.jquery.min.js', array( 'jquery' ), '0.36.0', true );
 			

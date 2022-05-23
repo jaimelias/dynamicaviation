@@ -2,8 +2,9 @@
 
 class Dynamic_Aviation_Settings
 {
-	public function __construct()
+	public function __construct($utilities)
 	{
+		$this->utilities = $utilities;
 		$this->init();
 	}
 	public function init()
@@ -11,43 +12,7 @@ class Dynamic_Aviation_Settings
 		add_action('admin_menu', array(&$this, 'add_settings_page'));
 		add_action('admin_init', array(&$this, 'settings_init'));
 	}
-	public function get_languages()
-	{
-		global $polylang;
-		$language_list = array();
 
-		if(isset($polylang))
-		{
-			$languages = PLL()->model->get_languages_list();
-
-			for($x = 0; $x < count($languages); $x++)
-			{
-				foreach($languages[$x] as $key => $value)
-				{
-					if($key == 'slug')
-					{
-						array_push($language_list, $value);
-					}
-				}	
-			}
-		}
-
-		if(count($language_list) === 0)
-		{
-			$locale_str = get_locale();
-
-			if(strlen($locale_str) === 5)
-			{
-				array_push($language_list, substr($locale_str, 0, -3));
-			}
-			else if(strlen($locale_str) === 2)
-			{
-				array_push($language_list, $locale_str);
-			}
-		}
-
-		return $language_list;
-	}
 
 	public function add_settings_page()
 	{
@@ -71,7 +36,7 @@ class Dynamic_Aviation_Settings
 	
 	public function settings_init()
 	{ 
-		$languages = $this->get_languages();
+		$languages = $this->utilities->get_languages();
 
 		register_setting( 'aircraft_settings', 'dy_email', 'sanitize_email');
 		register_setting( 'aircraft_settings', 'dy_whatsapp', 'intval');
@@ -153,7 +118,6 @@ class Dynamic_Aviation_Settings
 				'aircraft_settings_section',
 				array('name' => $estimate_note_name, 'rows' => 4, 'cols' => 50)
 			);
-
 		}
 
 		add_settings_field( 

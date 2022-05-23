@@ -1,66 +1,31 @@
 <?php
 
-/**
- * The admin-specific functionality of the plugin.
- *
- * @link       http://jaimelias.com
- * @since      1.0.0
- *
- * @package    Dynamic_Aviation
- * @subpackage Dynamic_Aviation/admin
- */
-
-/**
- * The admin-specific functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    Dynamic_Aviation
- * @subpackage Dynamic_Aviation/admin
- * @author     Jaimelías <jaimelias@about.me>
- */
 class Dynamic_Aviation_Admin {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
 	private $plugin_name;
-
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
 	private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
-	 */
-	public function __construct( $plugin_name, $version, $utilities ) {
-
+	public function __construct( $plugin_name, $version, $utilities ) 
+	{
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->utilities = $utilities;
+		$this->init();
 	}
 
-	public function enqueue_styles() {
+	public function init()
+	{
+		add_action( 'admin_enqueue_scripts', array(&$this, 'enqueue_styles'), 11);
+		add_action( 'admin_enqueue_scripts',  array(&$this, 'enqueue_scripts'));		
+		add_action('init', array(&$this, 'custom_rewrite_basic'));
+		add_action('init', array(&$this, 'custom_rewrite_tag'), 10, 0);	
+		add_action( 'admin_init', array(&$this, 'register_pll_strings'));			
+	}
 
-
+	public function enqueue_styles()
+	 {
 		wp_enqueue_style( 'handsontableCss', plugin_dir_url( __FILE__ ) . 'css/handsontable.full.min.css', array(), $this->version, 'all' );		 
-		 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/dynamicaviation-admin.css', array(), time(), 'all' );
-
 	}
 
 	public function enqueue_scripts() {
@@ -71,52 +36,42 @@ class Dynamic_Aviation_Admin {
 		if(!is_customize_preview() && ('aircrafts' == $typenow))
 		{
 			
-			wp_enqueue_script( 'handsontableJS', plugin_dir_url( __FILE__ ) . 'js/handsontable.full.min.js', array('jquery'), $this->version, true );
-			
-			wp_enqueue_script('algolia', '//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js', array( 'jquery' ), $this->version, false );
-			
+			wp_enqueue_script( 'handsontableJS', plugin_dir_url( __FILE__ ) . 'js/handsontable.full.min.js', array('jquery'), $this->version, true);			
+			wp_enqueue_script('algolia', '//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js', array( 'jquery' ), $this->version, false);			
 			wp_enqueue_script('algolia_autocomplete', '//cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js', array( 'jquery' ), $this->version, false );			
-			
 			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-admin.js', array( 'jquery', 'algolia', 'algolia_autocomplete', 'handsontableJS'), time(), false );
-
 			wp_add_inline_script('dynamicaviation', $this->utilities->json_src_url(), 'before');
-			wp_add_inline_script('dynamicaviation', $this->utilities->algoliasearch_before(), 'before');
 			wp_add_inline_script('dynamicaviation', $this->utilities->algoliasearch_after(), 'before');
 		
 		}
 	}
 	
-	public static function custom_rewrite_basic()
+	public function custom_rewrite_basic()
 	{
 		add_rewrite_rule('^fly/([^/]*)/?', 'index.php?fly=$matches[1]','top');
 		add_rewrite_rule('^cacheimg/([^/]*)/?.jpg', 'index.php?cacheimg=$matches[1]','top');
 		add_rewrite_rule('^instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[1]','top');
 		add_rewrite_rule('^request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[1]','top');
 
-		global $polylang;
-		
-		if(isset($polylang))
+		$languages = $this->utilities->get_languages();
+		$language_list = array();
+
+		for($x = 0; $x < count($languages); $x++)
 		{
-			$languages = PLL()->model->get_languages_list();
-			$language_list = array();
-			
-			for($x = 0; $x < count($languages); $x++)
+			if($languages[$x] != pll_default_language())
 			{
-				foreach($languages[$x] as $key => $value)
-				{
-					if($key == 'slug')
-					{
-						array_push($language_list, $value);
-					}
-				}	
+				array_push($language_list, $languages[$x]);
 			}
+		}
+
+		if(count($language_list) > 0)
+		{
 			$language_list = implode('|', $language_list);
-			
 			add_rewrite_rule('('.$language_list.')/fly/([^/]*)/?', 'index.php?fly=$matches[2]','top');
 			add_rewrite_rule('('.$language_list.')/aircraft/([^/]*)/?', 'index.php?aircraft=$matches[2]','top');
 			add_rewrite_rule('('.$language_list.')/instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[2]','top');
 			add_rewrite_rule('('.$language_list.')/request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[2]','top');
-		}				
+		}		
 	}
 
 	public static function custom_rewrite_tag()
