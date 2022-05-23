@@ -33,8 +33,8 @@ $return_itinerary = sanitize_text_field($_POST['return_itinerary']);
 $itinerary_html = $aircraft_link.'<br/></br/>'.$departure_itinerary;
 $itinerary_text = $aircraft_settings.'\n\n'.$departure_itinerary;
 
-$itinerary_html .= ($return_itinerary) ? '<br/><br/>' . $return_itinerary : $itinerary_html;
-$itinerary_text .= ($return_itinerary) ? '/n/n' . $return_itinerary : $itinerary_text;
+$itinerary_html = ($return_itinerary !== '') ? '<br/><br/>' . $return_itinerary : $itinerary_html;
+$itinerary_text = ($return_itinerary !== '') ? '/n/n' . $return_itinerary : $itinerary_text;
 
 
 

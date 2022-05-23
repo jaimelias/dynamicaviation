@@ -30,6 +30,13 @@ class Dynamic_Aviation_Utilities {
 		return $lang;
 	}
 
+	public function airport_img_url($json, $redirect_mobile)
+	{
+		$airport = $json['airport'];
+		$url = home_url('cacheimg/'.$this->sanitize_pathname($airport).'.jpg');		
+		return $url;
+	}
+
 	public function get_languages()
 	{
 		global $polylang;

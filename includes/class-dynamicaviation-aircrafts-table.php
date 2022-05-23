@@ -331,7 +331,12 @@ class Dynamic_Aviation_Aircrafts_Table {
 
             $output .= $this->pax_template();
             $output .= '<p class="large"><strong>'.esc_html(__('Departure', 'dynamicaviation')).':</strong> '.$this->departure_itinerary().'</p>';
-            $output .= '<p class="large"><strong>'.esc_html(__('Departure', 'dynamicaviation')).':</strong> '.$this->return_itinerary().'</p>';
+            
+            if($this->get()->aircraft_flight === 1)
+            {
+                $output .= '<p class="large"><strong>'.esc_html(__('Return', 'dynamicaviation')).':</strong> '.$this->return_itinerary().'</p>';
+            }
+            
 
             while($wp_query->have_posts())
             {

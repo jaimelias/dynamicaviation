@@ -189,7 +189,7 @@ class Dynamic_Aviation_Public {
 						'category' => esc_html(__('Charter Flights', 'dynamicaviation')),
 						'name' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$airport),
 						'description' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$address.'. '.__('Airplanes and helicopter rides in', 'dynamicaviation').' '.$airport.', '.$city),
-						'image' => esc_url($this->airport_img_url($airport_array, true)),
+						'image' => esc_url($this->utilities->airport_img_url($airport_array, true)),
 						'sku' => md5($iata),
 						'gtin8' => substr(md5($iata), 0, 8)
 					);
@@ -331,12 +331,8 @@ class Dynamic_Aviation_Public {
 			{
 				if(count($json) > 0)
 				{
-		
-					$output .= apply_filters('dy_aviation_price_table', '');	
-					ob_start();
-					require_once(plugin_dir_path( __FILE__ ).'partials/dynamicaviation-public-display.php');
-					$output .= ob_get_contents();
-					ob_end_clean();
+					$output .= apply_filters('dy_aviation_price_table', '');
+					$output .= apply_filters('dy_aviation_destination_details', '');
 				}				
 			}
 			
@@ -479,13 +475,7 @@ class Dynamic_Aviation_Public {
 			}
 		}
 	}
-	public function airport_img_url($json, $redirect_mobile)
-	{
-		//$json, $redirect_mobile
-		$airport = $json['airport'];
-		$url = home_url('cacheimg/'.$this->utilities->sanitize_pathname($airport).'.jpg');		
-		return $url;
-	}
+
 	
 	public static function airport_url_string($json)
 	{
