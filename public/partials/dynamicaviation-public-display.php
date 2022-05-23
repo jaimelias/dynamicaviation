@@ -45,7 +45,6 @@ if($lang)
 	<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
 		<table class="airport_description pure-table pure-table-striped">
 			<?php if($iata != null && $icao != null): ?>
-				<thead><tr><th colspan="2"><i class="fa fa-plane" aria-hidden="true"></i> <?php esc_html_e($airport); ?></th></tr></thead>
 				<?php if($iata != null): ?>
 				<tr><td>IATA</td><td><?php esc_html_e($iata); ?></td></tr>
 				<?php endif;?>

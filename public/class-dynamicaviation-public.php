@@ -1,25 +1,5 @@
 <?php
 
-/**
- * The public-facing functionality of the plugin.
- *
- * @link       http://jaimelias.com
- * @since      1.0.0
- *
- * @package    Dynamic_Aviation
- * @subpackage Dynamic_Aviation/public
- */
-
-/**
- * The public-facing functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    Dynamic_Aviation
- * @subpackage Dynamic_Aviation/public
- * @author     Jaimelías <jaimelias@about.me>
- */
 class Dynamic_Aviation_Public {
 
 
@@ -267,60 +247,7 @@ class Dynamic_Aviation_Public {
 		
 		return $arr;
 	}
-	
-	public static function price_calculator()
-	{
-		ob_start();
-		require_once(dirname( __FILE__ ) . '/partials/price-calculator.php');
-		$content = ob_get_contents();
-		ob_end_clean();
-		return $content;
-	}
-	public static function mapbox_airports($attr, $content = "")
-	{
-		if(!isset($_GET['fl_builder']))
-		{	
-	
-			ob_start();
-			
-			?>
-			<div class="pure-g">
-				<div class="mapbox_form pure-u-1 pure-u-sm-1-1 pure-u-md-2-5">
-			<?php
-			
-			require_once(dirname( __FILE__ ) . '/partials/price-calculator.php');
-					
-			?>
-				</div>
-					<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-3-5">
-						<div class="map-container">
-							<div class="map" id="mapbox_airports">
-							</div>
-						</div>
-					</div>
-			</div>
-			<?php
-			
-			$content = ob_get_contents();
-			ob_end_clean();		
-		}
-		else
-		{
-			 $content = '<h2 class="text-center">'.__('Mapbox preview not available in editing mode.', 'dynamicaviation').'</h2>';
-		}
-		
-		return $content;
-	}
 
-
-	public static function aircraft_calculator()
-	{
-			ob_start();
-			require(plugin_dir_path( __FILE__ ).'partials/price-calculator.php');
-			$output = ob_get_contents();
-			ob_end_clean();
-			return $output;
-	}
 	public function modify_wp_title($title)
 	{	 
 		if(get_query_var( 'fly' ))
@@ -358,7 +285,7 @@ class Dynamic_Aviation_Public {
 		}		
 		elseif(Dynamic_Aviation_Validators::valid_aircraft_search())
 		{
-			$output = null;
+			$output = '';
 			$output .= esc_html(__("Find an Aircraft", "dynamicaviation")).' ';			
 			$output .= sanitize_text_field($_GET['aircraft_origin']).'-'.sanitize_text_field($_GET['aircraft_destination']);
 			$output .= ' | '.esc_html(get_bloginfo('name'));
@@ -370,7 +297,7 @@ class Dynamic_Aviation_Public {
 			if(aviation_field( 'aircraft_type' ))
 			{
 				$aircraft_type = aviation_field( 'aircraft_type' );
-				$aircraft_type = self::aircraft_type($aircraft_type);
+				$aircraft_type = $this->utilities->aircraft_type($aircraft_type);
 				$title .= $aircraft_type .' '.get_the_title().' | '.get_bloginfo( 'name', 'display' );
 				return $title;
 			}
@@ -383,7 +310,7 @@ class Dynamic_Aviation_Public {
 			{
 				if(aviation_field( 'aircraft_type' ))
 				{
-					$aircraft_type = self::aircraft_type(aviation_field( 'aircraft_type' ));
+					$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
 					$title = '<span class="linkcolor">'.esc_html($aircraft_type).'</span> '.$title;
 				}				
 			}
@@ -424,14 +351,14 @@ class Dynamic_Aviation_Public {
 		{
 			global $airport_array;
 			$json = $airport_array;
-			$output = null;
+			$output = '';
 
 			if(is_array($json))
 			{
 				if(count($json) > 0)
 				{
 		
-					$output .= self::get_destination_table(esc_html($json['iata']));		
+					$output .= apply_filters('dy_aviation_price_table', '');	
 					ob_start();
 					require_once(plugin_dir_path( __FILE__ ).'partials/dynamicaviation-public-display.php');
 					$output .= ob_get_contents();
@@ -458,11 +385,7 @@ class Dynamic_Aviation_Public {
 		{
 			if(Dynamic_Aviation_Validators::validate_hash())
 			{
-				ob_start();
-				require_once(plugin_dir_path( __FILE__ ).'partials/aircraft-search.php');
-				$output = ob_get_contents();
-				ob_end_clean();
-				return $output;				
+				return apply_filters('dy_aviation_aircrafts_table', '');				
 			}
 			else
 			{
@@ -471,11 +394,7 @@ class Dynamic_Aviation_Public {
 		}
 		elseif(in_the_loop() && is_singular('aircrafts'))
 		{
-			ob_start();
-			require_once(plugin_dir_path( __FILE__ ).'partials/dynamicaviation-aircraft-single.php');
-			$output = ob_get_contents();
-			ob_end_clean();
-			return $output;			
+			return apply_filters('dy_aviation_aircraft_template', '');			
 		}
 		return $content;
 	}
@@ -512,12 +431,12 @@ class Dynamic_Aviation_Public {
 				}
 				else
 				{
-					$output = null;
+					$output = '';
 				}				
 			}
 			else
 			{
-				$output = null;
+				$output = '';
 			}
 		}
 		if(is_singular('aircrafts'))
@@ -733,19 +652,22 @@ class Dynamic_Aviation_Public {
 		
 		if(get_query_var( 'fly' ) != '' || get_query_var( 'cacheimg' ) != '')
 		{
-			$json = $resp['hits'];
-			
-			if(is_array($json))
+			if(array_key_exists('hits', $resp))
 			{
-				for($x = 0; $x < count($json); $x++)
-				{
-					if($new_query_var === self::cleanURL($json[$x]["airport"]))
-					{
-						return json_encode($json[$x]);
-					}
-				}			
+				$hits = $resp['hits'];
 				
-			}	
+				if(is_array($hits))
+				{
+					for($x = 0; $x < count($hits); $x++)
+					{
+						if($new_query_var === self::cleanURL($hits[$x]['airport']))
+						{
+							return json_encode($hits[$x]);
+						}
+					}			
+					
+				}
+			}
 		}
 		else
 		{
@@ -770,7 +692,7 @@ class Dynamic_Aviation_Public {
 
 		wp_enqueue_script( 'landing-cookies', plugin_dir_url( __FILE__ ).'js/cookies.js', array('jquery'), $this->version, true );		
 		
-		if(((is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'mapbox_airports')) || is_singular('aircrafts')) && !isset($_GET['fl_builder']))
+		if(((is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'aviation_search_form')) || is_singular('aircrafts')) && !isset($_GET['fl_builder']))
 		{
 			array_push($dep, 'algolia', 'mapbox', 'markercluster', 'sha512', 'picker-date-js', 'picker-time-js');
 			
@@ -831,7 +753,7 @@ class Dynamic_Aviation_Public {
 		{
 			wp_add_inline_style('minimalLayout', $this->get_inline_css('dynamicpackages-public'));
 		}
-		if(is_singular('aircrafts') || (is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'mapbox_airports') || has_shortcode( $post->post_content, 'jc_calculator'))))
+		if(is_singular('aircrafts') || (is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'aviation_search_form') || has_shortcode( $post->post_content, 'jc_calculator'))))
 		{
 			wp_add_inline_style('minimalLayout', $this->get_inline_css('dynamicaviation-public'));
 		}
@@ -841,7 +763,7 @@ class Dynamic_Aviation_Public {
 	{
 		global $post;
 		
-		if(is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'mapbox_airports') || has_shortcode( $post->post_content, 'jc_calculator')) || is_singular('aircrafts'))
+		if(is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'aviation_search_form') || has_shortcode( $post->post_content, 'jc_calculator')) || is_singular('aircrafts'))
 		{
 			wp_enqueue_style( 'picker-css', plugin_dir_url( __FILE__ ) . 'css/picker/default.css', array(), 'dynamicaviation', 'all' );
 			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.date'));
@@ -853,7 +775,7 @@ class Dynamic_Aviation_Public {
 	{
 		global $post;
 		
-		if(is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'mapbox_airports') && !isset($_GET['fl_builder']))
+		if(is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'aviation_search_form') && !isset($_GET['fl_builder']))
 		{
 			wp_enqueue_style('mapbox', 'https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css', array(), '3.1.1', 'all' );
 			wp_add_inline_style('mapbox', $this->get_inline_css('MarkerCluster'));
@@ -874,67 +796,6 @@ class Dynamic_Aviation_Public {
 		if(file_exists(dirname( __FILE__ ).'/'.$picker_translation))
 		{
 			wp_enqueue_script( 'picker-time-translation', plugin_dir_url( __FILE__ ).$picker_translation, array('jquery', 'picker-js'), '3.5.6', true);
-		}		
-	}
-	
-	public static function distance($lat1, $lon1, $lat2, $lon2, $unit) {
-
-	  $theta = $lon1 - $lon2;
-	  $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
-	  $dist = acos($dist);
-	  $dist = rad2deg($dist);
-	  $miles = $dist * 60 * 1.1515;
-	  $unit = strtoupper($unit);
-
-	  if ($unit == "K") {
-		return ($miles * 1.609344);
-	  } elseif ($unit == "N") {
-		  return ($miles * 0.8684);
-		} else {
-			return $miles;
-		  }
-	}
-
-	public static function convertNumberToTime($dec)
-	{
-		$seconds = ($dec * 3600);
-		$hours = floor($dec);
-		$seconds -= $hours * 3600;
-		$minutes = floor($seconds / 60);
-		return self::lz($hours).":".self::lz($minutes);
-	}
-
-	public static function lz($num)
-	{
-		return (strlen($num) < 2) ? "0{$num}" : $num;
-	}
-	public static function aircraft_type($type)
-	{
-		$type = intval($type);
-
-		if($type === 0)
-		{
-			return __('Turbo Prop', 'dynamicaviation');
-		}
-		elseif($type === 1)
-		{
-			return __('Light Jet', 'dynamicaviation');			
-		}
-		elseif($type === 2)
-		{
-			return __('Mid-size Jet', 'dynamicaviation');			
-		}
-		elseif($type === 3)
-		{
-			return __('Heavy Jet', 'dynamicaviation');			
-		}
-		elseif($type === 4)
-		{
-			return __('Airliner', 'dynamicaviation');		
-		}
-		elseif($type === 5)
-		{
-			return __('Helicopter', 'dynamicaviation');		
 		}		
 	}
 	
@@ -974,212 +835,6 @@ class Dynamic_Aviation_Public {
 		}
 	}
 
-	public static function get_destination_table($iata)
-	{
-		$output = null;
-		$filter = null;
-		$aircraft_count = 0;
-		$table_row = null;
-		global $airport_array;
-		
-		$iata_list = array();
-		
-		//aircrafts
-		$query_args = array(
-			'post_type' => 'aircrafts',
-			'posts_per_page' => 200, 
-			'post_parent' => 0, 
-			'meta_key' => 'aircraft_commercial', 
-			'orderby' => 'meta_value', 
-			'order' => 'ASC'
-		);
-		
-		if(is_singular('aircrafts'))
-		{
-			$query_args['p'] = get_the_ID();
-		}
-		
-		$wp_query = new WP_Query( $query_args );
-		
-		//aircraft
-		if ( $wp_query->have_posts() )
-		{
-			
-			$algolia_full = self::algolia_full();
-			
-			while ( $wp_query->have_posts() )
-			{
-				$wp_query->the_post();
-				global $post;
-				$base_iata = aviation_field( 'aircraft_base_iata' );
-				$table_price = aviation_field( 'aircraft_rates' );
-				$table_price = json_decode(html_entity_decode($table_price), true);
-				
-				for($x = 0; $x < count($algolia_full); $x++)
-				{
-					if($iata == $algolia_full[$x]['iata'])
-					{
-						$destination_airport = $algolia_full[$x]['airport'];
-						$destination_city = $algolia_full[$x]['city'];
-						$destination_country_code = $algolia_full[$x]['country_code'];
-					}
-				}
-				
-				$aircraft_url = home_lang().esc_html($post->post_type).'/'.esc_html($post->post_name);
-				
-				$limit = 5;
-				
-				for($x = 0; $x < count($table_price); $x++)
-				{
-					
-					$origin_iata = $table_price[$x][1];
-					
-					if($iata == $table_price[$x][1])
-					{
-						$origin_iata = $table_price[$x][0];
-					}
-					
-					if(($iata == $table_price[$x][0] || $iata == $table_price[$x][1]) && ($table_price[$x][0] != '' || $table_price[$x][1] != '') && is_array($algolia_full))
-					{
-						
-						for($y = 0; $y < count($algolia_full); $y++)
-						{
-							if($origin_iata == $algolia_full[$y]['iata'])
-							{
-								$origin_airport = $algolia_full[$y]['airport'];
-								$origin_city = $algolia_full[$y]['city'];
-								$origin_country_code = $algolia_full[$y]['country_code'];
-							}
-						}
-
-						$fees = $table_price[$x][4];
-						$seats = $table_price[$x][6];
-						$weight_pounds = $table_price[$x][7];
-						$weight_kg = intval(intval($weight_pounds)*0.453592);
-						$weight_allowed = esc_html($weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation'));
-						$aircraft_type = self::aircraft_type(aviation_field( 'aircraft_type' ));
-						
-						$route = __('Private Charter Flight', 'dynamicaviation').' '.$aircraft_type.' '.$post->post_title.' '.__('from', 'dynamicaviation').' '.$origin_airport.', '.$origin_city.' ('.$origin_iata.') '.__('to', 'dynamicaviation').' '.$destination_airport.', '.$destination_city.' ('.$iata.')';
-						
-						$table_row .= '<tr data-aircraft-type="'.esc_html(aviation_field( 'aircraft_type' )).'" data-iata="'.esc_html($origin_iata).'" title="'.esc_html($route).'">';
-						
-						if(!is_singular('aircrafts'))
-						{
-							if(self::is_commercial())
-							{
-								$table_row .= '<td><strong>'.esc_html(__('Commercial Flight', 'dynamicaviation')).'</strong></td>';
-							}
-							else
-							{
-								$table_row .= '<td><a class="strong" href="'.esc_url($aircraft_url).'/">'.esc_html($post->post_title).'</a> - <small>'.esc_html($aircraft_type).'</small><br/><i class="fas fa-male" ></i> '.esc_html($seats).' <small>('.$weight_allowed.')</small></td>';
-							}
-						}
-						
-						$table_row .= '<td><small class="text-muted">('.esc_html($origin_iata).')</small> <strong>'.esc_html($origin_city.', '.$origin_country_code).'</strong><br/>'.esc_html($origin_airport).'</td>';
-						
-						
-
-						$table_row .= '<td><strong>'.esc_html('$'.number_format($table_price[$x][3], 2, '.', ',')).'</strong><br/><span class="text-muted">';
-
-						if(self::is_commercial())
-						{
-							$table_row .= esc_html(__('Per Person', 'dynamicaviation'));
-						}
-						else
-						{
-							$table_row .= esc_html(__('Charter Flight', 'dynamicaviation'));
-						}
-						$table_row .= '</span>';
-						
-						if(floatval($fees) > 0)
-						{
-							$table_row .= '<br/><span class="text-muted">';
-							$table_row .= esc_html(__('Fees per pers.', 'dynamicaviation').' '.'$'.number_format($fees, 2, '.', ','));
-							$table_row .= '</span>';
-						}						
-						$table_row .= '<br/><span class="small text-muted"><i class="fas fa-clock" ></i> '.esc_html(self::convertNumberToTime($table_price[$x][2])).'</span>';
-						
-						$table_row .= '</td></tr>';
-						$aircraft_count++;	
-					}
-				}
-			}
-			wp_reset_postdata();
-		}	
-
-		if($aircraft_count > 0)
-		{
-			$airport_options = null;
-			$aircraft_type_list = array();
-			$aircraft_list_option = null;	
-			$table = '';
-			
-			if(is_singular('aircrafts'))
-			{
-				$table .= '<div itemscope itemtype="http://schema.org/Table"><h4 itemprop="about">'.esc_html(__('Charter Flights', 'dynamicaviation').' '.aviation_field( 'aircraft_base_name' ).' ('.aviation_field( 'aircraft_base_iata' )).') '.aviation_field( 'aircraft_base_city' ).'</h4>';
-			}
-			else if(get_query_var('fly'))
-			{
-				//do nothing
-			}
-			else
-			{
-				$table .= '<div itemscope itemtype="http://schema.org/Table"><h3 itemprop="about">'.esc_html(__('Flights to ', 'dynamicaviation')).' '.esc_html($destination_airport).' ('.esc_html($iata).'), '.esc_html($destination_city).', '.esc_html($destination_country_code).'</h3>';
-			}
-			
-			$table .= '<table id="dy_table" class="text-center small pure-table pure-table-bordered margin-bottom"><thead><tr>';
-			
-			
-			$origin_label = __('Destination', 'dynamicaviation');
-			
-			if(!is_singular('aircrafts'))
-			{
-				$origin_label = __('Origin', 'dynamicaviation');
-				$table .= '<th>'.esc_html(__('Flights', 'dynamicaviation')).'</th>';
-			}
-			
-			$table .= '<th>'.esc_html($origin_label).'</th>';
-			$table .= '<th>'.esc_html(__('One Way', 'dynamicaviation')).'</th>';
-			$table .= '</tr></thead><tbody>';
-			$table .= $table_row;
-			$table .= '</tbody></table>';
-			
-			if(!get_query_var('fly'))
-			{
-				$table .= '</div>';
-			}
-			
-			$output .=  $table;
-			return $output;
-		}		
-	}
-	
-	public static function algolia_full()
-	{
-		$query_param = 'browse?cursor=';
-		$algolia_token = get_option('algolia_token');
-		$algolia_index = get_option('algolia_index');
-		$algolia_id = get_option('algolia_id');
-		
-		$curl = curl_init();
-		
-		$headers = array();
-		$headers[] = 'X-Algolia-API-Key: '.$algolia_token;
-		$headers[] = 'X-Algolia-Application-Id: '.$algolia_id;
-
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);	
-
-		curl_setopt_array($curl, array(
-		CURLOPT_RETURNTRANSFER => 1,
-		CURLOPT_REFERER => esc_url(home_url()),
-		CURLOPT_URL => 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param,
-		));
-		$resp = curl_exec($curl);
-		$resp = json_decode($resp, true);
-		$resp = $resp['hits'];
-		return $resp;
-	}
-
 	public static function algolia_one($string)
 	{
 		$new_query_var = $string;
@@ -1203,14 +858,6 @@ class Dynamic_Aviation_Public {
 		$resp = json_decode($resp, true);
 		$resp = $resp['hits'];
 		return $resp;
-	}	
-
-	public static function is_commercial()
-	{
-		if(aviation_field( 'aircraft_commercial' ) == 1)
-		{
-			return true;
-		}
 	}
 
 	public function get_inline_js($file)

@@ -1,6 +1,6 @@
 <?php
 
-class Charterflights_Meta_Box
+class Dynamic_Aviation_Meta_Box
 {
 
 	public function __construct()

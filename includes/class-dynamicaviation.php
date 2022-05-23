@@ -28,6 +28,10 @@ class Dynamic_Aviation {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-dynamicaviation-admin.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-dynamicaviation-public.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-shortcodes.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-search-form.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-price-table.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-aircraft-single.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-aircrafts-table.php';
 
 		$this->loader = new Dynamic_Aviation_Loader();
 	}
@@ -45,12 +49,11 @@ class Dynamic_Aviation {
 		$plugin_admin = new Dynamic_Aviation_Admin( $this->get_plugin_name(), $this->get_version(),  $utilities);
 		
 		new Dynamic_Aviation_Settings();
-		new Charterflights_Post_Type();
-		new Charterflights_Meta_Box();
+		new Dynamic_Aviation_Post_Type();
+		new Dynamic_Aviation_Meta_Box();
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles', 11);
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-					
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');		
 		$this->loader->add_action('init', $plugin_admin, 'custom_rewrite_basic');
 		$this->loader->add_action('init', $plugin_admin, 'custom_rewrite_tag', 10, 0);	
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_pll_strings' );		
@@ -59,10 +62,18 @@ class Dynamic_Aviation {
 
 	private function define_public_hooks() 
 	{
-
 		$utilities = new Dynamic_Aviation_Utilities();
 		new Dynamic_Aviation_Public( $this->get_plugin_name(), $this->get_version(), $utilities);
-		new Dynamic_Aviation_Shortcodes();		
+
+		new Dynamic_Aviation_Search_Form($utilities);
+
+		$price_table = new Dynamic_Aviation_Price_Table($utilities);
+
+		new Dynamic_Aviation_Shortcodes($utilities, $price_table);		
+		
+		new Dynamic_Aviation_Aircraft_Single($utilities);
+
+		new Dynamic_Aviation_Aircrafts_Table($utilities);
 	}
 
 	public function run() {

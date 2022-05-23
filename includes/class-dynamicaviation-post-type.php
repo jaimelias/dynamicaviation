@@ -1,7 +1,7 @@
 <?php
 
 
-class Charterflights_Post_Type
+class Dynamic_Aviation_Post_Type
 {
 
 	public function __construct()

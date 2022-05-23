@@ -6,7 +6,7 @@ const mapboxId = mapbox_vars().mapbox_map_id;
 
 L.mapbox.accessToken = mapboxToken;
 
-const map = L.mapbox.map('mapbox_airports', mapboxId, {
+const map = L.mapbox.map('aviation_map', mapboxId, {
 	zoomControl: false,
 	minZoom: 4,
 	maxZoom: 16
@@ -24,7 +24,7 @@ jQuery(() => {
 
     'use strict';
 	
-	if(!isMobile && jQuery('.mapbox_form').length)
+	if(!isMobile && jQuery('.aviation_search_form_container').length)
 	{
 		load_mapbox(algoliaIndex, true);
 		
@@ -32,7 +32,7 @@ jQuery(() => {
 			load_mapbox(algoliaIndex, false);
 		});
 		
-		jQuery('.mapbox_form').each(function(){
+		jQuery('.aviation_search_form_container').each(function(){
 			
 			const thisForm = jQuery(this);
 			

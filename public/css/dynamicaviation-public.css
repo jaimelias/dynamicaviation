@@ -26,20 +26,10 @@
 	padding: 20px;
 	margin: 0 0 20px 0;
 }
-.map-container
-{
-	width: 100%;
-	position: relative;
-	height: 100%;
-}
  .map
  {
-	position:absolute; top:0; bottom:0; width:100%;
- }
- .mapbox_img
- {
-	max-width: 100%;
-	height: auto;
+	width: 100%;
+	height: 100%;
  }
  .leaflet-bottom.leaflet-left, .leaflet-bottom.leaflet-right, .leaflet-top.leaflet-left, .leaflet-top.leaflet-right
  {

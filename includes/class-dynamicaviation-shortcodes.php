@@ -4,66 +4,59 @@
 class Dynamic_Aviation_Shortcodes {
     
     
-    public function __construct()
+    public function __construct($utilities, $price_table)
     {
+		$this->price_table = $price_table;
         $this->init();
     }
 
     public function init()
     {
-		add_shortcode( 'mapbox_airports', array('Dynamic_Aviation_Shortcodes', 'mapbox_airports'));
-		add_shortcode( 'destination', array('Dynamic_Aviation_Shortcodes', 'filter_destination_table'));        
+		add_shortcode( 'aviation_search_form', array(&$this, 'search_form'));
+		add_shortcode( 'aviation_table', array(&$this, 'table'));
     }
 
-	public static function filter_destination_table($attr, $content = '')
+	public function table($attr, $content = '')
 	{
 		if($attr)
 		{
 			if(array_key_exists('iata', $attr))
 			{
-				$content = Dynamic_Aviation_Public::get_destination_table($attr['iata']);
+				$iata = sanitize_key($attr['iata']);
+
+				if($iata)
+				{
+					$content = $this->price_table->table(strtoupper($iata));
+				}
 			}
 		}
 		return $content;
 	}
 
-	public static function mapbox_airports($attr, $content = '')
+	public function search_form($attr, $content = '')
 	{
-		if(!isset($_GET['fl_builder']))
+		$is_full = true;
+
+		if(is_array($attr))
 		{
-			ob_start();
-			
-			?>
-			<div class="pure-g">
-				<div class="mapbox_form pure-u-1 pure-u-sm-1-1 pure-u-md-2-5">
-			<?php
-			
-			require_once(dirname( __DIR__ ) . '/public/partials/price-calculator.php');
-					
-			?>
-				</div>
-					<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-3-5">
-						<div class="map-container">
-							<div class="map" id="mapbox_airports">
-							</div>
-						</div>
-					</div>
-			</div>
-			<?php
-			
-			$content = ob_get_contents();
-			ob_end_clean();		
+			if(array_key_exists('full', $attr))
+			{
+				if(filter_var($attr['full'], FILTER_VALIDATE_BOOLEAN) === false)
+				{
+					$is_full = false;
+				}
+			}
+		}
+
+		if($is_full)
+		{
+			return apply_filters('dy_aviation_full_search_form', '');
 		}
 		else
 		{
-			 $content = '<h2 class="text-center">'.__('Map preview not available in editing mode.', 'dynamicaviation').'</h2>';
-		}
-		
-		return $content;
+			return apply_filters('dy_aviation_search_form', '');
+		}	
 	}
-
-
-
 }
 
 

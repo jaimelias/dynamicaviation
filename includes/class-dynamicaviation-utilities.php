@@ -22,7 +22,7 @@ class Dynamic_Aviation_Utilities {
 	}
 	public function algoliasearch_before()
 	{
-		$output = null;
+		$output = '';
 		$algolia_token = get_option('algolia_token');
 		$algolia_index = get_option('algolia_index');
 		$algolia_id = get_option('algolia_id');
@@ -35,6 +35,68 @@ class Dynamic_Aviation_Utilities {
 		}
 		return $output;
 	}
+
+	public function distance($lat1, $lon1, $lat2, $lon2, $unit) {
+
+		$theta = $lon1 - $lon2;
+		$dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+		$dist = acos($dist);
+		$dist = rad2deg($dist);
+		$miles = $dist * 60 * 1.1515;
+		$unit = strtoupper($unit);
+  
+		if ($unit == "K") {
+		  return ($miles * 1.609344);
+		} elseif ($unit == "N") {
+			return ($miles * 0.8684);
+		  } else {
+			  return $miles;
+			}
+	  }
+  
+	  public function convertNumberToTime($dec)
+	  {
+		  $seconds = ($dec * 3600);
+		  $hours = floor($dec);
+		  $seconds -= $hours * 3600;
+		  $minutes = floor($seconds / 60);
+		  return $this->lz($hours).":".$this->lz($minutes);
+	  }
+  
+	  public function lz($num)
+	  {
+		  return (strlen($num) < 2) ? "0{$num}" : $num;
+	  }
+
+	  public function aircraft_type($type)
+	  {
+		  $type = intval($type);
+  
+		  if($type === 0)
+		  {
+			  return __('Turbo Prop', 'dynamicaviation');
+		  }
+		  elseif($type === 1)
+		  {
+			  return __('Light Jet', 'dynamicaviation');			
+		  }
+		  elseif($type === 2)
+		  {
+			  return __('Mid-size Jet', 'dynamicaviation');			
+		  }
+		  elseif($type === 3)
+		  {
+			  return __('Heavy Jet', 'dynamicaviation');			
+		  }
+		  elseif($type === 4)
+		  {
+			  return __('Airliner', 'dynamicaviation');		
+		  }
+		  elseif($type === 5)
+		  {
+			  return __('Helicopter', 'dynamicaviation');		
+		  }		
+	  }
 }
 
 
