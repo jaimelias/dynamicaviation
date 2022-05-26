@@ -124,10 +124,10 @@ class Dynamic_Aviation_Aircrafts_Table {
         <table class="margin-bottom pure-table pure-table-bordered text-center instant_quote_table small">
             <thead>
                 <tr>
-                    <th><?php esc_html_e(__('Flights', 'dynamicaviation')); ?></th>
+                    <th><?php echo (esc_html__('Flights', 'dynamicaviation')); ?></th>
     
                     <?php if(!wp_is_mobile()): ?>
-                        <th><?php esc_html_e(__('Duration', 'dynamicaviation')); ?></th>
+                        <th><?php echo (esc_html__('Duration', 'dynamicaviation')); ?></th>
                     <?php endif; ?>
                     
                     <th colspan="2"><?php esc_html_e(($this->get()->aircraft_flight === 0) ? __('One Way', 'dynamicaviation') : __('Round Trip', 'dynamicaviation'));?></th>
@@ -255,20 +255,20 @@ class Dynamic_Aviation_Aircrafts_Table {
                 <form method="post" id="aircraft_booking_request" action="<?php echo esc_url(home_lang().'request_submitted');?>/">
 
                     <div class="modal-header clearfix">
-                        <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php esc_html_e(__('Request a Quote', 'dynamicaviation')); ?></h3>
+                        <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php echo (esc_html__('Request a Quote', 'dynamicaviation')); ?></h3>
                         <span class="close pointer pull-right large"><i class="fas fa-times"></i></span>
                     </div>				
 
                     <div class="pure-g gutters">
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="first_name"><?php esc_html_e(__('Name', 'dynamicaviation')); ?></label>
+                                <label for="first_name"><?php echo (esc_html__('Name', 'dynamicaviation')); ?></label>
                                 <input type="text" name="first_name" />								
                             </div>
                         </div>
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="lastname"><?php esc_html_e(__('Last Name', 'dynamicaviation')); ?></label>
+                                <label for="lastname"><?php echo (esc_html__('Last Name', 'dynamicaviation')); ?></label>
                                 <input type="text" name="lastname" />			
                             </div>
                         </div>
@@ -276,13 +276,13 @@ class Dynamic_Aviation_Aircrafts_Table {
                     <div class="pure-g gutters">
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="email"><?php esc_html_e(__('Email', 'dynamicaviation')); ?></label>
+                                <label for="email"><?php echo (esc_html__('Email', 'dynamicaviation')); ?></label>
                                 <input type="email" name="email" />								
                             </div>
                         </div>
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="phone"><?php esc_html_e(__('Phone', 'dynamicaviation')); ?></label>
+                                <label for="phone"><?php echo (esc_html__('Phone', 'dynamicaviation')); ?></label>
                                 <input type="text" name="phone" />								
                             </div>
                         </div>
@@ -290,7 +290,7 @@ class Dynamic_Aviation_Aircrafts_Table {
                     <div class="pure-g gutters">
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="country"><?php esc_html_e(__('Country', 'dynamicaviation')); ?></label>
+                                <label for="country"><?php echo (esc_html__('Country', 'dynamicaviation')); ?></label>
                                 <select name="country" class="countrylist"><option>--</option></select>								
                             </div>
                         </div>
@@ -306,7 +306,7 @@ class Dynamic_Aviation_Aircrafts_Table {
                     
                     <?php if(get_option('captcha_site_key')): ?>
                         <?php if(get_option('captcha_site_key') != null): ?>
-                            <button data-badge="bottomleft" data-callback="validateAviationEstimateRequest" class="g-recaptcha pure-button pure-button-primary" data-sitekey="<?php esc_html_e(get_option('captcha_site_key')); ?>" data-action='estimate'><i class="fas fa-plane"></i> <?php esc_html_e(__('Send Request', 'dynamicaviation'));?></button>	
+                            <button data-badge="bottomleft" data-callback="validateAviationEstimateRequest" class="g-recaptcha pure-button pure-button-primary" data-sitekey="<?php esc_html_e(get_option('captcha_site_key')); ?>" data-action='estimate'><i class="fas fa-plane"></i> <?php echo (esc_html__('Send Request', 'dynamicaviation'));?></button>	
                         <?php endif; ?>
                     <?php endif; ?>	
 
