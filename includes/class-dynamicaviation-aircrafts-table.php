@@ -306,9 +306,9 @@ class Dynamic_Aviation_Aircrafts_Table {
                     
                     <?php if(get_option('captcha_site_key')): ?>
                         <?php if(get_option('captcha_site_key') != null): ?>
-                            <button data-badge="bottomleft" data-callback="validate_request_quote" class="g-recaptcha pure-button pure-button-primary" id="aircraft_request" data-sitekey="<?php esc_html_e(get_option('captcha_site_key')); ?>"><i class="fas fa-plane"></i> <?php esc_html_e(__('Send Request', 'dynamicaviation'));?></button>	
+                            <button data-badge="bottomleft" data-callback="validateAviationEstimateRequest" class="g-recaptcha pure-button pure-button-primary" data-sitekey="<?php esc_html_e(get_option('captcha_site_key')); ?>" data-action='estimate'><i class="fas fa-plane"></i> <?php esc_html_e(__('Send Request', 'dynamicaviation'));?></button>	
                         <?php endif; ?>
-                    <?php endif; ?>				
+                    <?php endif; ?>	
 
                 </form>
             </div>

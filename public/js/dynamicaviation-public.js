@@ -96,81 +96,64 @@ const dynamicaviation_cookies = () => {
 
 
 
-function validate_request_quote (token) {
+async function validateAviationEstimateRequest (token) {
 	
-	return new Promise((resolve, reject) => { 
+	let invalids = [];
+	const thisForm = jQuery('#aircraft_booking_request');
+	const inputs = jQuery(thisForm).find('input').add('select').add('textarea');
+	const queryString = window.location.search;
+	const urlParams = new URLSearchParams(queryString);
+	const isOneWay = urlParams.has('aircraft_flight') ? parseInt(urlParams.get('aircraft_flight')) === 0 ? true : false : false;
+	const action = jQuery(thisForm).attr('action')+token;
+	const requiredOnRoundTrip = ['aircraft_return_date', 'aircraft_return_hour', 'return_itinerary'];
 
-		let count = 0;
-		const thisForm = jQuery('#aircraft_booking_request');
-		const getUrlParameter = (sParam) => {
-			const sPageURL = decodeURIComponent(window.location.search.substring(1));
-			const sURLVariables = sPageURL.split('&');
-			let sParameterName = null;
-
-			for (let i = 0; i < sURLVariables.length; i++) {
-				sParameterName = sURLVariables[i].split('=');
-
-				if (sParameterName[0] === sParam) {
-					return sParameterName[1] === undefined ? true : sParameterName[1];
-				}
-			}
-		};
+	jQuery(inputs).each(function(){	
 		
-		jQuery(thisForm).find('input').add('select').add('textarea').each(function(){			
-			if(jQuery(this).val() == '' && jQuery(this).attr('name') != 'g-recaptcha-response')
+		const thisName = jQuery(this).attr('name');
+		const thisVal = jQuery(this).val();
+
+		if(thisVal == '' && thisName != 'g-recaptcha-response')
+		{
+			if(isOneWay)
 			{
-				if(getUrlParameter('aircraft_flight') == 0)
-				{
-					if(jQuery(this).attr('name') == 'aircraft_return_date' || jQuery(this).attr('name') == 'aircraft_return_hour' || jQuery(this).attr('name') == 'return_itinerary')
-					{
-						jQuery(this).removeClass('invalid_field');
-						console.log(jQuery(this).attr('name'));
-					}
-					else
-					{
-						jQuery(this).addClass('invalid_field');
-						console.log(jQuery(this).attr('name'));
-						count++;
-					}
-				}
-				else
-				{
-					jQuery(this).addClass('invalid_field');
-					console.log(jQuery(this).attr('name'));
-					count++;
-				}
-			}
-			else
-			{
-				if(jQuery(this).val() == '--')
-				{
-					jQuery(this).addClass('invalid_field');
-					console.log(jQuery(this).attr('name'));
-					count++;
-				}
-				else
+				if(requiredOnRoundTrip.includes(thisName))
 				{
 					jQuery(this).removeClass('invalid_field');
-					console.log(jQuery(this).attr('name'));
 				}
+				else
+				{
+					jQuery(this).addClass('invalid_field');
+					invalids.push(thisName);
+				}				
 			}
-		});
-		
-		console.log( jQuery(thisForm).serializeArray() );
-		
-		if(count == 0 && jQuery(thisForm).attr('data-form-ready') == 'true')
-		{
-			jQuery(thisForm).attr({'action': jQuery(thisForm).attr('action')+token});
-			resolve();
-			jQuery(thisForm).submit();
+			else {
+				jQuery(this).addClass('invalid_field');
+				invalids.push(thisName);				
+			}
 		}
 		else
 		{
-			reject();
-			grecaptcha.reset();
+			if(jQuery(this).val() == '--')
+			{
+				jQuery(this).addClass('invalid_field');
+				invalids.push(thisName);
+			}
+			else
+			{
+				jQuery(this).removeClass('invalid_field');
+			}
 		}
 	});
-	
+			
+	if(invalids.length === 0)
+	{
+		jQuery(thisForm).attr({action}).submit();
+	}
+	else
+	{
+		console.log({invalids});
+		grecaptcha.reset();
+	}
 }
 
 const validate_instant_quote = () =>
@@ -191,7 +174,6 @@ const validate_instant_quote = () =>
 		
 		jQuery('#aircraft_booking_container').removeClass('hidden');
 		jQuery('.instant_quote_table').addClass('hidden');			
-		jQuery('#aircraft_booking_request').attr({'data-form-ready': 'true'});
 		jQuery('#aircraft_booking_request').find('input[name="first_name"]').focus();
 	});
 	
