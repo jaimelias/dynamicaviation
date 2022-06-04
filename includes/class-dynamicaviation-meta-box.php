@@ -58,8 +58,8 @@ class Dynamic_Aviation_Meta_Box
 
 		<p>
 			<label for="aircraft_rates"><?php _e( 'Prices Per Flight', 'dynamicaviation' ); ?></label><br>
-			<textarea class="hidden" type="text" name="aircraft_rates" id="aircraft_rates"><?php echo aviation_field( 'aircraft_rates' ); ?></textarea>
-			<div class="hot" id="aircraft_rates_table" data-sensei-headers="origin,destination,duration,price,fee per person, stops,seats,max weight" data-sensei-type="text,text,currency,currency,currency,numeric,numeric,numeric"></div>
+			<textarea class="" type="text" name="aircraft_rates" id="aircraft_rates"><?php echo esc_textarea(aviation_field('aircraft_rates')); ?></textarea>
+			<div class="hot" id="aircraft_rates_table" data-sensei-container="aircraft_rates_table" data-sensei-textarea="aircraft_rates" data-sensei-max="aircraft_flights" data-sensei-max="aircraft_flights" data-sensei-headers="origin,destination,duration,price,fee per person, stops,seats,max weight" data-sensei-type="text,text,currency,currency,currency,numeric,numeric,numeric"></div>
 		</p>	
 
 		<p><label for="aircraft_type"><?php _e( 'Type', 'dynamicaviation' ); ?></label><br>

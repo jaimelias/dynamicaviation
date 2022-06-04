@@ -68,8 +68,18 @@ class Dynamic_Aviation_Price_Table {
 				$wp_query->the_post();
 				global $post;
 				$base_iata = aviation_field( 'aircraft_base_iata' );
-				$table_price = aviation_field( 'aircraft_rates' );
+				$table_price = aviation_field('aircraft_rates');
 				$table_price = json_decode(html_entity_decode($table_price), true);
+				
+				if(!array_key_exists('aircraft_rates_table', $table_price))
+				{
+					return;
+				}
+				else
+				{
+					$table_price = $table_price['aircraft_rates_table'];
+				}
+
 				$is_commercial = (intval(aviation_field( 'aircraft_commercial')) === 1) ? true : false;
 				
 				for($x = 0; $x < count($algolia_full); $x++)

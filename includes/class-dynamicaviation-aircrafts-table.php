@@ -344,10 +344,15 @@ class Dynamic_Aviation_Aircrafts_Table {
                 global $post;
                 $has_rows = true;
                 
-                $table_price = aviation_field( 'aircraft_rates' );
+                $table_price = aviation_field('aircraft_rates');
                 $table_price = json_decode(html_entity_decode($table_price), true);
-                $is_commercial = (intval(aviation_field( 'aircraft_commercial')) === 1) ? true : false;
-                $rows .= $this->iterate_rows($post, $table_price, $is_commercial);
+
+                if(array_key_exists('aircraft_rates_table', $table_price))
+                {
+                    $table_price = $table_price['aircraft_rates_table'];
+                    $is_commercial = (intval(aviation_field( 'aircraft_commercial')) === 1) ? true : false;
+                    $rows .= $this->iterate_rows($post, $table_price, $is_commercial);
+                }
             }
 
             if($rows !== '')

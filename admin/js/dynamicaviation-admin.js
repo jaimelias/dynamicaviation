@@ -1,138 +1,174 @@
 jQuery(() => {
 	
+	if(jQuery('#aircraft_rates_table').length > 0)
+	{
+		initGridsFromTextArea();
+	}
+
+
 	if(jQuery('.aircraft_list').length > 0)
 	{
 		algolia_execute();
 	}
-	if(jQuery('#aircraft_rates').length > 0)
-	{
-		min_rows();
-
-		setTimeout(()=> {
-			register_grid(jQuery('#aircraft_rates'), jQuery('#aircraft_rates_table'));
-		}, 1000)
-		
-	}
-	if(jQuery('#aircraft_payment').length > 0)
-	{
-		jQuery('#aircraft_payment, #aircraft_last_minute').change(() =>{
-			jQuery('#post').attr({'action': jQuery('#post').attr('action')+'#aircraft-last-minute'});
-			jQuery('#post').submit();
-		});
-	}
 });
 
+const cellHeight = 23+2;
+const headerHeight = 26+2;
 
-const register_grid = (textareas, container) => {
-
-	var max_num = parseInt(jQuery('#aircraft_flights').val());
+const initGridsFromTextArea = () => {
+	jQuery('[data-sensei-container]').each(function(){
 	
-	if(isJson(jQuery(textareas).val()))
+		const {textareaId, containerId, minId, maxId} = getDataSenseiIds(this);
+				
+		setTimeout(() => { 
+			if(textareaId && containerId && maxId)
+			{
+				registerGrid(textareaId, containerId, minId, maxId);
+			}
+		}, 1000);
+		
+	});
+};
+
+
+const registerGrid = (textareaId, containerId, minId, maxId) => {	
+
+	//unescape textarea
+	let data = jQuery('<textarea />').html(jQuery(textareaId).val()).text();
+	let maxNum = parseInt(jQuery(maxId).val());
+	const gridId = jQuery(containerId).attr('id');
+	const grid = jQuery(containerId);
+	const headers = getHeaders(containerId);
+	const columns = getColType(containerId);
+	
+	const colsNum = (headers.length > 2) ? headers.length : 2;
+	
+	try
 	{
-		var data = JSON.parse(jQuery(textareas).val());
-	}
-	else
-	{
-		var data = initial_grid(textareas, container);
-		console.log(['initial_grid', data]);
-	}
-	
-	var grid = jQuery(container);
-	var headers = get_headers(jQuery(container));
-	var columns = get_col_type(jQuery(container));	
+		data = JSON.parse(data);
 
-	const menu = {};
-	menu.items = {};
-	menu.items.undo = {name: 'undo'};
-	menu.items.redo = {name: 'redo'};
+		if(data.hasOwnProperty(gridId))
+		{
+			data = data[gridId];
+		}
+	}
+	catch(e)
+	{
+		data = initialGrid(textareaId, maxId, containerId);
+		data = data[gridId];
+	}
+
+
+	const menu = {
+		items: {
+			undo: {
+				name: 'undo'
+			},
+			redo : {
+				name: 'redo'
+			}
+		}
+	};
+
+	const height = (maxNum > data.length) ? (cellHeight*maxNum)+headerHeight : (cellHeight*data.length)+headerHeight;
 	
-	var args = {
+	jQuery(containerId).height(height);
+		
+	const args = {
 		licenseKey: 'non-commercial-and-evaluation',
 		data: data,
 		stretchH: 'all',
 		columns: columns,
-		startCols: headers.length,
-		minCols: headers.length,
+		startCols: colsNum,
+		minCols: colsNum,
 		rowHeaders: true,
 		colHeaders: headers,
 		contextMenu: menu,
-		minRows: 10,
-		maxRows: max_num,
-		afterChange: function(changes, source)
-		{
+		minRows: maxNum,
+		height,
+		afterChange: (changes, source) => {
 			if (source !== 'loadData')
 			{
-				jQuery(textareas).text(JSON.stringify(update_grid(textareas, grid.handsontable('getData'))));
+				let gridData = grid.handsontable('getData');
+				
+				const maxNum = parseInt(jQuery(maxId).val());
+
+				if(gridData.length > maxNum)
+				{
+					gridData = gridData.filter((v, i) => i+1 <= maxNum);
+				}
+
+				updateTextArea({textareaId, changes: gridData, containerId});
 			}
 		}
 	}
+				
+	jQuery(grid).handsontable(args);
 	
-	grid.handsontable(args);
-	
-	jQuery('#aircraft_flights').on('change blur click', () => {
-	
-		min_rows();
-
-		var row_num = parseInt(grid.handsontable('countRows'));
-		var max_num = parseInt(jQuery('#aircraft_flights').val());
-		var instance = grid.handsontable('getInstance');
+	jQuery(minId).add(maxId).on('change click', function() {
+		const thisField = jQuery(this);
+		const maxNum = parseInt(jQuery(thisField).val());
+		let rowNum = parseInt(jQuery(grid).handsontable('countRows'));
+		const instance = jQuery(grid).handsontable('getInstance');
+		let diff = 1;
 		
-		if(row_num != max_num)
+		if(rowNum !== maxNum)
 		{
-			if(row_num < max_num)
+			if(rowNum < maxNum)
 			{
-				var diff = max_num - row_num;
-				instance.alter('insert_row', row_num, diff);
+				diff = maxNum - rowNum;
+				instance.alter('insert_row', rowNum, diff);
 			}
 			else
 			{
-				var diff = row_num - max_num;
-				instance.alter('remove_row', (row_num-diff), diff);				
-			}
+				diff = rowNum - maxNum;
 
-			jQuery(textareas).text(JSON.stringify(update_grid(textareas, grid.handsontable('getData'))));
+				instance.alter('remove_row', (rowNum-diff), diff);				
+			}
 		}
 		
-		instance.updateSettings({maxRows: max_num, data: grid.handsontable('getData')});
+		let gridData = jQuery(grid).handsontable('getData');
+
+		if(gridData.length > maxNum)
+		{
+			gridData = gridData.filter((v, i) => i+1 <= maxNum);
+		}
+
+		const height = (cellHeight*maxNum)+headerHeight;
+	
+		jQuery(containerId).height(height);
+		
+		const textAreaData = updateTextArea({textareaId, changes: gridData, containerId});
+		instance.updateSettings({maxRows: maxNum, data: textAreaData[gridId], height});
 		instance.render();
-	});			
-	
+	});		
 }
 
-const update_grid = (textareas, data) => {
-	var textareas_data = [];
-	
-	if(isJson(jQuery(textareas).val()))
-	{
-		var textareas_data = JSON.parse(jQuery(textareas).text());
-	}
-	else
-	{
-		var textareas_data = [];
-	}	
-	
-	textareas_data = data;
-	return textareas_data;
-}	
-
-const get_headers = container => {
-	var headers = [];
-	headers = jQuery(container).attr('data-sensei-headers');
-	headers = headers.split(',');
-	return headers;
+const getHeaders = containerId => {
+	let headers = jQuery(containerId).attr('data-sensei-headers');
+	return headers.split(',');
 }
-const get_col_type = container =>
-{
-	var columns = [];
-	columns = jQuery(container).attr('data-sensei-type');
+
+const getColType = containerId => {
+	let columns = jQuery(containerId).attr('data-sensei-type');
 	columns = columns.replace(/\s+/g, '');
 	columns = columns.split(',');
-	var select_option = [];
-	var output = [];
-
-	for(var x = 0; x < columns.length; x++)
+	let selectOption = null;
+	const output = [];
+	let readOnly = false;
+	const isDisabled = jQuery(containerId).attr('data-sensei-disabled');
+	
+	if(typeof isDisabled != 'undefined')
 	{
-		var row = {};
+		if(isDisabled == 'disabled')
+		{
+			readOnly = true;
+		}
+	}
+	
+	for(let x = 0; x < columns.length; x++)
+	{
+		let row = {};
 		
 		if(columns[x] == 'numeric')
 		{
@@ -152,12 +188,11 @@ const get_col_type = container =>
 		}
 		else if(columns[x] == 'dropdown')
 		{
-			
-			select_option = jQuery(container).attr('data-sensei-dropdown');
-			select_option = select_option.replace(/\s+/g, '');
-			select_option = select_option.split(',');
+			selectOption = jQuery(containerId).attr('data-sensei-dropdown');
+			selectOption = selectOption.replace(/\s+/g, '');
+			selectOption = selectOption.split(',');
 			row.type = 'dropdown';
-			row.source = select_option;
+			row.source = selectOption;
 		}
 		else if(columns[x] == 'readonly')
 		{
@@ -167,54 +202,218 @@ const get_col_type = container =>
 		{
 			row.type = 'checkbox';
 			row.className = 'htCenter';
-		}		
+		}
 		else
 		{
 			row.type = 'text';
 		}
+		
+		if(readOnly === true)
+		{
+			row.readOnly = true;
+		}
+		
 		output.push(row);
 	}
-
+	
 	return output;	
 }
 
-const initial_grid = (textareas, container) => 
-{
-	var headers = get_headers(jQuery(container));
-	var max_num = parseInt(jQuery('#aircraft_flights').val());  
-	var new_grid = [];
+const initialGrid = (textareaId, maxId, containerId) => {
+	const headers = getHeaders(containerId);
+	const maxNum = parseInt(jQuery(maxId).val());  
+	const scale = {};
+	const newGrid = [];
+	const gridId = jQuery(containerId).attr('id');
 	
-	for(var x = 0; x < max_num; x++)
+	for(let x = 0; x < maxNum; x++)
 	{
-		var row = [];
+		const row = [];
 		
-		for(var y = 0; y < headers.length; y++)
+		for(let y = 0; y < headers.length; y++)
 		{
-			row.push(null);
+			if(gridId == 'seasons_chart')
+			{
+				if((y+1) == headers.length)
+				{
+					row.push(gridId+'_'+(x+1));
+				}
+				else
+				{
+					row.push(null);
+				}				
+			}
+			else
+			{
+				row.push(null);
+			}
 		}
-		new_grid.push(row);
+		newGrid.push(row);
 	}
+
+	scale[gridId] = newGrid;
 	
-	jQuery(textareas).text(JSON.stringify(new_grid));
+	jQuery(textareaId).text(JSON.stringify(scale));
 	
-	return new_grid;
+	return scale;
 }
 
-const min_rows = () => {
-	if(parseInt(jQuery('#aircraft_flights').val()) < 10 || jQuery('#aircraft_flights').val() == '')
+const updateTextArea = ({textareaId, changes, containerId}) => {
+	
+	let output = {};
+	const gridId = jQuery(containerId).attr('id');
+	let oldData = jQuery('<textarea />').html(jQuery(textareaId).val()).text();
+
+	try{
+		oldData = JSON.parse(oldData);
+	}
+	catch(e)
 	{
-		jQuery('#aircraft_flights').val(10);
+		console.log(e.message);
+		console.log(oldData);
 	}
+
+	const height = (cellHeight * changes.length) + headerHeight;
+
+	jQuery(containerId).height(height);
+	output = {...oldData, [gridId]: changes};
+	jQuery(textareaId).text(JSON.stringify(output));
+	return output;
 }
 
-const isJson= str => {
-	try {
-		JSON.parse(str);
-	} catch (e) {
+const initSeasonGrids = () => {
+
+	
+	const seasonContainer = jQuery('#package_seasons_chart');
+
+	if(jQuery(seasonContainer).length === 0)
+	{
 		return false;
 	}
-	return true;
+
+	let data = jQuery('<textarea />').html(jQuery(seasonContainer).val()).text();
+	const numSeasons = parseInt(jQuery('[name="package_num_seasons"]').val());
+	const preRender = jQuery('<div>');
+
+	try
+	{
+		data = JSON.parse(data);
+	}
+	catch(e)
+	{
+		console.log(e.message);
+		data = {};
+	}
+
+	let occupancyChartData = jQuery('<textarea />').html(jQuery('#package_occupancy_chart').val()).text();
+
+	try
+	{
+		occupancyChartData = JSON.parse(occupancyChartData);
+	}
+	catch(e)
+	{
+		console.log(e.message);
+		occupancyChartData = {};
+	}
+
+	if(data.hasOwnProperty('seasons_chart'))
+	{
+		let {seasons_chart} = data;
+		let newRows = [];
+		const diff = numSeasons - seasons_chart.length;
+
+		if(numSeasons > seasons_chart.length)
+		{
+			for(let x = 0; x < diff; x++)
+			{
+				const thisIndex = seasons_chart.length + x + 1;
+				const gridId = `seasons_chart_${thisIndex}`;
+				let lastRow = ['', '', '', '', gridId];
+				newRows.push(lastRow);
+			}
+
+			seasons_chart = [...seasons_chart, ...newRows];
+		}
+
+		for(let x = 0; x < numSeasons; x++)
+		{
+			const season = seasons_chart[x];
+			const lastCell = season[season.length - 1];
+			const occupancyContainer = jQuery('#occupancy_chart').clone();
+			const id = jQuery(occupancyContainer).attr('id');
+			const gridKey = id+lastCell;
+			jQuery(occupancyContainer).attr({'id': gridKey, 'data-sensei-container': gridKey});			
+
+			const {maxId} = getDataSenseiIds(occupancyContainer);
+			const maxRows = parseInt(jQuery(maxId).val());
+
+			if(!occupancyChartData.hasOwnProperty(gridKey))
+			{
+				occupancyChartData[gridKey] = [...Array(maxRows).keys()].map(()=> [null, null]);
+			}
+
+
+			let title = jQuery('#package_variable_duration_price_title').text();
+			title = (season[0]) 
+				? `${title} - ${season[4]} [${season[0]}]` 
+				: `${title} - ${season[4]}`;
+
+			const wrapper = jQuery('<div>').addClass('hot-container');			
+			jQuery(wrapper).html(occupancyContainer);
+			jQuery(preRender).append(jQuery('<h3></h3>').text(title));
+			jQuery(preRender).append(wrapper);
+		}
+
+		for(let k in occupancyChartData)
+		{
+			if(k.startsWith('occupancy_chartseasons_chart_'))
+			{
+				const index = parseInt(k.replace('occupancy_chartseasons_chart_', ''));
+				
+				if(index > numSeasons)
+				{
+					console.log(k);
+					delete occupancyChartData[k];
+				}
+			}
+		}
+
+		jQuery('#package_occupancy_chart').html(JSON.stringify(occupancyChartData));
+		jQuery('#special_seasons').html(preRender);
+
+		setTimeout(() => {
+			
+			jQuery(preRender).find('.hot').each(function() {
+
+				const {textareaId, containerId, minId, maxId} = getDataSenseiIds(this);
+
+				registerGrid(textareaId, containerId, minId, maxId);
+			})
+
+		}, 1000);
+
+
+		jQuery('#package_num_seasons').change(() => {
+			initSeasonGrids();
+		});
+	}
+};
+
+const getDataSenseiIds = obj => {
+	const thisTextArea = jQuery(obj).attr('data-sensei-textarea');
+	const thisMin = jQuery(obj).attr('data-sensei-min');
+	const thisMax = jQuery(obj).attr('data-sensei-max');
+	const thisContainer = jQuery(obj).attr('data-sensei-container');
+
+	const textareaId = (thisTextArea) ? `#${thisTextArea}` : null;
+	const containerId = (thisContainer) ? `#${thisContainer}` : null;
+	const minId = (thisMin) ? `#${thisMin}`: null;
+	const maxId = (thisMax) ? `#${thisMax}`: null;
+
+	return {textareaId, containerId, minId, maxId};
 }
+
 
 const algolia_execute = () => {
 

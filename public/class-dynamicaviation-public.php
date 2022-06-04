@@ -155,21 +155,28 @@ class Dynamic_Aviation_Public {
 					while ( $wp_query23->have_posts() )
 					{
 						$wp_query23->the_post();
-						$table_price = html_entity_decode(aviation_field( 'aircraft_rates' ));
+						$table_price = html_entity_decode(aviation_field('aircraft_rates'));
 						$table_price = json_decode($table_price, true);
 
-						if(is_array($table_price))
+						if(array_key_exists('aircraft_rates_table', $table_price))
 						{
-							for($x = 0; $x < count($table_price); $x++)
+							$table_price = $table_price['aircraft_rates_table'];
+							
+							if(is_array($table_price))
 							{
-								$tp = $table_price[$x];
-								
-								if(($iata == $tp[0] || $iata == $tp[1]) && ($tp[0] != '' || $tp[1] != ''))
+								for($x = 0; $x < count($table_price); $x++)
 								{
-									array_push($prices, floatval($tp[3]));
-								}
-							}							
+									$tp = $table_price[$x];
+									
+									if(($iata == $tp[0] || $iata == $tp[1]) && ($tp[0] != '' || $tp[1] != ''))
+									{
+										array_push($prices, floatval($tp[3]));
+									}
+								}							
+							}
 						}
+
+
 					}
 
 					wp_reset_postdata();				

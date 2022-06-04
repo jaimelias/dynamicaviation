@@ -113,7 +113,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_web_api_key', 
 				'Web API Key', 
-				array(&$this, 'input_text'), 
+				array(&$this, 'settings_input'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_web_api_key') 
@@ -122,7 +122,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_email', 
 				'Email', 
-				array(&$this, 'input_text'), 
+				array(&$this, 'settings_input'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_email', 'type' => 'email') 
@@ -131,7 +131,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_email_bcc', 
 				'Bcc', 
-				array(&$this, 'input_text'), 
+				array(&$this, 'settings_input'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_email_bcc', 'type' => 'email') 
@@ -140,7 +140,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_name', 
 				'Name', 
-				array(&$this, 'input_text'), 
+				array(&$this, 'settings_input'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_name') 
@@ -149,7 +149,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_smtp_api_key', 
 				'SMTP API Key', 
-				array(&$this, 'input_text'), 
+				array(&$this, 'settings_input'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_smtp_api_key') 
@@ -157,7 +157,7 @@ if(!class_exists('Sendgrid_Mailer'))
 			add_settings_field( 
 				'sendgrid_smtp_username', 
 				'SMTP Username', 
-				array(&$this, 'input_text'), 
+				array(&$this, 'settings_input'), 
 				'sendgrid_settings', 
 				'sendgrid_settings_section',
 				array('name' => 'sendgrid_smtp_username') 
@@ -165,12 +165,12 @@ if(!class_exists('Sendgrid_Mailer'))
 			
 		}
 		
-		public function input_text($arr){
+		public function settings_input($arr){
 				$name = $arr['name'];
 				$url = (array_key_exists('url', $arr)) ? '<a href="'.esc_url($arr['url']).'">?</a>' : null;
 				$type = (array_key_exists('type', $arr)) ? $arr['type'] : 'text';
 			?>
-			<input type="<?php echo $type; ?>" name="<?php esc_attr_e($name); ?>" id="<?php echo $name; ?>" value="<?php esc_attr_e(get_option($name)); ?>" /> <span><?php echo $url; ?></span>
+			<input type="<?php echo $type; ?>" name="<?php echo esc_attr($name); ?>" id="<?php echo $name; ?>" value="<?php echo esc_attr(get_option($name)); ?>" /> <span><?php echo $url; ?></span>
 
 		<?php }		
 
@@ -207,6 +207,7 @@ if(!class_exists('Sendgrid_Mailer'))
 					$attachments = (array_key_exists('attachments', $args)) ? $args['attachments'] : array();
 					$emails = $this->get_email_arr($args['to']);
 					$count_emails = count($emails);
+					$invalid_emails = false;
 										
 					if($count_emails > 0)
 					{					
@@ -216,64 +217,73 @@ if(!class_exists('Sendgrid_Mailer'))
 							$email->setFrom(sanitize_email($this->email), esc_html($this->name));
 							$email->setSubject($subject);
 							
-							
-
 							for($x = 0; $x < $count_emails; $x++)
-							{
-								//allow only 5 recipients
-								
-								if($x <= 10 && is_email($emails[$x]))
+							{	
+								if(is_email($emails[$x]))
 								{
-									if($x < 1)
+									//allow only 5 recipients
+
+									if($x <= 5)
 									{
-										$email->addTo($emails[$x]);
+										if($x === 0)
+										{
+											$email->addTo($emails[$x]);
+										}
+										else
+										{
+											$email->addCc($emails[$x], null, null, ($x-1));
+										}
 									}
-									else
-									{
-										$email->addCc($emails[$x], null, null, ($x-1));
-									}
-								}
-							}
-														
-							if($this->email_bcc)
-							{
-								$email->addBcc($this->email_bcc);
-							}
-							
-							$email->addContent('text/html', $message);				
-							
-							if($this->has_attachments($attachments))
-							{
-								for($x = 0; $x < count($attachments); $x++)
-								{						
-									$attachment = new Attachment();
-									$attachment->setContent($attachments[$x]['data']);
-									$attachment->setType('application/pdf');
-									$attachment->setFilename(wp_specialchars_decode($attachments[$x]['filename']));
-									$attachment->setDisposition('attachment');
-									$email->addAttachment($attachment);	
-								}							
-							}
-							
-							$sendgrid = new \SendGrid(esc_html($this->web_api_key));
-							
-							try {
-								
-								$response = $sendgrid->send($email);
-								
-								if($response->statusCode() >= 200 && $response->statusCode() <= 299)
-								{
-									return $args;
 								}
 								else
 								{
-									write_log($response->body());
+									$invalid_emails = true;
+									break;
 								}
-							} 
-							catch(Exception $e)
+							}
+							
+							if(!$invalid_emails)
 							{
-								write_log($e->getMessage());
-							}				
+								if($this->email_bcc)
+								{
+									$email->addBcc($this->email_bcc);
+								}
+								
+								$email->addContent('text/html', $message);				
+								
+								if($this->has_attachments($attachments))
+								{
+									for($x = 0; $x < count($attachments); $x++)
+									{						
+										$attachment = new Attachment();
+										$attachment->setContent($attachments[$x]['data']);
+										$attachment->setType('application/pdf');
+										$attachment->setFilename(wp_specialchars_decode($attachments[$x]['filename']));
+										$attachment->setDisposition('attachment');
+										$email->addAttachment($attachment);	
+									}							
+								}
+								
+								$sendgrid = new \SendGrid(esc_html($this->web_api_key));
+								
+								try {
+									
+									$response = $sendgrid->send($email);
+									
+									if($response->statusCode() >= 200 && $response->statusCode() <= 299)
+									{
+										return $args;
+									}
+									else
+									{
+										write_log($response->body());
+									}
+								} 
+								catch(Exception $e)
+								{
+									write_log($e->getMessage());
+								}
+							}
 						}
 						else
 						{
