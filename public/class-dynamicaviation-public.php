@@ -704,7 +704,7 @@ class Dynamic_Aviation_Public {
 		wp_enqueue_script( 'picker-time-js', plugin_dir_url( __FILE__ ) . 'js/picker/picker.time.js',array('jquery', 'picker-js'), '3.6.2', true);	
 		wp_enqueue_script( 'picker-legacy', plugin_dir_url( __FILE__ ) . 'js/picker/legacy.js', array('jquery', 'picker-js'), '3.6.2', true);
 
-		$picker_translation = 'js/picker/translations/'.substr(get_locale(), 0, -3).'.js';
+		$picker_translation = 'js/picker/translations/'.get_locale().'.js';
 				
 		if(file_exists(dirname( __FILE__ ).'/'.$picker_translation))
 		{
