@@ -1,3 +1,6 @@
+const cellHeight = 23+2;
+const headerHeight = 26+2;
+
 jQuery(() => {
 	
 	if(jQuery('#aircraft_rates_table').length > 0)
@@ -11,9 +14,6 @@ jQuery(() => {
 		algolia_execute();
 	}
 });
-
-const cellHeight = 23+2;
-const headerHeight = 26+2;
 
 const initGridsFromTextArea = () => {
 	jQuery('[data-sensei-container]').each(function(){
@@ -40,7 +40,6 @@ const registerGrid = (textareaId, containerId, minId, maxId) => {
 	const grid = jQuery(containerId);
 	const headers = getHeaders(containerId);
 	const columns = getColType(containerId);
-	
 	const colsNum = (headers.length > 2) ? headers.length : 2;
 	
 	try
@@ -417,12 +416,29 @@ const getDataSenseiIds = obj => {
 
 const algolia_execute = () => {
 
+
+	let iata = null;
+	const href = window.location.href;
+	const url = new URL(href);
+	const {searchParams, pathname} = url;
+
+
+	if(pathname.endsWith('post-new.php') && searchParams.has('iata'))
+	{
+		iata = searchParams.get('iata');
+	}
+
 	jQuery('.aircraft_list').each(function() {
 
-		var this_id = jQuery(this).attr('id');
-		this_id = '#' + this_id;
+		let thisId = jQuery(this).attr('id');
+		thisId = '#' + thisId;
 
-		autocomplete(this_id, {
+		if(!jQuery(this).val() && iata)
+		{
+			jQuery(this).val(iata);
+		}
+
+		autocomplete(thisId, {
 			hint: false
 		}, [{
 			source: autocomplete.sources.hits(algoliaIndex, {
@@ -430,15 +446,15 @@ const algolia_execute = () => {
 			}),
 			displayKey: 'iata',
 			templates: {
-				suggestion: function(suggestion) {
-					var htmllang = jQuery("html").attr("lang");
+				suggestion: suggestion => {
+					let htmllang = jQuery("html").attr("lang");
 					htmllang = htmllang.slice(0, 2);
 					htmllang.toLowerCase();
 					
-					var country_names = suggestion.country_names;
-					var country_lang = null;
+					const country_names = suggestion.country_names;
+					let  country_lang = null;
 					
-					for(var prop in country_names[0])
+					for(let prop in country_names[0])
 					{
 						if(prop == htmllang)
 						{
@@ -451,13 +467,13 @@ const algolia_execute = () => {
 					}
 					
 					
-					var country_flag = suggestion.country_code;
-					var flag_url = jsonsrc()+"img/flags/"+country_flag+'.svg';
+					const country_flag = suggestion.country_code;
+					let flag_url = jsonsrc()+"img/flags/"+country_flag+'.svg';
 					flag_url = flag_url.toLowerCase();
 					
 					//console.log(suggestion);
 
-					var result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> (<span class="iata"></span>)</div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
+					let result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> (<span class="iata"></span>)</div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
 					result.find('.sairport > .airport').html(suggestion._highlightResult.airport.value);
 					result.find('.sairport > .iata').html(suggestion._highlightResult.iata.value);
 					result.find('.slocation > .city').html(suggestion._highlightResult.city.value);

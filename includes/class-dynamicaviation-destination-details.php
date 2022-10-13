@@ -21,6 +21,7 @@ class Dynamic_Aviation_Destination_Details {
     {
         $output = '';
         $current_language = current_language();
+        $can_user_edit = (current_user_can('editor') || current_user_can('administrator')) ? true : false;
         
         $args = array(
             'post_type' => 'destinations',
@@ -44,11 +45,23 @@ class Dynamic_Aviation_Destination_Details {
             while ( $wp_query->have_posts() )
             {
                 $wp_query->the_post();
+                global $post;
+                $output .= '<div class="entry-content">'.get_the_content().'</div>';
 
-                $output = '<div class="entry-content">'.get_the_content().'</div>';
+                if( $can_user_edit )
+                {
+                    $output .= '<p><a class="pure-button" href="'.esc_url(get_edit_post_link($post->ID)).'"><i class="fas fa-pencil-alt" ></i> '.esc_html(__('Edit Destination', 'dynamicaviation')).'</a></p>';
+                }
             }
 
             wp_reset_postdata();
+        }
+        else
+        {
+            if($can_user_edit)
+            {
+                $output .= '<p><a class="pure-button" href="'.esc_url(admin_url('post-new.php?post_type=destinations&iata='.$iata)).'"><i class="fas fa-plus" ></i> '.esc_html(__('Add Destination', 'dynamicaviation')).'</a></p>';
+            }
         }
 
         return $output;
