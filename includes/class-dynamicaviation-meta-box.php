@@ -5,35 +5,70 @@ class Dynamic_Aviation_Meta_Box
 
 	public function __construct()
 	{
-		add_action( 'save_post', array(&$this, 'aircraft_save') );
-		add_action( 'add_meta_boxes', array(&$this, 'aircraft_add_meta_box') );
+		add_action( 'save_post', array(&$this, 'save') );
+		add_action( 'add_meta_boxes', array(&$this, 'add_meta_box') );
 	}
 
-	public function aircraft_add_meta_box() {
+	public function add_meta_box() {
 		
 		add_meta_box(
 			'aircraft_settings',
 			__( 'Flights', 'dynamicaviation' ),
-			array(&$this, 'aircraft_settings'),
+			array(&$this, 'aircraft_fields'),
 			'aircrafts',
 			'normal',
 			'default'
 		);
+
+		add_meta_box(
+			'destination_settings',
+			__( 'Flights', 'dynamicaviation' ),
+			array(&$this, 'destination_fields'),
+			'destinations',
+			'normal',
+			'default'
+		);
+
 	}
 
-	public function aircraft_settings($post) {
-	wp_nonce_field( '_aircraft_nonce', 'aircraft_nonce' ); ?>
+	public function base_field()
+	{
+		?>
+			<p>
+				<label for="aircraft_base_iata"><?php _e( 'Base IATA', 'dynamicaviation' ); ?></label><br>
+				<input class="aircraft_list" type="text" name="aircraft_base_iata" id="aircraft_base_iata" value="<?php echo aviation_field( 'aircraft_base_iata' ); ?>">
+			</p>
+		<?php
+	}
+
+	public function echo_nonce()
+	{
+		wp_nonce_field( '_aviation_nonce', 'aviation_nonce' );
+	}
+
+	public function destination_fields($post)
+	{
+		$this->echo_nonce();
+		$this->base_field();
+	}
+
+	public function aircraft_fields($post) {
+		$this->echo_nonce();
+		
+		$aircraft_type = aviation_field('aircraft_type');
+		$aircraft_commercial = aviation_field( 'aircraft_commercial' );
+		
+		?>
 		<p><label for="aircraft_commercial"><?php _e( 'Type of Transport', 'dynamicaviation' ); ?></label><br>
 			<select name="aircraft_commercial" id="aircraft_commercial">
-				<option value="0" <?php echo (aviation_field( 'aircraft_commercial' ) == 0 ) ? 'selected' : '' ?>><?php _e( 'Charter Flight', 'dynamicaviation' ); ?></option>
-				<option value="1" <?php echo (aviation_field( 'aircraft_commercial' ) == 1 ) ? 'selected' : '' ?>><?php _e( 'Commercial Flight', 'dynamicaviation' ); ?></option>
+				<option value="0" <?php echo ($aircraft_commercial == 0 ) ? 'selected' : '' ?>><?php _e( 'Charter Flight', 'dynamicaviation' ); ?></option>
+				<option value="1" <?php echo ($aircraft_commercial == 1 ) ? 'selected' : '' ?>><?php _e( 'Commercial Flight', 'dynamicaviation' ); ?></option>
 			</select>
 		</p>	
 
-		<p>
-			<label for="aircraft_base_iata"><?php _e( 'Base IATA', 'dynamicaviation' ); ?></label><br>
-			<input class="aircraft_list" type="text" name="aircraft_base_iata" id="aircraft_base_iata" value="<?php echo aviation_field( 'aircraft_base_iata' ); ?>">
-		</p>
+
+		<?php $this->base_field(); ?>
+
 		<p>
 			<label for="aircraft_base_name"><?php _e( 'Base Name', 'dynamicaviation' ); ?></label><br>
 			<input class="aircraft_base_name" type="text" name="aircraft_base_name" id="aircraft_base_name" value="<?php echo aviation_field( 'aircraft_base_name' ); ?>" readonly>
@@ -58,18 +93,18 @@ class Dynamic_Aviation_Meta_Box
 
 		<p>
 			<label for="aircraft_rates"><?php _e( 'Prices Per Flight', 'dynamicaviation' ); ?></label><br>
-			<textarea class="" type="text" name="aircraft_rates" id="aircraft_rates"><?php echo esc_textarea(aviation_field('aircraft_rates')); ?></textarea>
+			<textarea class="hidden" type="text" name="aircraft_rates" id="aircraft_rates"><?php echo esc_textarea(aviation_field('aircraft_rates')); ?></textarea>
 			<div class="hot" id="aircraft_rates_table" data-sensei-container="aircraft_rates_table" data-sensei-textarea="aircraft_rates" data-sensei-max="aircraft_flights" data-sensei-max="aircraft_flights" data-sensei-headers="origin,destination,duration,price,fee per person, stops,seats,max weight" data-sensei-type="text,text,currency,currency,currency,numeric,numeric,numeric"></div>
 		</p>	
 
 		<p><label for="aircraft_type"><?php _e( 'Type', 'dynamicaviation' ); ?></label><br>
 			<select name="aircraft_type" id="aircraft_type">
-				<option value="0" <?php echo (aviation_field( 'aircraft_type' ) == 0 ) ? 'selected' : '' ?>>Turbo Prop</option>
-				<option value="1" <?php echo (aviation_field( 'aircraft_type' ) == 1 ) ? 'selected' : '' ?>>Light Jet</option>
-				<option value="2" <?php echo (aviation_field( 'aircraft_type' ) == 2 ) ? 'selected' : '' ?>>Mid-size Jet</option>
-				<option value="3" <?php echo (aviation_field( 'aircraft_type' ) == 3 ) ? 'selected' : '' ?>>Heavy Jet</option>
-				<option value="4" <?php echo (aviation_field( 'aircraft_type' ) == 4 ) ? 'selected' : '' ?>>Airliner</option>
-				<option value="5" <?php echo (aviation_field( 'aircraft_type' ) == 5 ) ? 'selected' : '' ?>>Helicopter</option>				
+				<option value="0" <?php echo ($aircraft_type == 0 ) ? 'selected' : '' ?>>Turbo Prop</option>
+				<option value="1" <?php echo ($aircraft_type == 1 ) ? 'selected' : '' ?>>Light Jet</option>
+				<option value="2" <?php echo ($aircraft_type == 2 ) ? 'selected' : '' ?>>Mid-size Jet</option>
+				<option value="3" <?php echo ($aircraft_type == 3 ) ? 'selected' : '' ?>>Heavy Jet</option>
+				<option value="4" <?php echo ($aircraft_type == 4 ) ? 'selected' : '' ?>>Airliner</option>
+				<option value="5" <?php echo ($aircraft_type == 5 ) ? 'selected' : '' ?>>Helicopter</option>				
 			</select>
 		</p>
 		
@@ -106,9 +141,9 @@ class Dynamic_Aviation_Meta_Box
 	<?php
 	}
 
-	public  function aircraft_save( $post_id ) {
+	public function save( $post_id ) {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
-		if ( ! isset( $_POST['aircraft_nonce'] ) || ! wp_verify_nonce( $_POST['aircraft_nonce'], '_aircraft_nonce' ) ) return;
+		if ( ! isset( $_POST['aviation_nonce'] ) || ! wp_verify_nonce( $_POST['aviation_nonce'], '_aviation_nonce' ) ) return;
 		if ( ! current_user_can( 'edit_post', $post_id ) ) return;
 		
 		if ( isset( $_POST['aircraft_commercial'] ) )

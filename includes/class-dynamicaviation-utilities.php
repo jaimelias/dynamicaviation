@@ -4,32 +4,6 @@
 class Dynamic_Aviation_Utilities {
 
 
-	public function current_language()
-	{
-		global $polylang;
-		$lang = '';
-
-		if(isset($polylang))
-		{
-			$lang = pll_current_language();
-		}
-		else
-		{
-			$locale_str = get_locale();
-
-			if(strlen($locale_str) === 5)
-			{
-				$lang = substr($locale_str, 0, -3);
-			}
-			if(strlen($locale_str) === 2)
-			{
-				$lang = $locale_str;
-			}			
-		}
-
-		return $lang;
-	}
-
 	public function airport_img_url($json, $redirect_mobile)
 	{
 		$airport = $json['airport'];

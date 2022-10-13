@@ -12,7 +12,7 @@ class Dynamic_Aviation_Public {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->utilities =  $utilities;
-
+		add_action('init', array(&$this, 'init'));
 		add_action( 'parse_query', array( &$this, 'on_quote_submit' ), 1);
 		add_filter('minimal_sitemap', array(&$this, 'sitemap'), 10);
 		add_filter('dy_aviation_estimate_notes', array(&$this, 'estimate_notes'));
@@ -36,11 +36,14 @@ class Dynamic_Aviation_Public {
 		add_filter('body_class', array(&$this, 'remove_body_class'), 100);
 	}
 
+	public function init()
+	{
+		$this->current_language = current_language();
+	}
 
 	public function estimate_notes()
 	{
-		$current_language = $this->utilities->current_language();
-		return get_option('dy_aviation_estimate_note_'.$current_language);
+		return get_option('dy_aviation_estimate_note_'.$this->current_language);
 	}
 
 	
@@ -55,9 +58,14 @@ class Dynamic_Aviation_Public {
 				if(Dynamic_Aviation_Validators::validate_recaptcha())
 				{
 					$data = $_POST;
-					$data['lang'] = substr( get_locale(), 0, 2 );
+					$data['lang'] = current_language();
 					
-					$args50 = array('post_type' => 'aircrafts','posts_per_page' => 1, 'p' => intval($data['aircraft_id']));	
+					$args50 = array(
+						'post_type' => 'aircrafts',
+						'posts_per_page' => 1, 
+						'p' => intval($data['aircraft_id'])
+					);	
+					
 					$wp_query50 = new WP_Query( $args50 );
 					
 					if($wp_query50->have_posts())
@@ -407,13 +415,12 @@ class Dynamic_Aviation_Public {
 					$codes = '('.$iata.')';
 					$city = $json['city'];
 					$country_name = $json['country_names'];
-					$lang = $this->utilities->current_language();
 					
-					if($lang)
+					if($this->current_language)
 					{
-						if(array_key_exists($lang, $country_name))
+						if(array_key_exists($this->current_language, $country_name))
 						{
-							$country_lang = $country_name[$lang];
+							$country_lang = $country_name[$this->current_language];
 						}
 						else
 						{
@@ -495,7 +502,7 @@ class Dynamic_Aviation_Public {
 		//map position
 		$mapbox_marker = 'pin-l-airport+dd3333('.$_geoloc['lng'].','.$_geoloc['lat'].')';
 
-		return 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/600x400?access_token='.esc_html($mapbox_token);				
+		return 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/660x440?access_token='.esc_html($mapbox_token);				
 	}
 	
 	public function redirect_cacheimg()
@@ -581,7 +588,7 @@ class Dynamic_Aviation_Public {
 			$new_template = locate_template( array( 'page.php' ) );
 			return $new_template;			
 		}
-		if(get_query_var( 'fly' ) || Dynamic_Aviation_Validators::valid_aircraft_search() || is_singular('aircrafts'))
+		if(get_query_var( 'fly' ) || Dynamic_Aviation_Validators::valid_aircraft_search() || is_singular('aircrafts') || is_singular('destinations'))
 		{
 			$new_template = locate_template( array( 'page.php' ) );
 			return $new_template;			

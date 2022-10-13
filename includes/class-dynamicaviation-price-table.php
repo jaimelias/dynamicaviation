@@ -188,7 +188,7 @@ class Dynamic_Aviation_Price_Table {
 				$table .= '<div itemscope itemtype="http://schema.org/Table"><h3 itemprop="about">'.esc_html(__('Flights to ', 'dynamicaviation')).' '.esc_html($destination_airport).' ('.esc_html($iata).'), '.esc_html($destination_city).', '.esc_html($destination_country_code).'</h3>';
 			}
 			
-			$table .= '<table id="dy_table" class="text-center small pure-table pure-table-bordered margin-bottom"><thead><tr>';
+			$table .= '<table id="dy_table" class="text-center small pure-table pure-table-bordered bottom-40"><thead><tr>';
 			
 			
 			$origin_label = __('Destination', 'dynamicaviation');
@@ -203,7 +203,7 @@ class Dynamic_Aviation_Price_Table {
 			$table .= '<th>'.esc_html(__('One Way', 'dynamicaviation')).'</th>';
 			$table .= '</tr></thead><tbody>';
 			$table .= $table_row;
-			$table .= '</tbody></table>';
+			$table .= '</tbody></table><hr/>';
 			
 			if(!get_query_var('fly'))
 			{

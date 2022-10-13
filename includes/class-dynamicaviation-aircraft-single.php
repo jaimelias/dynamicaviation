@@ -51,7 +51,8 @@ class Dynamic_Aviation_Aircraft_Single {
     {
         $labels = $this->get_table_labels();
         $keys = $this->get_table_keys();
-        $table = '<table class="text-center pure-table small pure-table-striped">';
+        $base = aviation_field('aircraft_base_name');
+        $table = '<table class="text-center pure-table small pure-table-striped bottom-40">';
         
         for($x = 0; $x < count($keys); $x++)
         {
@@ -78,7 +79,7 @@ class Dynamic_Aviation_Aircraft_Single {
                 }
                 else if($key == 'aircraft_base_iata')
                 {
-                    $value = aviation_field('aircraft_base_name');
+                    $value = $base;
                 }
                 
                 $table .= '<tr>';
