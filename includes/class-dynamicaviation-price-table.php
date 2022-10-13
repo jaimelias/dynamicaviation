@@ -66,14 +66,18 @@ class Dynamic_Aviation_Price_Table {
 				
 				if(!array_key_exists('aircraft_rates_table', $table_price))
 				{
-					return;
+					return __('Local price table is null or invalid.', 'dynamicaviation');
+				}
+				if(!is_array($algolia_full))
+				{
+					return __('Database is not or invalid.', 'dynamicaviation');
 				}
 				else
 				{
 					$table_price = $table_price['aircraft_rates_table'];
 				}
 
-				$is_commercial = (intval(aviation_field( 'aircraft_commercial')) === 1) ? true : false;
+				$is_commercial = (aviation_field( 'aircraft_commercial') == 1) ? true : false;
 				
 				for($x = 0; $x < count($algolia_full); $x++)
 				{
@@ -89,15 +93,16 @@ class Dynamic_Aviation_Price_Table {
 								
 				for($x = 0; $x < count($table_price); $x++)
 				{
-					
 					$origin_iata = $table_price[$x][1];
 					
 					if($iata == $table_price[$x][1])
 					{
 						$origin_iata = $table_price[$x][0];
 					}
+
+					//wp_die($origin_iata);
 					
-					if(($iata == $table_price[$x][0] || $iata == $table_price[$x][1]) && ($table_price[$x][0] != '' || $table_price[$x][1] != '') && is_array($algolia_full))
+					if(($iata == $table_price[$x][0] || $iata == $table_price[$x][1]) && (!empty($table_price[$x][0]) ||  !empty($table_price[$x][1]) ))
 					{
 						
 						for($y = 0; $y < count($algolia_full); $y++)
@@ -123,14 +128,9 @@ class Dynamic_Aviation_Price_Table {
 						
 						if(!is_singular('aircrafts'))
 						{
-							if($is_commercial)
-							{
-								$table_row .= '<td><strong>'.esc_html(__('Commercial Flight', 'dynamicaviation')).'</strong></td>';
-							}
-							else
-							{
-								$table_row .= '<td><a class="strong" href="'.esc_url($aircraft_url).'/">'.esc_html($post->post_title).'</a> - <small>'.esc_html($aircraft_type).'</small><br/><i class="fas fa-male" ></i> '.esc_html($seats).' <small>('.$weight_allowed.')</small></td>';
-							}
+							$table_row .= ($is_commercial) 
+							? '<td><strong>'.esc_html(__('Commercial Flight', 'dynamicaviation')).'</strong></td>'
+							: '<td><a class="strong" href="'.esc_url($aircraft_url).'/">'.esc_html($post->post_title).'</a> - <small>'.esc_html($aircraft_type).'</small><br/><i class="fas fa-male" ></i> '.esc_html($seats).' <small>('.$weight_allowed.')</small></td>';
 						}
 						
 						$table_row .= '<td><small class="text-muted">('.esc_html($origin_iata).')</small> <strong>'.esc_html($origin_city.', '.$origin_country_code).'</strong><br/>'.esc_html($origin_airport).'</td>';
