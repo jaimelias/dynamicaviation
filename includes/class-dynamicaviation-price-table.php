@@ -99,8 +99,6 @@ class Dynamic_Aviation_Price_Table {
 					{
 						$origin_iata = $table_price[$x][0];
 					}
-
-					//wp_die($origin_iata);
 					
 					if(($iata == $table_price[$x][0] || $iata == $table_price[$x][1]) && (!empty($table_price[$x][0]) ||  !empty($table_price[$x][1]) ))
 					{
@@ -197,27 +195,37 @@ class Dynamic_Aviation_Price_Table {
 
 	public static function algolia_full()
 	{
-		$query_param = 'browse?cursor=';
-		$algolia_token = get_option('algolia_token');
-		$algolia_index = get_option('algolia_index');
-		$algolia_id = get_option('algolia_id');
-		
-		$curl = curl_init();
-		
-		$headers = array('X-Algolia-API-Key: '.$algolia_token, 'X-Algolia-Application-Id: '.$algolia_id);
+		$output = array();
+		$which_var = 'dynamicaviation_algolia_full';
+		global $$which_var;
 
-		$curl_arr = array(
-			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_REFERER => esc_url(home_url()),
-			CURLOPT_URL => 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param,
-		);
+		if(isset($$which_var))
+		{
+			return $$which_var;
+		}
+		else
+		{
+			$query_param = 'browse?cursor=';
+			$algolia_token = get_option('algolia_token');
+			$algolia_index = get_option('algolia_index');
+			$algolia_id = get_option('algolia_id');
+			$headers = array('X-Algolia-API-Key: '.$algolia_token, 'X-Algolia-Application-Id: '.$algolia_id);
+			$url = 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param;
+			$curl_arr = array(
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_REFERER => esc_url(home_url()),
+				CURLOPT_URL => esc_url($url)
+			);
 
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);	
-		curl_setopt_array($curl, $curl_arr);
-		$resp = curl_exec($curl);
-		$resp = json_decode($resp, true);
-		$resp = $resp['hits'];
-		return $resp;
+			$curl = curl_init();
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);	
+			curl_setopt_array($curl, $curl_arr);
+			$resp = curl_exec($curl);
+			$resp = json_decode($resp, true);
+			$output = $resp['hits'];
+			$GLOBALS[$which_var] = $output;
+			return $output;
+		}
 	}
 }
 
