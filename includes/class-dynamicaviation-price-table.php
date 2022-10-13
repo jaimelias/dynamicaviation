@@ -17,6 +17,7 @@ class Dynamic_Aviation_Price_Table {
 
 	public function table($iata = '')
 	{
+		$output = '';
 		global $airport_array;
 
 		if($iata === '')
@@ -32,44 +33,36 @@ class Dynamic_Aviation_Price_Table {
 			}
 		}
 
-
 		if(!$iata)
 		{
 			return __('IATA not found', 'dynamicaviation');
 		}
-
-		$output = '';
-		$filter = null;
-		$aircraft_count = 0;
-		$table_row = null;
-		$iata_list = array();
 		
-		$query_args = array(
-			'post_type' => 'aircrafts',
-			'posts_per_page' => 200, 
-			'post_parent' => 0, 
-			'meta_key' => 'aircraft_commercial', 
-			'orderby' => 'meta_value', 
-			'order' => 'ASC'
+		
+		$wp_query = new WP_Query( 
+			array(
+				'post_type' => 'aircrafts',
+				'posts_per_page' => 200, 
+				'post_parent' => 0, 
+				'meta_key' => 'aircraft_commercial', 
+				'orderby' => 'meta_value', 
+				'order' => 'ASC'
+			)
 		);
 		
-
-
-		$wp_query = new WP_Query( $query_args );
-		
-		//aircraft
 		if ( $wp_query->have_posts() )
 		{
-			
+
+			$aircraft_count = 0;
+			$table_row = '';
 			$algolia_full = $this->algolia_full();
-			
+
 			while ($wp_query->have_posts() )
 			{
 				$wp_query->the_post();
 				global $post;
-				$base_iata = aviation_field( 'aircraft_base_iata' );
-				$table_price = aviation_field('aircraft_rates');
-				$table_price = json_decode(html_entity_decode($table_price), true);
+				$base_iata = aviation_field('aircraft_base_iata');
+				$table_price = json_decode(html_entity_decode(aviation_field('aircraft_rates')), true);
 				
 				if(!array_key_exists('aircraft_rates_table', $table_price))
 				{
@@ -93,9 +86,7 @@ class Dynamic_Aviation_Price_Table {
 				}
 				
 				$aircraft_url = home_lang().esc_html($post->post_type).'/'.esc_html($post->post_name);
-				
-				$limit = 5;
-				
+								
 				for($x = 0; $x < count($table_price); $x++)
 				{
 					
@@ -122,7 +113,7 @@ class Dynamic_Aviation_Price_Table {
 						$fees = $table_price[$x][4];
 						$seats = $table_price[$x][6];
 						$weight_pounds = $table_price[$x][7];
-						$weight_kg = intval(intval($weight_pounds)*0.453592);
+						$weight_kg = intval($weight_pounds)*0.453592;
 						$weight_allowed = esc_html($weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation'));
 						$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
 						
@@ -146,14 +137,8 @@ class Dynamic_Aviation_Price_Table {
 
 						$table_row .= '<td><strong>'.esc_html('$'.number_format($table_price[$x][3], 2, '.', ',')).'</strong><br/><span class="text-muted">';
 
-						if($is_commercial)
-						{
-							$table_row .= esc_html(__('Per Person', 'dynamicaviation'));
-						}
-						else
-						{
-							$table_row .= esc_html(__('Charter Flight', 'dynamicaviation'));
-						}
+						$table_row .= ($is_commercial) ? esc_html(__('Per Person', 'dynamicaviation')) : esc_html(__('Charter Flight', 'dynamicaviation'));
+
 						$table_row .= '</span>';
 						
 						if(floatval($fees) > 0)
@@ -161,7 +146,8 @@ class Dynamic_Aviation_Price_Table {
 							$table_row .= '<br/><span class="text-muted">';
 							$table_row .= esc_html(__('Fees per pers.', 'dynamicaviation').' '.'$'.number_format($fees, 2, '.', ','));
 							$table_row .= '</span>';
-						}						
+						}
+
 						$table_row .= '<br/><span class="small text-muted"><i class="fas fa-clock" ></i> '.esc_html($this->utilities->convertNumberToTime($table_price[$x][2])).'</span>';
 						
 						$table_row .= '</td></tr>';
@@ -169,6 +155,7 @@ class Dynamic_Aviation_Price_Table {
 					}
 				}
 			}
+			
 			wp_reset_postdata();
 		}	
 
@@ -189,8 +176,6 @@ class Dynamic_Aviation_Price_Table {
 			}
 			
 			$table .= '<table id="dy_table" class="text-center small pure-table pure-table-bordered bottom-40"><thead><tr>';
-			
-			
 			$origin_label = __('Destination', 'dynamicaviation');
 			
 			if(!is_singular('aircrafts'))
@@ -204,11 +189,6 @@ class Dynamic_Aviation_Price_Table {
 			$table .= '</tr></thead><tbody>';
 			$table .= $table_row;
 			$table .= '</tbody></table><hr/>';
-			
-			if(!get_query_var('fly'))
-			{
-				$table .= '</div>';
-			}
 			
 			$output .=  $table;
 			return $output;
@@ -224,9 +204,7 @@ class Dynamic_Aviation_Price_Table {
 		
 		$curl = curl_init();
 		
-		$headers = array();
-		$headers[] = 'X-Algolia-API-Key: '.$algolia_token;
-		$headers[] = 'X-Algolia-Application-Id: '.$algolia_id;
+		$headers = array('X-Algolia-API-Key: '.$algolia_token, 'X-Algolia-Application-Id: '.$algolia_id);
 
 		$curl_arr = array(
 			CURLOPT_RETURNTRANSFER => 1,

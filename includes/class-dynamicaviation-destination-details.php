@@ -112,7 +112,7 @@ class Dynamic_Aviation_Destination_Details {
                     </table>
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3">
-                    <img class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php esc_html_e($airport).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
+                    <img width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php esc_html_e($airport).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
                     <?php echo $this->get_destination_content($iata); ?>
                 </div>
             </div>
