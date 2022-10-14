@@ -38,17 +38,22 @@ class Dynamic_Aviation_Price_Table {
 			return __('IATA not found', 'dynamicaviation');
 		}
 		
-		
-		$wp_query = new WP_Query( 
-			array(
-				'post_type' => 'aircrafts',
-				'posts_per_page' => 200, 
-				'post_parent' => 0, 
-				'meta_key' => 'aircraft_commercial', 
-				'orderby' => 'meta_value', 
-				'order' => 'ASC'
-			)
+
+		$args = array(
+			'post_type' => 'aircrafts',
+			'posts_per_page' => 200, 
+			'post_parent' => 0, 
+			'meta_key' => 'aircraft_price_per_hour', 
+			'orderby' => 'meta_value_num', 
+			'order' => 'ASC'
 		);
+
+		if(is_singular('aircrafts'))
+		{
+			$args['p'] = get_the_ID();
+		}
+		
+		$wp_query = new WP_Query($args);
 		
 		if ( $wp_query->have_posts() )
 		{
