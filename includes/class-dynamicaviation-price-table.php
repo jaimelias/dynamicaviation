@@ -32,13 +32,7 @@ class Dynamic_Aviation_Price_Table {
 				$iata = $airport_array['iata'];
 			}
 		}
-
-		if(!$iata)
-		{
-			return __('IATA not found', 'dynamicaviation');
-		}
 		
-
 		$args = array(
 			'post_type' => 'aircrafts',
 			'posts_per_page' => 200, 
@@ -92,8 +86,18 @@ class Dynamic_Aviation_Price_Table {
 					$row = '';
 					$origin_iata = $table_price[$x][0];
 					$destination_iata = $table_price[$x][1];
+
+					$show_all = true;
+
+					if($iata)
+					{
+						if(!in_array($iata, array($origin_iata, $destination_iata)))
+						{
+							$show_all = false;
+						}
+					}
 					
-					if($origin_iata !== $destination_iata && !empty($origin_iata) && !empty($destination_iata))
+					if($show_all && $origin_iata !== $destination_iata && !empty($origin_iata) && !empty($destination_iata))
 					{
 
 
@@ -192,8 +196,10 @@ class Dynamic_Aviation_Price_Table {
 				$label = (is_singular('aircrafts')) ? __('Destination', 'dynamicaviation') : __('Origin', 'dynamicaviation');
 				$origin = $v['origin'];
 				$destination = $v['destination'];
+				$label_from = sprintf(__('%s (%s), %s', 'dynamicaviation'), $origin['airport'], $origin['iata'], $origin['city']);
+				$label_to = sprintf(__('to %s (%s), %s', 'dynamicaviation'), $destination['airport'], $destination['iata'], $destination['city']);
 				$table = '<div itemscope itemtype="http://schema.org/Table">';
-				$table .= '<h4 itemprop="about">'.esc_html(sprintf(__('%s (%s), %s to %s (%s)', 'dynamicaviation'), $origin['airport'], $origin['iata'], $origin['city'], $destination['airport'], $destination['iata'])).'</h4>';
+				$table .= '<h4 itemprop="about"><span class="text-muted">'.esc_html($label_from).'</span> '.esc_html($label_to).'</h4>';
 				$table .= '<table class="dy_table text-center small pure-table pure-table-bordered bottom-40"><thead><tr>';
 
 				if(!is_singular('aircrafts'))
