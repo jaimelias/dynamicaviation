@@ -100,6 +100,7 @@ class Dynamic_Aviation_Price_Table {
 					if($show_all && $origin_iata !== $destination_iata && !empty($origin_iata) && !empty($destination_iata))
 					{
 
+						$route_name = (is_singular('aircrafts')) ? 'default' :  $origin_iata.'_'.$destination_iata;
 
 						for($d = 0; $d < count($algolia_full); $d++)
 						{
@@ -119,7 +120,6 @@ class Dynamic_Aviation_Price_Table {
 								$origin_airport = $algolia_full[$y]['airport'];
 								$origin_city = $algolia_full[$y]['city'];
 								$origin_country_code = $algolia_full[$y]['country_code'];
-								$route_name = $origin_iata.'_'.$destination_iata;
 							}
 						}
 
@@ -159,8 +159,12 @@ class Dynamic_Aviation_Price_Table {
 							? '<td><strong>'.esc_html(__('Commercial Flight', 'dynamicaviation')).'</strong></td>'
 							: '<td><a class="strong" href="'.esc_url($aircraft_url).'/">'.esc_html($post->post_title).'</a> - <small>'.esc_html($aircraft_type).'</small><br/><i class="fas fa-male" ></i> '.esc_html($seats).' <small>('.$weight_allowed.')</small></td>';
 						}
+						else
+						{
+							$row .= '<td><small class="text-muted">('.esc_html($origin_iata).')</small> <strong>'.esc_html($origin_city.', '.$origin_country_code).'</strong><br/>'.esc_html($origin_airport).'</td>';
+							$row .= '<td><small class="text-muted">('.esc_html($destination_iata).')</small> <strong>'.esc_html($destination_city.', '.$destination_country_code).'</strong><br/>'.esc_html($destination_airport).'</td>';
+						}
 						
-						$row .= '<td><small class="text-muted">('.esc_html($origin_iata).')</small> <strong>'.esc_html($origin_city.', '.$origin_country_code).'</strong><br/>'.esc_html($origin_airport).'</td>';
 
 						$row .= '<td><strong>'.esc_html('$'.number_format($table_price[$x][3], 2, '.', ',')).'</strong><br/><span class="text-muted">';
 
@@ -179,6 +183,7 @@ class Dynamic_Aviation_Price_Table {
 						
 						$row .= '</td></tr>';
 
+
 						$routes[$route_name]['rows'] .= $row;
 
 						$count++;	
@@ -193,21 +198,30 @@ class Dynamic_Aviation_Price_Table {
 		{
 			foreach($routes as $k => $v)
 			{	
-				$label = (is_singular('aircrafts')) ? __('Destination', 'dynamicaviation') : __('Origin', 'dynamicaviation');
 				$origin = $v['origin'];
 				$destination = $v['destination'];
-				$label_from = sprintf(__('%s (%s), %s', 'dynamicaviation'), $origin['airport'], $origin['iata'], $origin['city']);
-				$label_to = sprintf(__('to %s (%s), %s', 'dynamicaviation'), $destination['airport'], $destination['iata'], $destination['city']);
+				$label_origin = sprintf(__('%s (%s), %s', 'dynamicaviation'), $origin['airport'], $origin['iata'], $origin['city']);
+				$label_destination = sprintf(__('to %s (%s), %s', 'dynamicaviation'), $destination['airport'], $destination['iata'], $destination['city']);
 				$table = '<div itemscope itemtype="http://schema.org/Table">';
-				$table .= '<h4 itemprop="about"><span class="text-muted">'.esc_html($label_from).'</span> '.esc_html($label_to).'</h4>';
+				
+				if(!is_singular('aircrafts'))
+				{
+					$table .= '<h4 itemprop="about"><span class="text-muted">'.esc_html($label_origin).'</span> '.esc_html($label_destination).'</h4>';
+				}
+
 				$table .= '<table class="dy_table text-center small pure-table pure-table-bordered bottom-40"><thead><tr>';
 
 				if(!is_singular('aircrafts'))
 				{
 					$table .= '<th>'.esc_html(__('Flights', 'dynamicaviation')).'</th>';
 				}
+				else
+				{
+					$table .= '<th>'.esc_html(__('Origin', 'dynamicaviation')).'</th>';
+					$table .= '<th>'.esc_html(__('Destination', 'dynamicaviation')).'</th>';
+				}
 
-				$table .= '<th>'.esc_html($label).'</th>';
+				
 				$table .= '<th>'.esc_html(__('One Way', 'dynamicaviation')).'</th>';
 				$table .= '</tr></thead><tbody>';
 				$table .= $v['rows'];
