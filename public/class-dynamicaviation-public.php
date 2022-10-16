@@ -470,29 +470,39 @@ class Dynamic_Aviation_Public {
 	}	
 	public function main_wp_query($query)
 	{
-		if(get_query_var( 'fly' ) && $query->is_main_query())
+		if(!is_admin())
 		{
-			$GLOBALS['airport_array'] = json_decode($this->utilities->return_json(), true); 
-						
-			global $polylang;
-			//removes alternate to home
-			if($polylang)
+			if(get_query_var( 'fly' ) && $query->is_main_query())
 			{
-				remove_filter('wp_head', array($polylang->links, 'wp_head'));
-			}
-			
-			//add main query to bypass not found error
-			$query->set('post_type', 'page');
-			$query->set( 'posts_per_page', 1 );
-		}
-		elseif( Dynamic_Aviation_Validators::valid_aircraft_search() || Dynamic_Aviation_Validators::valid_aircraft_quote())
-		{
-			if($query->is_main_query())
-			{
+				$GLOBALS['airport_array'] = json_decode($this->utilities->return_json(), true); 
+							
+				global $polylang;
+				//removes alternate to home
+				if($polylang)
+				{
+					remove_filter('wp_head', array($polylang->links, 'wp_head'));
+				}
+				
+				//add main query to bypass not found error
 				$query->set('post_type', 'page');
-				$query->set( 'posts_per_page', 1 );				
+				$query->set( 'posts_per_page', 1 );
+			}
+			elseif( Dynamic_Aviation_Validators::valid_aircraft_search() || Dynamic_Aviation_Validators::valid_aircraft_quote())
+			{
+				if($query->is_main_query())
+				{
+					$query->set('post_type', 'page');
+					$query->set( 'posts_per_page', 1 );				
+				}
+			}
+			elseif(is_post_type_archive('aircrafts') && $query->is_main_query())
+			{
+				$query->set( 'meta_key', 'aircraft_price_per_hour' );
+				$query->set( 'orderby', 'meta_value_num' );
+				$query->set( 'order', 'ASC');
 			}
 		}
+
 	}
 
 	
@@ -848,7 +858,7 @@ class Dynamic_Aviation_Public {
 			$price_per_hour = aviation_field('aircraft_price_per_hour');
 			$excerpt = '<p><strong>'.esc_html(__('Type', 'dynamicaviation')).'</strong>: '.esc_html($type).'<br/>';
 			$excerpt .= '<strong>'.esc_html(__('Passengers', 'dynamicaviation')).'</strong>: '.esc_html($passengers).'<br/>';
-			$excerpt .= '<strong>'.esc_html(__('Price Per Hour', 'dynamicaviation')).'</strong>: '.esc_html($price_per_hour).'</p>';
+			$excerpt .= '<strong>'.esc_html(__('Price Per Hour', 'dynamicaviation')).'</strong>: $'.esc_html($price_per_hour).'</p>';
 		}
 
 		return $excerpt;
