@@ -32,7 +32,6 @@ class Dynamic_Aviation {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-price-table.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-aircraft-single.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-aircrafts-table.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-mapbox.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-destination-details.php';
 
 		$this->loader = new Dynamic_Aviation_Loader();
@@ -68,8 +67,6 @@ class Dynamic_Aviation {
 		new Dynamic_Aviation_Aircraft_Single($utilities);
 
 		new Dynamic_Aviation_Aircrafts_Table($utilities);
-
-		new Dynamic_Aviation_Mapbox($utilities);
 
 		new Dynamic_Aviation_Destination_Details($utilities);
 	}

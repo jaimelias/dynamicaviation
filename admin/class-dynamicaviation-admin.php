@@ -18,8 +18,9 @@ class Dynamic_Aviation_Admin {
 		add_action( 'admin_enqueue_scripts', array(&$this, 'enqueue_styles'), 11);
 		add_action( 'admin_enqueue_scripts',  array(&$this, 'enqueue_scripts'));		
 		add_action('init', array(&$this, 'custom_rewrite_basic'));
-		add_action('init', array(&$this, 'custom_rewrite_tag'), 10, 0);	
-		add_action( 'admin_init', array(&$this, 'register_pll_strings'));			
+		add_action('init', array(&$this, 'custom_rewrite_tag'), 10, 0);
+		add_action( 'query_vars', array(&$this, 'query_vars_die') );
+		add_action( 'parse_request', array(&$this, 'parse_query_cacheimage') );
 	}
 
 	public function enqueue_styles()
@@ -72,21 +73,49 @@ class Dynamic_Aviation_Admin {
 		}		
 	}
 
-	public static function custom_rewrite_tag()
+	public function custom_rewrite_tag()
 	{
 		add_rewrite_tag('%fly%', '([^&]+)');
-		add_rewrite_tag('%cacheimg%', '([^&]+)');
+		//add_rewrite_tag('%cacheimg%', '([^&]+)');
 		add_rewrite_tag('%aircraft%', '([^&]+)');
 		add_rewrite_tag('%instant_quote%', '([^&]+)');
 		add_rewrite_tag('%request_submitted%', '([^&]+)');
-	}	
-	
-	public static function register_pll_strings($sting_name)
-	{
-		if(function_exists('pll_register_string'))
-		{
-			pll_register_string('aircraft_charter', 'Private Jet Charter');			
-		}
-	}	
+	}
 
+
+	public function query_vars_die($vars)
+	{
+		$vars[] = 'cacheimg';
+		return $vars;
+	}
+
+
+	public function parse_query_cacheimage($query)
+	{
+		$path = pathinfo($_SERVER['REQUEST_URI']);
+		$dirname = $path['dirname'];
+		$dirname_arr = array_values(array_filter(explode('/', $dirname)));
+		$filename = $path['filename'];
+
+		if(is_array($dirname_arr))
+		{
+			if(count($dirname_arr) === 2)
+			{
+				if($dirname_arr[1] === 'cacheimg')
+				{
+					header('Content-Type: image/jpeg');
+
+					$url = $this->utilities->airport_url_string($this->utilities->return_json($filename));
+		
+					$ch = curl_init ($url);
+					curl_setopt($ch, CURLOPT_HEADER, 0);
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+					$raw = curl_exec($ch);			
+					curl_close ($ch);
+					exit($raw);
+				}
+			}
+		}
+	}
 }

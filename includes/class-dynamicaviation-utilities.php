@@ -149,7 +149,7 @@ class Dynamic_Aviation_Utilities {
 		  return $url;
 	  }
 
-	  public function return_json() {
+	  public function return_json($query_var = null) {
 		
 		$algolia_token = get_option('algolia_token');
 		$algolia_index = get_option('algolia_index');
@@ -163,22 +163,27 @@ class Dynamic_Aviation_Utilities {
 
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 		
-		if(get_query_var( 'fly' ) != '')
+		if($query_var)
 		{
-			$new_query_var = get_query_var( 'fly' );
-			$query_param = '?query='.$new_query_var.'&hitsPerPage=1';
-		}
-		if(get_query_var( 'cacheimg' ) != '')
-		{
-			$new_query_var = get_query_var( 'cacheimg' );
-			$query_param = '?query='.$new_query_var.'&hitsPerPage=1';
+			$query_param = '?query='.$query_var.'&hitsPerPage=1';
 		}
 		else
 		{
-			$query_param = 'browse?cursor=';
+			if(get_query_var( 'fly' ) != '')
+			{
+				$query_var = get_query_var( 'fly' );
+				$query_param = '?query='.$query_var.'&hitsPerPage=1';
+			}
+			if(get_query_var( 'cacheimg' ) != '')
+			{
+				$query_var = get_query_var( 'cacheimg' );
+				$query_param = '?query='.$query_var.'&hitsPerPage=1';
+			}
+			else
+			{
+				$query_param = 'browse?cursor=';
+			}
 		}
-		
-
 
 		curl_setopt_array($curl, array(
 		CURLOPT_RETURNTRANSFER => 1,
@@ -189,7 +194,7 @@ class Dynamic_Aviation_Utilities {
 		$resp = json_decode($resp, true);
 			
 		
-		if(get_query_var( 'fly' ) != '' || get_query_var( 'cacheimg' ) != '')
+		if($query_var)
 		{
 			if(array_key_exists('hits', $resp))
 			{
@@ -199,9 +204,9 @@ class Dynamic_Aviation_Utilities {
 				{
 					for($x = 0; $x < count($hits); $x++)
 					{
-						if($new_query_var === $this->sanitize_pathname($hits[$x]['airport']))
+						if($query_var === $this->sanitize_pathname($hits[$x]['airport']))
 						{
-							return json_encode($hits[$x]);
+							return $hits[$x];
 						}
 					}			
 					
@@ -213,6 +218,20 @@ class Dynamic_Aviation_Utilities {
 			return $resp;
 		}
 		
+	}
+
+	public function airport_url_string($json)
+	{
+		//json
+		$_geoloc = $json['_geoloc'];
+		
+		//mapbox options
+		$mapbox_token = get_option('mapbox_token');
+		
+		//map position
+		$mapbox_marker = 'pin-l-airport+dd3333('.$_geoloc['lng'].','.$_geoloc['lat'].')';
+
+		return 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/660x440?access_token='.esc_html($mapbox_token);				
 	}
 
 }

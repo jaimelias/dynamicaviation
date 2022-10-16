@@ -32,7 +32,6 @@ class Dynamic_Aviation_Public {
 		add_filter('the_excerpt', array(&$this, 'modify_excerpt'));
 		add_filter('aircraftpack_enable_open_graph', array(&$this, 'dequeue_canonical'));
 		add_filter('template_include', array(&$this, 'package_template'), 10 );
-		add_filter('template_redirect', array(&$this, 'redirect_cacheimg'), 11);
 		add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);		
 		add_filter('body_class', array(&$this, 'remove_body_class'), 100);
 
@@ -480,7 +479,7 @@ class Dynamic_Aviation_Public {
 		{
 			if(get_query_var( 'fly' ) && $query->is_main_query())
 			{
-				$GLOBALS['airport_array'] = json_decode($this->utilities->return_json(), true); 
+				$GLOBALS['airport_array'] = $this->utilities->return_json(); 
 							
 				global $polylang;
 				//removes alternate to home
@@ -512,40 +511,7 @@ class Dynamic_Aviation_Public {
 	}
 
 	
-	public static function airport_url_string($json)
-	{
-		//json
-		$_geoloc = $json['_geoloc'];
-		
-		//mapbox options
-		$mapbox_token = get_option('mapbox_token');
-		
-		//map position
-		$mapbox_marker = 'pin-l-airport+dd3333('.$_geoloc['lng'].','.$_geoloc['lat'].')';
-
-		return 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/660x440?access_token='.esc_html($mapbox_token);				
-	}
 	
-	public function redirect_cacheimg()
-	{
-		if(get_query_var( 'cacheimg' ) && !in_the_loop())
-		{
-			header('Content-Type: image/jpeg');
-
-			$json = json_decode($this->utilities->return_json(), true);
-			$url = self::airport_url_string($json);
-
-			$ch = curl_init ($url);
-			curl_setopt($ch, CURLOPT_HEADER, 0);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
-			$raw = curl_exec($ch);			
-		
-			echo $raw;
-			curl_close ($ch);
-			exit();
-		}
-	}
 
 	public function sitemap($sitemap)
 	{
