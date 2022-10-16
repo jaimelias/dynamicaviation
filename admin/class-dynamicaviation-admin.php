@@ -76,7 +76,7 @@ class Dynamic_Aviation_Admin {
 	public function custom_rewrite_tag()
 	{
 		add_rewrite_tag('%fly%', '([^&]+)');
-		//add_rewrite_tag('%cacheimg%', '([^&]+)');
+		add_rewrite_tag('%cacheimg%', '([^&]+)');
 		add_rewrite_tag('%aircraft%', '([^&]+)');
 		add_rewrite_tag('%instant_quote%', '([^&]+)');
 		add_rewrite_tag('%request_submitted%', '([^&]+)');
