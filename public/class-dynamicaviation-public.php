@@ -29,6 +29,7 @@ class Dynamic_Aviation_Public {
 		add_filter('wp_title', array(&$this, 'modify_wp_title'), 100);
 		add_filter('the_content', array(&$this, 'modify_content'));
 		add_filter('the_title', array(&$this, 'modify_title'));
+		add_filter('the_excerpt', array(&$this, 'modify_excerpt'));
 		add_filter('aircraftpack_enable_open_graph', array(&$this, 'dequeue_canonical'));
 		add_filter('template_include', array(&$this, 'package_template'), 10 );
 		add_filter('template_redirect', array(&$this, 'redirect_cacheimg'), 11);
@@ -283,25 +284,20 @@ class Dynamic_Aviation_Public {
 		}		
 		elseif(is_singular('aircrafts'))
 		{			
-			if(aviation_field( 'aircraft_type' ))
-			{
-				$aircraft_type = aviation_field( 'aircraft_type' );
-				$aircraft_type = $this->utilities->aircraft_type($aircraft_type);
-				$title .= $aircraft_type .' '.get_the_title().' | '.get_bloginfo( 'name', 'display' );
-				return $title;
-			}
+			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
+			$city = aviation_field('aircraft_base_city');
+			$title = sprintf(__('Charter Flight %s %s in %s', 'dynamicaviation'), $aircraft_type, get_the_title(), $city) .' | '.get_bloginfo( 'name', 'display' );
+			return $title;
 		}
 		return $title;
 	}
 	public function modify_title($title)
-	{	
+	{
 			if(in_the_loop() && is_singular('aircrafts'))
 			{
-				if(aviation_field( 'aircraft_type' ))
-				{
-					$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
-					$title = '<span class="linkcolor">'.esc_html($aircraft_type).'</span> '.$title;
-				}				
+				$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
+				$title = '<span class="linkcolor">'.esc_html($aircraft_type).'</span> '.$title;
+				return $title;				
 			}
 			elseif(in_the_loop() && Dynamic_Aviation_Validators::valid_aircraft_search())
 			{
@@ -800,7 +796,7 @@ class Dynamic_Aviation_Public {
 	
 	public function remove_body_class($classes)
 	{
-		if(get_query_var('fly') || get_query_var('instant_quote') || get_query_var('request_submitted'))
+		if(get_query_var('fly') || get_query_var('instant_quote') || get_query_var('request_submitted') || is_singular('aircrafts'))
 		{
 			if(in_array('blog', $classes))
 			{
@@ -809,6 +805,19 @@ class Dynamic_Aviation_Public {
 		}
 		
 		return $classes;
+	}
+
+	public function modify_excerpt($excerpt)
+	{
+		if(is_singular('aircrafts'))
+		{
+			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
+			$city = aviation_field('aircraft_base_city');
+			$airport = aviation_field('aircraft_base_name');
+			return sprintf(__('%s for rent in %s. Private Charter Flight Service %s %s in %s.', 'dynamicaviation'), $aircraft_type, $city, $aircraft_type, get_the_title(), $airport, $city);
+		}
+
+		return $excerpt;
 	}
 	
 }

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Panama Jet Hub\n"
 "POT-Creation-Date: 2020-09-29 04:29+0000\n"
-"PO-Revision-Date: 2022-10-16 03:01+0000\n"
+"PO-Revision-Date: 2022-10-16 02:41+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish (Spain)\n"
 "Language: es_ES\n"
@@ -23,13 +23,7 @@ msgstr ""
 msgid "%s (%s), %s"
 msgstr "%s (%s), %s"
 
-#: public/class-dynamicaviation-public.php:817
-#, php-format
-#| msgid "%s for rent in %s. Private Charter Flight Service %s %s in %s"
-msgid "%s for rent in %s. Private Charter Flight Service %s %s in %s."
-msgstr "%s para alquiler en %s. Servicio de vuelos privados en %s %s en %s."
-
-#: public/class-dynamicaviation-public.php:80
+#: public/class-dynamicaviation-public.php:79
 #, php-format
 msgid "%s, Your request was Sent to our Charter Experts!"
 msgstr ""
@@ -73,8 +67,8 @@ msgstr "Lista de navegación de aeronave"
 msgid "Airliner"
 msgstr "Avión"
 
-#: public/class-dynamicaviation-public.php:207
-#: public/class-dynamicaviation-public.php:445
+#: public/class-dynamicaviation-public.php:206
+#: public/class-dynamicaviation-public.php:444
 msgid "Airplanes and helicopter rides in"
 msgstr "Aviones y tours en helicóptero en"
 
@@ -148,13 +142,13 @@ msgstr "Nombre de base"
 msgid "Charter Flight"
 msgstr "Vuelo privado"
 
-#: public/class-dynamicaviation-public.php:289
+#: public/class-dynamicaviation-public.php:288
 #, php-format
 msgid "Charter Flight %s %s in %s"
 msgstr "Alquiler de %s %s en %s"
 
-#: public/class-dynamicaviation-public.php:205
-#: public/class-dynamicaviation-public.php:320
+#: public/class-dynamicaviation-public.php:204
+#: public/class-dynamicaviation-public.php:319
 msgid "Charter Flights"
 msgstr "Vuelos Privados"
 
@@ -228,10 +222,10 @@ msgstr "Partida"
 msgid "Destination"
 msgstr "Destino"
 
-#: public/class-dynamicaviation-public.php:264
-#: public/class-dynamicaviation-public.php:269
-#: public/class-dynamicaviation-public.php:324
-#: public/class-dynamicaviation-public.php:329
+#: public/class-dynamicaviation-public.php:263
+#: public/class-dynamicaviation-public.php:268
+#: public/class-dynamicaviation-public.php:323
+#: public/class-dynamicaviation-public.php:328
 msgid "Destination Not Found"
 msgstr "Destino no encontrado"
 
@@ -290,8 +284,8 @@ msgstr ""
 msgid "Find Aircrafts"
 msgstr "Encontrar aeronaves"
 
-#: public/class-dynamicaviation-public.php:279
-#: public/class-dynamicaviation-public.php:304
+#: public/class-dynamicaviation-public.php:278
+#: public/class-dynamicaviation-public.php:303
 msgid "Find an Aircraft"
 msgstr "Aeronaves disponibles"
 
@@ -347,11 +341,11 @@ msgstr ""
 msgid "Instant Quotes"
 msgstr "Cotizaciones instantaneas"
 
-#: public/class-dynamicaviation-public.php:362
+#: public/class-dynamicaviation-public.php:361
 msgid "Invalid Recaptcha"
 msgstr "Recaptcha inválido"
 
-#: public/class-dynamicaviation-public.php:373
+#: public/class-dynamicaviation-public.php:372
 msgid "Invalid Request"
 msgstr "Solicitud inválida"
 
@@ -533,10 +527,11 @@ msgid "Prices Per Flight"
 msgstr "Precios por vuelo"
 
 #: includes/class-dynamicaviation-price-table.php:152
+#: public/class-dynamicaviation-public.php:205
 #: public/class-dynamicaviation-public.php:206
-#: public/class-dynamicaviation-public.php:207
-#: public/class-dynamicaviation-public.php:252
-#: public/class-dynamicaviation-public.php:445
+#: public/class-dynamicaviation-public.php:251
+#: public/class-dynamicaviation-public.php:444
+#: public/partials/metatags-aircraft.php:4
 msgid "Private Charter Flight"
 msgstr "Vuelo charter privado"
 
@@ -560,12 +555,12 @@ msgstr "Rango en millas nauticas"
 msgid "Request a Quote"
 msgstr "Solicitar cotización"
 
-#: public/class-dynamicaviation-public.php:358
+#: public/class-dynamicaviation-public.php:357
 msgid "Request received. Our sales team will be in touch with you soon."
 msgstr "Solicitud recibida. Nuestro equipo de ventas en contácto muy pronto."
 
-#: public/class-dynamicaviation-public.php:274
-#: public/class-dynamicaviation-public.php:308
+#: public/class-dynamicaviation-public.php:273
+#: public/class-dynamicaviation-public.php:307
 msgid "Request Submitted"
 msgstr "Solicitar cotización"
 

@@ -25,9 +25,8 @@ msgstr "%s (%s), %s"
 
 #: public/class-dynamicaviation-public.php:817
 #, php-format
-#| msgid "%s for rent in %s. Private Charter Flight Service %s %s in %s"
-msgid "%s for rent in %s. Private Charter Flight Service %s %s in %s."
-msgstr "%s para alquiler en %s. Servicio de vuelos privados en %s %s en %s."
+msgid "%s for rent in %s. Private Charter Flight Service %s %s in %s"
+msgstr "%s para alquiler en %s. Servicio de vuelos privados en %s %s en %s"
 
 #: public/class-dynamicaviation-public.php:80
 #, php-format

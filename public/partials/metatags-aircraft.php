@@ -1,5 +1,5 @@
 
 
 
-<meta name="description" content="<?php echo (esc_html__('Private Charter Flight', 'dynamicaviation')); ?> <?php esc_html_e(get_the_title()); ?>" />
+<meta name="description" content="<?php the_excerpt(); ?>" />
 <link rel="canonical" href="<?php echo esc_url(get_the_permalink()); ?>" />
