@@ -833,7 +833,8 @@ class Dynamic_Aviation_Public {
 			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
 			$city = aviation_field('aircraft_base_city');
 			$airport = aviation_field('aircraft_base_name');
-			return sprintf(__('%s for rent in %s. Private Charter Flight Service %s %s in %s.', 'dynamicaviation'), $aircraft_type, $city, $aircraft_type, get_the_title(), $airport, $city);
+			$price_per_hour = '$'.aviation_field('aircraft_price_per_hour');
+			return sprintf(__('%s for rent in %s. Private Charter Flight Service %s %s in %s, %s from %s per hour.', 'dynamicaviation'), $aircraft_type, $city, $aircraft_type, get_the_title(), $airport, $city, $price_per_hour);
 		}
 
 		return $excerpt;

@@ -145,8 +145,8 @@ class Dynamic_Aviation_Price_Table {
 						$fees = $table_price[$x][4];
 						$seats = $table_price[$x][6];
 						$weight_pounds = $table_price[$x][7];
-						$weight_kg = intval($weight_pounds)*0.453592;
-						$weight_allowed = esc_html($weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation'));
+						$weight_kg = intval(floatval($weight_pounds)*0.453592);
+						$weight_allowed = $weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation');
 						$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
 						
 						$route = __('Private Charter Flight', 'dynamicaviation').' '.$aircraft_type.' '.$post->post_title.' '.__('from', 'dynamicaviation').' '.$origin_airport.', '.$origin_city.' ('.$origin_iata.') '.__('to', 'dynamicaviation').' '.$destination_airport.', '.$destination_city.' ('.$destination_iata.')';
@@ -157,14 +157,20 @@ class Dynamic_Aviation_Price_Table {
 						{
 							$row .= ($is_commercial) 
 							? '<td><strong>'.esc_html(__('Commercial Flight', 'dynamicaviation')).'</strong></td>'
-							: '<td><a class="strong" href="'.esc_url($aircraft_url).'/">'.esc_html($post->post_title).'</a> - <small>'.esc_html($aircraft_type).'</small><br/><i class="fas fa-male" ></i> '.esc_html($seats).' <small>('.$weight_allowed.')</small></td>';
+							: '<td><a class="strong" href="'.esc_url($aircraft_url).'/">'.esc_html($post->post_title).'</a><br/><small>'.esc_html($aircraft_type).'</small></td>';
 						}
 						else
 						{
-							$row .= '<td><small class="text-muted">('.esc_html($origin_iata).')</small> <strong>'.esc_html($origin_city.', '.$origin_country_code).'</strong><br/>'.esc_html($origin_airport).'</td>';
-							$row .= '<td><small class="text-muted">('.esc_html($destination_iata).')</small> <strong>'.esc_html($destination_city.', '.$destination_country_code).'</strong><br/>'.esc_html($destination_airport).'</td>';
+							$row .= '<td><strong>'.esc_html($origin_airport).'</strong><br/><small class="text-muted">('.esc_html($origin_iata).')</small>, <span>'.esc_html($origin_city.', '.$origin_country_code).'</span></td>';
+							$row .= '<td><strong>'.esc_html($destination_airport).'</strong><br/><small class="text-muted">('.esc_html($destination_iata).')</small>, <span>'.esc_html($destination_city.', '.$destination_country_code).'</span></td>';
 						}
 						
+						$row .= '<td><strong><i class="fas fa-male" ></i> '.esc_html($seats).' </strong><br/><small>'.esc_html($weight_allowed).'</small></td>';
+						
+						if(!wp_is_mobile())
+						{
+							$row .= '<td><i class="fas fa-clock" ></i> '.esc_html($this->utilities->convertNumberToTime($table_price[$x][2])).'</td>';
+						}
 
 						$row .= '<td><strong>'.esc_html('$'.number_format($table_price[$x][3], 2, '.', ',')).'</strong><br/><span class="text-muted">';
 
@@ -174,15 +180,10 @@ class Dynamic_Aviation_Price_Table {
 						
 						if(floatval($fees) > 0)
 						{
-							$row .= '<br/><span class="text-muted">';
-							$row .= esc_html(__('Fees per pers.', 'dynamicaviation').' '.'$'.number_format($fees, 2, '.', ','));
-							$row .= '</span>';
+							$row .= '<br/><span class="text-muted">' . esc_html(__('Fees per pers.', 'dynamicaviation').' '.'$'.number_format($fees, 2, '.', ',')) . '</span>';
 						}
-
-						$row .= '<br/><span class="small text-muted"><i class="fas fa-clock" ></i> '.esc_html($this->utilities->convertNumberToTime($table_price[$x][2])).'</span>';
 						
 						$row .= '</td></tr>';
-
 
 						$routes[$route_name]['rows'] .= $row;
 
@@ -221,6 +222,12 @@ class Dynamic_Aviation_Price_Table {
 					$table .= '<th>'.esc_html(__('Destination', 'dynamicaviation')).'</th>';
 				}
 
+				$table .= '<th>'.esc_html(__('Passengers', 'dynamicaviation')).'</th>';
+
+				if(!wp_is_mobile())
+				{
+					$table .= '<th>'.esc_html(__('Duration', 'dynamicaviation')).'</th>';
+				}
 				
 				$table .= '<th>'.esc_html(__('One Way', 'dynamicaviation')).'</th>';
 				$table .= '</tr></thead><tbody>';

@@ -19,6 +19,7 @@ class Dynamic_Aviation_Aircraft_Single {
             __('Type', 'dynamicaviation'),
             __('Manufacturer', 'dynamicaviation'),
             __('Model', 'dynamicaviation'),
+            __('Price Per Hour', 'dynamicaviation'),
             __('Year of Construction', 'dynamicaviation'),
             __('Passengers', 'dynamicaviation'),
             __('Range', 'dynamicaviation'),
@@ -36,6 +37,7 @@ class Dynamic_Aviation_Aircraft_Single {
             'aircraft_type',
             'aircraft_manufacturer',
             'aircraft_model',
+            'aircraft_price_per_hour',
             'aircraft_year_of_construction',
             'aircraft_passengers',
             'aircraft_range',
@@ -64,6 +66,10 @@ class Dynamic_Aviation_Aircraft_Single {
                 if($key == 'aircraft_type')
                 {
                     $value = $this->utilities->aircraft_type($value);
+                }
+                if($key == 'aircraft_price_per_hour')
+                {
+                    $value = '$'.$value;
                 }
                 else if($key == 'aircraft_range')
                 {
