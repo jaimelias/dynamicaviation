@@ -47,7 +47,7 @@ class Dynamic_Aviation_Aircraft_Single {
         );
     }
 
-    public function template()
+    public function template($content)
     {
         $labels = $this->get_table_labels();
         $keys = $this->get_table_keys();
@@ -91,23 +91,18 @@ class Dynamic_Aviation_Aircraft_Single {
         
         $table .= '</table>';
         
-        return $this->container($table);
+        return $this->container($content, $table);
     }
 
 
-    public function container($table)
+    public function container($content, $table)
     {
-        $content = get_the_content();
         ob_start();
         ?>
             <div class="pure-g gutters">
                 <div class="pure-u-1 pure-u-md-2-3">
-                    <?php if(has_post_thumbnail() && empty($content)): ?>
-                        <p><?php the_post_thumbnail('medium', array('class' => 'img-responsive')); ?></p>
-                    <?php else: ?>
-                        <?php echo $content; ?>
-                    <?php endif;?>
-                    </div>
+                 <?php echo $content; ?>
+                </div>
                 <div class="pure-u-1 pure-u-md-1-3">
                     <?php echo $table; ?>
                 </div>

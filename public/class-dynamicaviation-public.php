@@ -379,7 +379,7 @@ class Dynamic_Aviation_Public {
 		}
 		elseif(in_the_loop() && is_singular('aircrafts'))
 		{
-			return apply_filters('dy_aviation_aircraft_template', '');			
+			return apply_filters('dy_aviation_aircraft_template', $content);			
 		}
 		return $content;
 	}
