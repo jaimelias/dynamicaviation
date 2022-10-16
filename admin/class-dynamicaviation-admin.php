@@ -20,7 +20,7 @@ class Dynamic_Aviation_Admin {
 		add_action('init', array(&$this, 'custom_rewrite_basic'));
 		add_action('init', array(&$this, 'custom_rewrite_tag'), 10, 0);
 		add_action( 'query_vars', array(&$this, 'query_vars_die') );
-		add_action( 'parse_request', array(&$this, 'parse_query_cacheimage') );
+		add_action( 'plugins_loaded', array(&$this, 'cacheimage') );
 	}
 
 	public function enqueue_styles()
@@ -90,7 +90,7 @@ class Dynamic_Aviation_Admin {
 	}
 
 
-	public function parse_query_cacheimage($query)
+	public function cacheimage($query)
 	{
 		$path = pathinfo($_SERVER['REQUEST_URI']);
 		$dirname = $path['dirname'];
