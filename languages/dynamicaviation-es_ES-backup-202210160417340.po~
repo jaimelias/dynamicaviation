@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Panama Jet Hub\n"
 "POT-Creation-Date: 2020-09-29 04:29+0000\n"
-"PO-Revision-Date: 2022-10-16 04:17+0000\n"
+"PO-Revision-Date: 2022-10-16 04:15+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish (Spain)\n"
 "Language: es_ES\n"
@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-SearchPath-0: .\n"
 "Report-Msgid-Bugs-To: \n"
-"X-Loco-Version: 2.6.2; wp-6.0.2"
+"X-Loco-Version: 2.4.3; wp-5.5.1"
 
 #: includes/class-dynamicaviation-price-table.php:203
 #, php-format
@@ -60,7 +60,7 @@ msgstr "Aeronave"
 #: includes/class-dynamicaviation-post-type.php:19
 #: public/class-dynamicaviation-public.php:860
 msgid "Aircrafts"
-msgstr "Aeronaves"
+msgstr "Aircrafts"
 
 #: public/class-dynamicaviation-public.php:292
 msgid "Aircrafts for Rent"

@@ -35,6 +35,11 @@ class Dynamic_Aviation_Public {
 		add_filter('template_redirect', array(&$this, 'redirect_cacheimg'), 11);
 		add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);		
 		add_filter('body_class', array(&$this, 'remove_body_class'), 100);
+
+		add_filter('minimal_posted_on', array(&$this, 'minimalizr_hide_posted_on'), 100);
+		add_filter('minimal_archive_excerpt', array(&$this, 'minimalizr_modify_archive_excerpt'), 100);
+		add_filter('minimal_archive_title', array(&$this, 'minimalizr_modify_archive_title'), 100);
+
 	}
 
 	public function init()
@@ -281,7 +286,11 @@ class Dynamic_Aviation_Public {
 			$output .= ' | '.esc_html(get_bloginfo('name'));
 			return $output;
 			
-		}		
+		}
+		elseif(is_post_type_archive('aircrafts'))
+		{
+			return __('Aircrafts for Rent', 'dynamicaviation') . ' | '. get_bloginfo( 'name', 'display' );
+		}
 		elseif(is_singular('aircrafts'))
 		{			
 			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
@@ -818,6 +827,40 @@ class Dynamic_Aviation_Public {
 		}
 
 		return $excerpt;
+	}
+
+	public function minimalizr_hide_posted_on($posted_on)
+	{
+		if(is_post_type_archive('aircrafts'))
+		{
+			return '';
+		}
+
+		return $posted_on;
+	}
+
+	public function minimalizr_modify_archive_excerpt($excerpt)
+	{
+		if(is_post_type_archive('aircrafts'))
+		{
+			$type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
+			$passengers = aviation_field('aircraft_passengers');
+			$price_per_hour = aviation_field('aircraft_price_per_hour');
+			$excerpt = '<p><strong>'.esc_html(__('Type', 'dynamicaviation')).'</strong>: '.esc_html($type).'<br/>';
+			$excerpt .= '<strong>'.esc_html(__('Passengers', 'dynamicaviation')).'</strong>: '.esc_html($passengers).'<br/>';
+			$excerpt .= '<strong>'.esc_html(__('Price Per Hour', 'dynamicaviation')).'</strong>: '.esc_html($price_per_hour).'</p>';
+		}
+
+		return $excerpt;
+	}
+	public function minimalizr_modify_archive_title($title)
+	{
+		if(is_post_type_archive('aircrafts'))
+		{
+			return __('Aircrafts', 'dynamicaviation');
+		}
+
+		return $title;
 	}
 	
 }
