@@ -80,7 +80,7 @@ class Dynamic_Aviation_Destination_Details {
         $_geoloc = $json['_geoloc'];
         $airport = $json['airport'];
         $country_name = $json['country_names'];
-        $static_map = $this->utilities->airport_img_url($json, false);
+        $static_map = $this->utilities->airport_img_url($json);
         
         if($iata != null && $icao != null)
         {

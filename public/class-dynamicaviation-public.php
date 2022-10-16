@@ -119,7 +119,12 @@ class Dynamic_Aviation_Public {
 		{
 			global $airport_array;
 
-			if(is_object($airport_array) || is_array($airport_array))
+			if(!isset($airport_array))
+			{
+				return;
+			}
+
+			if(is_array($airport_array))
 			{
 				
 				[
@@ -131,7 +136,7 @@ class Dynamic_Aviation_Public {
 				] = $airport_array;
 				
 				
-				$lang = substr(get_locale(), 0, -3);
+				$lang = current_language();
 				$prices = array();
 				
 				if($lang)
@@ -147,9 +152,10 @@ class Dynamic_Aviation_Public {
 				}
 				
 				$addressArray = array(($airport.' ('.$iata.')'), $city, $country_lang);
-				$address = implode(', ', $addressArray);		
+				$address = implode(', ', $addressArray);
 				
-				$args23 = array(
+				
+				$args = array(
 					'post_type' => 'aircrafts',
 					'posts_per_page' => 200,
 					'post_parent' => 0,
@@ -162,20 +168,20 @@ class Dynamic_Aviation_Public {
 					'orderby' => 'meta_value'
 				);
 				
-				$wp_query23 = new WP_Query( $args23 );
+				$wp_query = new WP_Query( $args );
 
-				if ($wp_query23->have_posts())
+				if ($wp_query->have_posts())
 				{	
-					while ( $wp_query23->have_posts() )
+					while ( $wp_query->have_posts() )
 					{
-						$wp_query23->the_post();
+						$wp_query->the_post();
 						$table_price = html_entity_decode(aviation_field('aircraft_rates'));
 						$table_price = json_decode($table_price, true);
 
 						if(array_key_exists('aircraft_rates_table', $table_price))
 						{
 							$table_price = $table_price['aircraft_rates_table'];
-							
+
 							if(is_array($table_price))
 							{
 								for($x = 0; $x < count($table_price); $x++)
@@ -189,17 +195,15 @@ class Dynamic_Aviation_Public {
 								}							
 							}
 						}
-
-
 					}
 
 					wp_reset_postdata();				
-					
 				}
+
+
 
 				if(count($prices) > 0)
 				{
-					
 					$arr = array(
 						'@context' => 'http://schema.org/',
 						'@type' => 'Product',
@@ -210,16 +214,18 @@ class Dynamic_Aviation_Public {
 						'category' => esc_html(__('Charter Flights', 'dynamicaviation')),
 						'name' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$airport),
 						'description' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$address.'. '.__('Airplanes and helicopter rides in', 'dynamicaviation').' '.$airport.', '.$city),
-						'image' => esc_url($this->utilities->airport_img_url($airport_array, true)),
+						'image' => esc_url($this->utilities->airport_img_url($airport_array)),
 						'sku' => md5($iata),
 						'gtin8' => substr(md5($iata), 0, 8)
 					);
+
+					$raw_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
 					$offers = array(
 						'priceCurrency' => 'USD',
 						'priceValidUntil' => esc_html(date('Y-m-d', strtotime('+1 year'))),
 						'availability' => 'http://schema.org/InStock',
-						'url' => esc_url(get_the_permalink())
+						'url' => esc_url($raw_url)
 					);
 					
 					if(count($prices) == 1)
@@ -524,10 +530,20 @@ class Dynamic_Aviation_Public {
 	{
 		if(get_query_var( 'cacheimg' ) && !in_the_loop())
 		{
+			header('Content-Type: image/jpeg');
+
 			$json = json_decode($this->utilities->return_json(), true);
-			$static_map = self::airport_url_string($json);
-			wp_redirect(esc_url($static_map));
-			exit;
+			$url = self::airport_url_string($json);
+
+			$ch = curl_init ($url);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+			$raw = curl_exec($ch);			
+		
+			echo $raw;
+			curl_close ($ch);
+			exit();
 		}
 	}
 
