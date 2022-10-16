@@ -94,14 +94,15 @@ class Dynamic_Aviation_Admin {
 	{
 		$path = pathinfo($_SERVER['REQUEST_URI']);
 		$dirname = $path['dirname'];
+		$basename = $path['basename'];
 		$dirname_arr = array_values(array_filter(explode('/', $dirname)));
 		$filename = $path['filename'];
 
 		if(is_array($dirname_arr))
 		{
-			if(count($dirname_arr) === 2)
+			if(count($dirname_arr) > 0)
 			{
-				if($dirname_arr[1] === 'cacheimg')
+				if(in_array('cacheimg', $dirname_arr) && str_ends_with($basename, '.jpg'))
 				{
 					header('Content-Type: image/jpeg');
 
