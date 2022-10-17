@@ -19,8 +19,7 @@ class Dynamic_Aviation_Admin {
 		add_action( 'admin_enqueue_scripts',  array(&$this, 'enqueue_scripts'));		
 		add_action('init', array(&$this, 'custom_rewrite_basic'));
 		add_action('init', array(&$this, 'custom_rewrite_tag'), 10, 0);
-		$this->cacheimage();
-		//add_action( 'plugins_loaded', array(&$this, 'cacheimage') );
+		add_action( 'plugins_loaded', array(&$this, 'cacheimage') );
 	}
 
 	public function enqueue_styles()
