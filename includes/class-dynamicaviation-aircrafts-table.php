@@ -11,6 +11,7 @@ class Dynamic_Aviation_Aircrafts_Table {
     public function init()
     {
         add_filter('dy_aviation_aircrafts_table', array(&$this, 'template'));
+        add_action( 'widgets_init', array(&$this, 'aircraft_quote_not_found_sidebar') );
     }
 
     public function get()
@@ -74,7 +75,19 @@ class Dynamic_Aviation_Aircrafts_Table {
 
     public function not_found()
     {
-        return '<p class="large">'.esc_html(__('The requested quote is not available in our website yet. Please contact our sales team for an immediate answer.', 'dynamicaviation')).'</p>';
+
+        ob_start(); ?>
+
+            <p class="large"><?php echo esc_html(__('The requested quote is not available in our website yet. Please contact our sales team for an immediate answer.', 'dynamicaviation')); ?></php>
+            <?php if ( is_active_sidebar( 'aircraft-quote-not-found' ) ) { ?>
+                <div id="aircraft-quote-not-found-widget">
+                    <?php dynamic_sidebar('aircraft-quote-not-found'); ?>
+                </div>
+            <?php } ?>            
+        <?php
+            $content = ob_get_contents();
+            ob_end_clean();	
+            return $content;
     }
 
     public function pax_template()
@@ -114,36 +127,38 @@ class Dynamic_Aviation_Aircrafts_Table {
         return $output;
     }
 
-    public function table_container($table)
+    public function table_container($rows)
     {
         ob_start(); 
-        ?>
 
-        <hr/>
-		
-        <table class="margin-bottom pure-table pure-table-bordered text-center instant_quote_table small">
-            <thead>
-                <tr>
-                    <th><?php echo (esc_html__('Flights', 'dynamicaviation')); ?></th>
-    
-                    <?php if(!wp_is_mobile()): ?>
-                        <th><?php echo (esc_html__('Duration', 'dynamicaviation')); ?></th>
-                    <?php endif; ?>
-                    
-                    <th colspan="2"><?php esc_html_e(($this->get()->aircraft_flight === 0) ? __('One Way', 'dynamicaviation') : __('Round Trip', 'dynamicaviation'));?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php echo $table; ?>
-            </tbody>
-        </table>
+        if($rows): ?>
+
+            <hr/>
+            
+            <table class="margin-bottom pure-table pure-table-bordered text-center instant_quote_table small">
+                <thead>
+                    <tr>
+                        <th><?php echo (esc_html__('Flights', 'dynamicaviation')); ?></th>
+        
+                        <?php if(!wp_is_mobile()): ?>
+                            <th><?php echo (esc_html__('Duration', 'dynamicaviation')); ?></th>
+                        <?php endif; ?>
+                        
+                        <th colspan="2"><?php esc_html_e(($this->get()->aircraft_flight === 0) ? __('One Way', 'dynamicaviation') : __('Round Trip', 'dynamicaviation'));?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php echo $rows; ?>
+                </tbody>
+            </table>
 
 
         <?php
-        $content = ob_get_contents();
-        ob_end_clean();	
+            $content = ob_get_contents();
+            ob_end_clean();	
+            endif;
 		
-		return $content;
+		    return $content;
     }
 
 
@@ -325,7 +340,7 @@ class Dynamic_Aviation_Aircrafts_Table {
         $output = '';
         $rows = '';
         $wp_query = new WP_Query($this->query_args());
-
+        
         if ($wp_query->have_posts())
         {
 
@@ -342,26 +357,36 @@ class Dynamic_Aviation_Aircrafts_Table {
             {
                 $wp_query->the_post();
                 global $post;
-                $has_rows = true;
-                
-                $table_price = aviation_field('aircraft_rates');
-                $table_price = json_decode(html_entity_decode($table_price), true);
+               
+                $table_price = json_decode(html_entity_decode(aviation_field('aircraft_rates')), true);
 
                 if(array_key_exists('aircraft_rates_table', $table_price))
                 {
-                    $table_price = $table_price['aircraft_rates_table'];
-                    $is_commercial = (intval(aviation_field( 'aircraft_commercial')) === 1) ? true : false;
-                    $rows .= $this->iterate_rows($post, $table_price, $is_commercial);
+                    $aircraft_rates_table = $table_price['aircraft_rates_table'];
+
+                    if(is_array($aircraft_rates_table))
+                    {
+                        if(count($aircraft_rates_table) > 0)
+                        {
+                            $is_commercial = (intval(aviation_field( 'aircraft_commercial')) === 1) ? true : false;
+                            $rows .= $this->iterate_rows($post, $aircraft_rates_table, $is_commercial);
+                        }
+                    }
+
                 }
             }
 
-            if($rows !== '')
+            wp_reset_postdata();
+
+            if($rows)
             {
                 $output .= $this->table_container($rows);
                 $output .= $this->request_form();
             }
-
-            wp_reset_postdata();
+            else
+            {
+                $output = $this->not_found();
+            }            
         }
         else
         {
@@ -370,6 +395,19 @@ class Dynamic_Aviation_Aircrafts_Table {
 
         return $output;
     }
+
+    public function aircraft_quote_not_found_sidebar() {
+        register_sidebar( array(
+            'name'          => __( 'Sidebar for Charter Flight Quote Not Available', 'dynamicaviation' ),
+            'id'            => 'aircraft-quote-not-found',
+            'description'   => __( 'Widgets in this area will be shown only if users can not find a charter flight quote.', 'dynamicaviation' ),
+            'before_widget' => '<div id="%1$s" class="widget %2$s">',
+            'after_widget'  => '</div>',
+            'before_title'  => '<h3 class="widget-title">',
+            'after_title'   => '</h3>',
+        ) );
+    }
+
 }
 
 ?>
