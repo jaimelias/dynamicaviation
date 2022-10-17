@@ -19,6 +19,7 @@ class Dynamic_Aviation_Admin {
 		add_action( 'admin_enqueue_scripts',  array(&$this, 'enqueue_scripts'));		
 		add_action('init', array(&$this, 'custom_rewrite_basic'));
 		add_action('init', array(&$this, 'custom_rewrite_tag'), 10, 0);
+		add_action( 'wp_headers', array(&$this, 'cacheimage_header') );
 		add_action( 'plugins_loaded', array(&$this, 'cacheimage') );
 	}
 
@@ -88,6 +89,28 @@ class Dynamic_Aviation_Admin {
 		return $vars;
 	}
 
+	public function cacheimage_header($headers)
+	{
+		$path = pathinfo($_SERVER['REQUEST_URI']);
+		$dirname = $path['dirname'];
+		$basename = $path['basename'];
+		$dirname_arr = array_values(array_filter(explode('/', $dirname)));
+		$filename = $path['filename'];
+
+		if(is_array($dirname_arr))
+		{
+			if(count($dirname_arr) > 0)
+			{
+				if(in_array('cacheimg', $dirname_arr) && str_ends_with($basename, '.jpg'))
+				{
+
+					$headers['Content-Type'] = 'image/jpeg';
+				}
+			}
+		}
+
+		return $headers;
+	}
 
 	public function cacheimage()
 	{
@@ -113,7 +136,7 @@ class Dynamic_Aviation_Admin {
 					curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
 					$raw = curl_exec($ch);			
 					curl_close ($ch);
-					echo $raw;
+					exit($raw);
 				}
 			}
 		}
