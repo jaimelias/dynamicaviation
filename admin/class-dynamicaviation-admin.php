@@ -114,7 +114,7 @@ class Dynamic_Aviation_Admin {
 					curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
 					$raw = curl_exec($ch);			
 					curl_close ($ch);
-					exit($raw);
+					echo $raw;
 				}
 			}
 		}
