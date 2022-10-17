@@ -65,39 +65,29 @@ class Dynamic_Aviation_Public {
 					$data = $_POST;
 					$data['lang'] = current_language();
 					
-					$args50 = array(
-						'post_type' => 'aircrafts',
-						'posts_per_page' => 1, 
-						'p' => intval($data['aircraft_id'])
-					);	
-					
-					$wp_query50 = new WP_Query( $args50 );
-					
-					if($wp_query50->have_posts())
+
+
+					if(!isset($_POST['aircraft_id']))
 					{
-						while ($wp_query50->have_posts())
-						{
-							$wp_query50->the_post();
-						}
+						$subject = sprintf(__('%s, Your flight request has been sent to our specialists at %s!', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'));
+						require_once('general_email_template.php');
+					}
+					else{
+						$subject = sprintf(__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'), sanitize_text_field($data['aircraft_price']));
+						require_once('quote_email_template.php');
 					}
 					
-					$subject = sprintf(__('%s, Your request was Sent to our Charter Experts!', 'dynamicaviation'), $data['first_name']);
-
-					require_once('email_template.php');
 					
 					$args = array(
 						'subject' => $subject,
 						'to' => sanitize_email($_POST['email']),
 						'message' => $email_template
 					);
-					
 
-					echo $email_template;
-					exit();
 
 					sg_mail($args);
 
-					self::webhook(json_encode($data));
+					//self::webhook(json_encode($data));
 					$GLOBALS['VALID_JET_RECAPTCHA'] = true;
 				}
 			}			

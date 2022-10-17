@@ -11,7 +11,6 @@ class Dynamic_Aviation_Aircrafts_Table {
     public function init()
     {
         add_filter('dy_aviation_aircrafts_table', array(&$this, 'template'));
-        add_action( 'widgets_init', array(&$this, 'aircraft_quote_not_found_sidebar') );
     }
 
     public function get()
@@ -75,19 +74,8 @@ class Dynamic_Aviation_Aircrafts_Table {
 
     public function not_found()
     {
+        return '<p>'.esc_html(__('The requested quote is not available in our website yet. Please contact our sales team for an immediate answer.', 'dynamicaviation')).'</p>';
 
-        ob_start(); ?>
-
-            <p class="large"><?php echo esc_html(__('The requested quote is not available in our website yet. Please contact our sales team for an immediate answer.', 'dynamicaviation')); ?></php>
-            <?php if ( is_active_sidebar( 'aircraft-quote-not-found' ) ) { ?>
-                <div id="aircraft-quote-not-found-widget">
-                    <?php dynamic_sidebar('aircraft-quote-not-found'); ?>
-                </div>
-            <?php } ?>            
-        <?php
-            $content = ob_get_contents();
-            ob_end_clean();	
-            return $content;
     }
 
     public function pax_template()
@@ -260,12 +248,12 @@ class Dynamic_Aviation_Aircrafts_Table {
         return $table;
     }
 
-    public function request_form()
+    public function request_form($hide_contact_form)
     {
         ob_start(); 
         ?>
 
-            <div id="aircraft_booking_container" class="hidden animate-fade">
+            <div id="aircraft_booking_container" class="<?php echo ($hide_contact_form) ? 'hidden' : ''; ?> animate-fade">
 
                 <form method="post" id="aircraft_booking_request" action="<?php echo esc_url(home_lang().'request_submitted');?>/">
 
@@ -381,31 +369,21 @@ class Dynamic_Aviation_Aircrafts_Table {
             if($rows)
             {
                 $output .= $this->table_container($rows);
-                $output .= $this->request_form();
+                $output .= $this->request_form(true);
             }
             else
             {
                 $output = $this->not_found();
+                $output .= $this->request_form(false);
             }            
         }
         else
         {
             $output = $this->not_found();
+            $output .= $this->request_form(false);
         }
 
         return $output;
-    }
-
-    public function aircraft_quote_not_found_sidebar() {
-        register_sidebar( array(
-            'name'          => __( 'Sidebar for Charter Flight Quote Not Available', 'dynamicaviation' ),
-            'id'            => 'aircraft-quote-not-found',
-            'description'   => __( 'Widgets in this area will be shown only if users can not find a charter flight quote.', 'dynamicaviation' ),
-            'before_widget' => '<div id="%1$s" class="widget %2$s">',
-            'after_widget'  => '</div>',
-            'before_title'  => '<h3 class="widget-title">',
-            'after_title'   => '</h3>',
-        ) );
     }
 
 }

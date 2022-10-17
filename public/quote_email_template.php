@@ -5,7 +5,7 @@ $aircraft_name = sanitize_text_field($_POST['aircraft_name']);
 $aircraft_seats = sanitize_text_field($_POST['aircraft_seats']);
 $aircraft_weight = sanitize_text_field($_POST['aircraft_weight']);
 $aircraft_url = sanitize_text_field($_POST['aircraft_url']);
-
+$passengers = sanitize_text_field($_POST['aircraft_pax']);
 $aircraft_settings = $aircraft_name . ' ('.$aircraft_seats.' '.__('seats or', 'dynamicaviation').' '.$aircraft_weight.')';
 $aircraft_link = '<strong><a href="'.esc_url($aircraft_url).'">'.esc_html($aircraft_settings).'</a></strong>';
 
@@ -30,18 +30,20 @@ $label_subtotal = __('Subtotal', 'dynamicpackages');
 $departure_itinerary = sanitize_text_field($_POST['departure_itinerary']);
 $return_itinerary = sanitize_text_field($_POST['return_itinerary']);
 
-$itinerary_html = $aircraft_link.'<br/></br/>'.$departure_itinerary;
-$itinerary_text = $aircraft_settings.'\n\n'.$departure_itinerary;
 
-$itinerary_html = ($return_itinerary !== '') ? '<br/><br/>' . $return_itinerary : $itinerary_html;
-$itinerary_text = ($return_itinerary !== '') ? '/n/n' . $return_itinerary : $itinerary_text;
-
+$departure_itinerary = ($departure_itinerary) ? __('Departure', 'dynamicaviation') . ': ' . $departure_itinerary : '';
+$return_itinerary = ($return_itinerary) ? __('Return', 'dynamicaviation') . ': ' . $return_itinerary : '';
+$itinerary_html = ($return_itinerary) ? $departure_itinerary.'<br/><br/>'.$return_itinerary : $departure_itinerary;
+$itinerary_html .= '<br/><br/>' . __('Passengers', 'dynamicaviation') . ': ' . $passengers;
+$itinerary_text = ($return_itinerary) ? $departure_itinerary . ' || ' . $return_itinerary : $departure_itinerary;
+$itinerary_text .= ' || ' . __('Passengers', 'dynamicaviation') . ': ' . $passengers;
+$itinerary_text = $aircraft_name . ' || ' . $itinerary_text;
 
 
 $label_notes = __('Notes', 'dynamicpackages');
 $notes = nl2br(apply_filters('dy_aviation_estimate_notes', ''));
 $footer = $company_address;
-$whatsapp_url = 'https://wa.me/' . get_option('dy_whatsapp') . '?text=' . urlencode($itinerary_text);
+$whatsapp_url = esc_url('https://wa.me/' . get_option('dy_whatsapp') . '?text=' . urlencode($itinerary_text));
 $whatsapp = (get_option('dy_whatsapp')) ? '<a style="border: 16px solid #25d366; text-align: center; background-color: #25d366; color: #fff; font-size: 18px; line-height: 18px; display: block; width: 100%; box-sizing: border-box; text-decoration: none; font-weight: 900;" href="'.esc_url($whatsapp_url).'">'.__('Whatsapp Advisory', 'dynamicpackages').'</a>' : null;
 
 $email_template = <<<EOT
@@ -161,6 +163,8 @@ $email_template = <<<EOT
 					
 					<tr>
 						<td style="padding: 5px;vertical-align: top; border-bottom: solid 1px #eeeeee;">
+							${aircraft_link}
+							<br/>
 							${itinerary_html}
 						</td>
 						<td style="width: 100px; padding: 5px;vertical-align: top; text-align: right; ">
