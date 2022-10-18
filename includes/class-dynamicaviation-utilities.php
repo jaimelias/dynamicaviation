@@ -11,6 +11,44 @@ class Dynamic_Aviation_Utilities {
 		return $url;
 	}
 
+	public function transport_title_plural($this_id = null)
+	{
+		if(!$this_id)
+		{
+			$id = get_the_ID();
+		}
+
+		$transport = aviation_field('aircraft_commercial', $this_id);
+
+		if($transport == 0)
+		{
+			return __('Charter Flights', 'dynamicaviation');
+		}
+		elseif($transport == 1)
+		{
+			return __('Commercial Flights', 'dynamicaviation');
+		}
+	}
+
+	public function transport_title_singular($this_id = null)
+	{
+		if(!$this_id)
+		{
+			$id = get_the_ID();
+		}
+
+		$transport = aviation_field('aircraft_commercial', $this_id);
+
+		if($transport == 0)
+		{
+			return __('Charter Flight', 'dynamicaviation');
+		}
+		elseif($transport == 1)
+		{
+			return __('Commercial Flight', 'dynamicaviation');
+		}
+	}
+
 	public function get_languages()
 	{
 		global $polylang;

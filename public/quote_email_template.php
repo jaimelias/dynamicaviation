@@ -7,7 +7,9 @@ $aircraft_weight = sanitize_text_field($_POST['aircraft_weight']);
 $aircraft_url = sanitize_text_field($_POST['aircraft_url']);
 $passengers = sanitize_text_field($_POST['aircraft_pax']);
 $aircraft_settings = $aircraft_name . ' ('.$aircraft_seats.' '.__('seats or', 'dynamicaviation').' '.$aircraft_weight.')';
-$aircraft_link = '<strong><a href="'.esc_url($aircraft_url).'">'.esc_html($aircraft_settings).'</a></strong>';
+$aircraft_link = ($is_commercial) 
+	? $aircraft_name
+	:'<a href="'.esc_url($aircraft_url).'">'.esc_html($aircraft_settings).'</a>';
 
 $today = date_i18n(get_option('date_format'), strtotime(null));
 $label_doc = __('Estimate', 'dynamicpackages');
@@ -163,7 +165,9 @@ $email_template = <<<EOT
 					
 					<tr>
 						<td style="padding: 5px;vertical-align: top; border-bottom: solid 1px #eeeeee;">
-							${aircraft_link}
+							<small>[${transport_title}]</small>
+							<br/>
+							<strong>${aircraft_link}</strong>
 							<br/>
 							${itinerary_html}
 						</td>

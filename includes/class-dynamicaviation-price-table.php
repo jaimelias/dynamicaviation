@@ -19,10 +19,12 @@ class Dynamic_Aviation_Price_Table {
 	{
 		$output = '';
 		global $airport_array;
+		$is_aircraft_page = is_singular('aircrafts');
+		$is_destination_page = get_query_var('fly');
 
 		if($iata === '')
 		{
-			if(is_singular('aircrafts'))
+			if($is_aircraft_page)
 			{
 				$iata = aviation_field('aircraft_base_iata');
 				$query_args['p'] = get_the_ID();
@@ -42,7 +44,7 @@ class Dynamic_Aviation_Price_Table {
 			'order' => 'ASC',
 		);
 
-		if(is_singular('aircrafts'))
+		if($is_aircraft_page)
 		{
 			$args['p'] = get_the_ID();
 		}
@@ -77,9 +79,8 @@ class Dynamic_Aviation_Price_Table {
 					$table_price = $table_price['aircraft_rates_table'];
 				}
 
+				$transport = aviation_field( 'aircraft_commercial');
 				$is_commercial = (aviation_field( 'aircraft_commercial') == 1) ? true : false;
-				
-
 					
 				for($x = 0; $x < count($table_price); $x++)
 				{
@@ -99,8 +100,8 @@ class Dynamic_Aviation_Price_Table {
 					
 					if($show_all && $origin_iata !== $destination_iata && !empty($origin_iata) && !empty($destination_iata))
 					{
-
-						$route_name = (is_singular('aircrafts')) ? 'default' :  $origin_iata.'_'.$destination_iata;
+						$route_name = ($is_aircraft_page) ? 'default' : $transport.'_'.$origin_iata.'_'.$destination_iata;
+						$this_transport_title = $this->utilities->transport_title_plural($post->ID);
 
 						for($d = 0; $d < count($algolia_full); $d++)
 						{
@@ -138,7 +139,8 @@ class Dynamic_Aviation_Price_Table {
 									'city' => $destination_city,
 									'country_code' => $destination_country_code
 								),
-								'rows' => null
+								'rows' => null,
+								'transport_title' => $this_transport_title
 							);
 						}
 
@@ -149,11 +151,11 @@ class Dynamic_Aviation_Price_Table {
 						$weight_allowed = $weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation');
 						$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
 						
-						$route = __('Private Charter Flight', 'dynamicaviation').' '.$aircraft_type.' '.$post->post_title.' '.__('from', 'dynamicaviation').' '.$origin_airport.', '.$origin_city.' ('.$origin_iata.') '.__('to', 'dynamicaviation').' '.$destination_airport.', '.$destination_city.' ('.$destination_iata.')';
+						$route = $this_transport_title . ' ' . $aircraft_type .' '. $post->post_title . ' ' . __('from', 'dynamicaviation').' '.$origin_airport.', '.$origin_city.' ('.$origin_iata.') '.__('to', 'dynamicaviation').' '.$destination_airport.', '.$destination_city.' ('.$destination_iata.')';
 						
 						$row .= '<tr data-aircraft-type="'.esc_html(aviation_field( 'aircraft_type' )).'" data-iata="'.esc_html($origin_iata).'" title="'.esc_html($route).'">';
 						
-						if(!is_singular('aircrafts'))
+						if(!$is_aircraft_page)
 						{
 							$row .= ($is_commercial) 
 							? '<td><strong>'.esc_html(__('Commercial Flight', 'dynamicaviation')).'</strong></td>'
@@ -161,7 +163,6 @@ class Dynamic_Aviation_Price_Table {
 						}
 						else
 						{
-							$row .= '<td><strong>'.esc_html($origin_airport).'</strong><br/><small class="text-muted">('.esc_html($origin_iata).')</small>, <span>'.esc_html($origin_city.', '.$origin_country_code).'</span></td>';
 							$row .= '<td><strong>'.esc_html($destination_airport).'</strong><br/><small class="text-muted">('.esc_html($destination_iata).')</small>, <span>'.esc_html($destination_city.', '.$destination_country_code).'</span></td>';
 						}
 						
@@ -201,24 +202,28 @@ class Dynamic_Aviation_Price_Table {
 			{	
 				$origin = $v['origin'];
 				$destination = $v['destination'];
+				$transport_title = $v['transport_title'];
 				$label_origin = sprintf(__('%s (%s), %s', 'dynamicaviation'), $origin['airport'], $origin['iata'], $origin['city']);
 				$label_destination = sprintf(__('to %s (%s), %s', 'dynamicaviation'), $destination['airport'], $destination['iata'], $destination['city']);
 				$table = '<div itemscope itemtype="http://schema.org/Table">';
 				
-				if(!is_singular('aircrafts'))
+				if(!$is_aircraft_page)
 				{
-					$table .= '<h4 itemprop="about"><span class="text-muted">'.esc_html($label_origin).'</span> '.esc_html($label_destination).'</h4>';
+					$table .= '<h4 itemprop="about"><span class="light">'.esc_html($transport_title).'</span> <span class="text-muted">'.esc_html($label_origin).'</span> <span>'.esc_html($label_destination).'</span></h4>';
+				}
+				else
+				{
+					$table .= '<h4 itemprop="about">'.esc_html(sprintf(__('%s from %s', 'dynamicaviation'), $transport_title, $label_origin)).'</h4>';
 				}
 
 				$table .= '<table class="dy_table text-center small pure-table pure-table-bordered bottom-40"><thead><tr>';
 
-				if(!is_singular('aircrafts'))
+				if(!$is_aircraft_page)
 				{
 					$table .= '<th>'.esc_html(__('Flights', 'dynamicaviation')).'</th>';
 				}
 				else
 				{
-					$table .= '<th>'.esc_html(__('Origin', 'dynamicaviation')).'</th>';
 					$table .= '<th>'.esc_html(__('Destination', 'dynamicaviation')).'</th>';
 				}
 

@@ -52,7 +52,7 @@ class Dynamic_Aviation_Public {
 	}
 
 	
-	public static function on_quote_submit()
+	public function on_quote_submit()
 	{
 		global $VALID_JET_RECAPTCHA;
 		
@@ -65,15 +65,16 @@ class Dynamic_Aviation_Public {
 					$data = $_POST;
 					$data['lang'] = current_language();
 					
-
-
 					if(!isset($_POST['aircraft_id']))
 					{
-						$subject = sprintf(__('%s, Your flight request has been sent to our specialists at %s!', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'));
+						$subject = sprintf(__('%s, Your request has been sent to our specialists at %s!', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'));
 						require_once('general_email_template.php');
 					}
 					else{
+						$this_id = sanitize_text_field($_POST['aircraft_id']);
 						$subject = sprintf(__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'), sanitize_text_field($data['aircraft_price']));
+						$is_commercial = (aviation_field('aircraft_commercial', $this_id) == 1) ? true : false;
+						$transport_title = $this->utilities->transport_title_singular($this_id);
 						require_once('quote_email_template.php');
 					}
 					
@@ -289,8 +290,10 @@ class Dynamic_Aviation_Public {
 		elseif(is_singular('aircrafts'))
 		{			
 			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
+			$is_commercial = (aviation_field( 'aircraft_commercial') == 1) ? true : false;
 			$city = aviation_field('aircraft_base_city');
-			$title = sprintf(__('Charter Flight %s %s in %s', 'dynamicaviation'), $aircraft_type, get_the_title(), $city) .' | '.get_bloginfo( 'name', 'display' );
+			$label = $this->utilities->transport_title_plural();
+			$title = sprintf(__('%s %s %s in %s', 'dynamicaviation'), $label, $aircraft_type, get_the_title(), $city) .' | '.get_bloginfo( 'name', 'display' );
 			return $title;
 		}
 		return $title;
@@ -803,10 +806,11 @@ class Dynamic_Aviation_Public {
 		if(is_singular('aircrafts'))
 		{
 			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
+			$transport_title = $this->utilities->transport_title_singular();
 			$city = aviation_field('aircraft_base_city');
 			$airport = aviation_field('aircraft_base_name');
 			$price_per_hour = '$'.aviation_field('aircraft_price_per_hour');
-			return sprintf(__('%s for rent in %s. Private Charter Flight Service %s %s in %s, %s from %s per hour.', 'dynamicaviation'), $aircraft_type, $city, $aircraft_type, get_the_title(), $airport, $city, $price_per_hour);
+			return sprintf(__('%s for rent in %s. %s Service %s %s in %s, %s from %s per hour.', 'dynamicaviation'), $aircraft_type, $city, $transport_title, $aircraft_type, get_the_title(), $airport, $city, $price_per_hour);
 		}
 
 		return $excerpt;
