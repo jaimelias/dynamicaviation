@@ -603,7 +603,7 @@ class Dynamic_Aviation_Public {
 
 		wp_enqueue_script( 'landing-cookies', plugin_dir_url( __FILE__ ).'js/cookies.js', array('jquery'), $this->version, true );		
 		
-		if(((is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'aviation_search_form')) || is_singular('aircrafts')) && !isset($_GET['fl_builder']))
+		if(((is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'aviation_search_form')) || is_singular('aircrafts') || get_query_var('fly')) && !isset($_GET['fl_builder']))
 		{
 			array_push($dep, 'algolia', 'mapbox', 'markercluster', 'sha512', 'picker-date-js', 'picker-time-js');
 			
@@ -657,13 +657,8 @@ class Dynamic_Aviation_Public {
 		global $post;
 
 		wp_enqueue_style('minimalLayout', plugin_dir_url( __FILE__ ) . 'css/minimal-layout.css', array(), '', 'all' );
-		
-		
-		if(get_query_var('fly'))
-		{
-			wp_add_inline_style('minimalLayout', $this->get_inline_css('dynamicpackages-public'));
-		}
-		if(is_singular('aircrafts') || (is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'aviation_search_form') || has_shortcode( $post->post_content, 'jc_calculator'))))
+
+		if(is_singular('aircrafts') || get_query_var('fly') || (is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'aviation_search_form') || has_shortcode( $post->post_content, 'jc_calculator'))))
 		{
 			wp_add_inline_style('minimalLayout', $this->get_inline_css('dynamicaviation-public'));
 		}
@@ -673,7 +668,7 @@ class Dynamic_Aviation_Public {
 	{
 		global $post;
 		
-		if(is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'aviation_search_form') || has_shortcode( $post->post_content, 'jc_calculator')) || is_singular('aircrafts'))
+		if(is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'aviation_search_form') || has_shortcode( $post->post_content, 'jc_calculator')) || is_singular('aircrafts') || is_singular('aircrafts') || get_query_var('fly'))
 		{
 			wp_enqueue_style( 'picker-css', plugin_dir_url( __FILE__ ) . 'css/picker/default.css', array(), 'dynamicaviation', 'all' );
 			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.date'));

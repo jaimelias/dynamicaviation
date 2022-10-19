@@ -103,7 +103,7 @@ class Dynamic_Aviation_Destination_Details {
         ob_start(); 
         ?>
 
-            <div class="pure-g gutters">
+            <div class="pure-g gutters bottom-20">
 
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
                     <table class="airport_description pure-table pure-table-striped">
@@ -125,16 +125,20 @@ class Dynamic_Aviation_Destination_Details {
                     </table>
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3">
-                    <img width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php esc_html_e($airport).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
-                    <?php echo $this->get_destination_content($iata); ?>
+                    <div class="entry-content">
+                        <img width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php esc_html_e($airport).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
+                        <?php echo $this->get_destination_content($iata); ?>
+                    </div>
                 </div>
             </div>
 
+            <hr/>
 
-            <?php if(is_active_sidebar( 'quote-sidebar' )): ?>
-                <h2><span class="linkcolor"><?php echo (esc_html__('Quote Charter Flight to', 'dynamicaviation'));?></span> <?php esc_html_e($airport); ?><span class="linkcolor">, <?php esc_html_e($city);?></span></h2>
-                <ul id="quote-sidebar"><?php dynamic_sidebar('quote-sidebar'); ?></ul>
-            <?php endif; ?>
+            <h4><span class="linkcolor"><?php echo (esc_html__('Quote Charter Flight to', 'dynamicaviation'));?></span> <?php esc_html_e($airport); ?><span class="linkcolor">, <?php esc_html_e($city);?></span></h4>
+            <div id="quote-sidebar">
+                <?php echo apply_filters('dy_aviation_search_form', ''); ?>
+            </div>
+
 
         <?php
         

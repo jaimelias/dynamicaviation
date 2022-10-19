@@ -2,21 +2,7 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
- ul#quote-sidebar
- {
-	margin: 0 !important;
-	padding: 0 !important;
-	list-style-type: none;
- }
- ul#quote-sidebar > li
- {
-	margin: 0;
-	padding: 0;
- }
- ul#quote-sidebar > .widget-title
- {
-	font-weight: 800;
- }
+
  .aircraft_price_list
  {
 	margin: 0 0 40px 0;
