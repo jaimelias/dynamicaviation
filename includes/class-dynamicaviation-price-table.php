@@ -100,7 +100,10 @@ class Dynamic_Aviation_Price_Table {
 					
 					if($show_all && $origin_iata !== $destination_iata && !empty($origin_iata) && !empty($destination_iata))
 					{
-						$route_name = ($is_aircraft_page) ? 'default' : $transport.'_'.$origin_iata.'_'.$destination_iata;
+						$route_name = ($is_aircraft_page) 
+							? $transport.'_'.$origin_iata 
+							: $transport.'_'.$origin_iata.'_'.$destination_iata;
+							
 						$this_transport_title = $this->utilities->transport_title_plural($post->ID);
 
 						for($d = 0; $d < count($algolia_full); $d++)
