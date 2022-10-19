@@ -26,7 +26,6 @@ class Dynamic_Aviation_Price_Table {
 		{
 			if($is_aircraft_page)
 			{
-				$iata = aviation_field('aircraft_base_iata');
 				$query_args['p'] = get_the_ID();
 			}
 			else 
@@ -85,8 +84,17 @@ class Dynamic_Aviation_Price_Table {
 				for($x = 0; $x < count($table_price); $x++)
 				{
 					$row = '';
+
 					$origin_iata = $table_price[$x][0];
 					$destination_iata = $table_price[$x][1];
+
+
+					if($iata)
+					{
+						$origin_iata = ($iata === $origin_iata) ? $table_price[$x][1] : $origin_iata;
+						$destination_iata = ($iata === $destination_iata) ? $destination_iata : $table_price[$x][0];
+					}
+
 
 					$show_all = true;
 
@@ -97,13 +105,13 @@ class Dynamic_Aviation_Price_Table {
 							$show_all = false;
 						}
 					}
-					
+
 					if($show_all && $origin_iata !== $destination_iata && !empty($origin_iata) && !empty($destination_iata))
 					{
-						$route_name = ($is_aircraft_page) 
+						$route_name = (!$is_destination_page) 
 							? $transport.'_'.$origin_iata 
 							: $transport.'_'.$origin_iata.'_'.$destination_iata;
-							
+
 						$this_transport_title = $this->utilities->transport_title_plural($post->ID);
 
 						for($d = 0; $d < count($algolia_full); $d++)
@@ -197,7 +205,9 @@ class Dynamic_Aviation_Price_Table {
 			}
 			
 			wp_reset_postdata();
-		}	
+		}
+
+		//write_log($routes);
 
 		if($count > 0)
 		{
