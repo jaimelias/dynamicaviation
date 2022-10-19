@@ -106,7 +106,7 @@ class Dynamic_Aviation_Destination_Details {
             <div class="pure-g gutters bottom-20">
 
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
-                    <table class="airport_description pure-table pure-table-striped">
+                    <table class="airport_description pure-table pure-table-striped bottom-20">
                         <?php if($iata != null && $icao != null): ?>
                             <?php if($iata != null): ?>
                             <tr><td>IATA</td><td><?php esc_html_e($iata); ?></td></tr>
@@ -126,7 +126,7 @@ class Dynamic_Aviation_Destination_Details {
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3">
                     <div class="entry-content">
-                        <img width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php esc_html_e($airport).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
+                        <img class="bottom-20" width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php esc_html_e($airport).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
                         <?php echo $this->get_destination_content($iata); ?>
                     </div>
                 </div>
