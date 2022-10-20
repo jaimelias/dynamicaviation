@@ -174,7 +174,9 @@ class Dynamic_Aviation_Price_Table {
 						}
 						else
 						{
-							$row .= '<td><strong>'.esc_html($destination_airport).'</strong><br/><small class="text-muted">('.esc_html($destination_iata).')</small>, <span>'.esc_html($destination_city.', '.$destination_country_code).'</span></td>';
+							$destination_url = home_lang() . 'fly/' . $this->utilities->sanitize_pathname($destination_airport);
+							$destination_link = '<a href="'.esc_url($destination_url).'"><strong>'.esc_html(sprintf(__('Flights to %s', 'dynamicaviation'), $destination_airport, $destination_city)).'</strong></a>';
+							$row .= '<td>'.$destination_link.'<br/><small class="text-muted">('.esc_html($destination_iata).')</small>, <span>'.esc_html($destination_city.', '.$destination_country_code).'</span></td>';
 						}
 						
 						$row .= '<td><strong><i class="fas fa-male" ></i> '.esc_html($seats).' </strong><br/><small>'.esc_html($weight_allowed).'</small></td>';
