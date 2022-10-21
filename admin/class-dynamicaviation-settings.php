@@ -36,7 +36,7 @@ class Dynamic_Aviation_Settings
 	
 	public function settings_init()
 	{ 
-		$languages = $this->utilities->get_languages();
+		$languages = get_languages();
 
 		register_setting( 'aircraft_settings', 'dy_email', 'sanitize_email');
 		register_setting( 'aircraft_settings', 'dy_whatsapp', 'intval');

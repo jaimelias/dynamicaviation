@@ -38,7 +38,27 @@ class Dynamic_Aviation_Public {
 		add_filter('minimal_posted_on', array(&$this, 'minimalizr_hide_posted_on'), 100);
 		add_filter('minimal_archive_excerpt', array(&$this, 'minimalizr_modify_archive_excerpt'), 100);
 		add_filter('minimal_archive_title', array(&$this, 'minimalizr_modify_archive_title'), 100);
+		add_filter('pll_translation_url', array(&$this, 'pll_translation_url'), 100, 2);
+	}
 
+
+	public function pll_translation_url($url, $slug)
+	{
+		global $polylang;
+		$query_var = get_query_var('fly');
+		
+		if(isset($polylang) && $query_var)
+		{
+			$default_language = pll_default_language();
+
+
+			$url = ($slug === $default_language) 
+				? esc_url(home_url('/fly/' . $query_var))
+				: esc_url(home_url('/' . $slug . '/fly/' . $query_var));
+
+		}
+
+		return $url;
 	}
 
 	public function init()
