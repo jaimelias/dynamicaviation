@@ -317,7 +317,7 @@ jQuery('.aircraft_calculator').each(function(){
 
 					const localize = ['airport', 'city'];
 
-					let {country_names, country_code, _highlightResult} = suggestion;
+					let {country_names, country_code, _highlightResult, iata, icao} = suggestion;
 
 					localize.forEach(k => {
 
@@ -337,30 +337,16 @@ jQuery('.aircraft_calculator').each(function(){
 					});
 
 
-					const {airport, iata, city, icao} = _highlightResult;
+					const {airport, iata: _iata, city} = _highlightResult;
 
 					const country = (country_names.hasOwnProperty(htmllang)) ? country_names[htmllang] : null;
 					let flag_url = String(jsonsrc() + "img/flags/" + country_code + '.svg').toLowerCase();
 					const result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> <strong class="iata"></strong></div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
 					result.find('.sairport > .airport').html(airport.value);
 					
-
-					if(icao)
+					if(iata.length === 3)
 					{
-						if(icao.hasOwnProperty('value'))
-						{
-							if(icao.value)
-							{
-								result.find('.sairport > .iata').html(`(${iata.value})`);
-							}
-						}
-					}
-					else
-					{
-						if(iata.value.length === 3)
-						{
-							result.find('.sairport > .iata').html(`(${iata.value})`);
-						}
+						result.find('.sairport > .iata').html(`(${_iata.value})`);
 					}
 					
 					result.find('.slocation > .city').html(city.value);
