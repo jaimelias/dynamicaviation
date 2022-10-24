@@ -447,46 +447,73 @@ const algolia_execute = () => {
 			displayKey: 'iata',
 			templates: {
 				suggestion: suggestion => {
-					let htmllang = jQuery("html").attr("lang");
+
+					let htmllang = jQuery('html').attr('lang');
 					htmllang = htmllang.slice(0, 2);
 					htmllang.toLowerCase();
-					
-					const country_names = suggestion.country_names;
-					let  country_lang = null;
-					
-					for(let prop in country_names[0])
-					{
-						if(prop == htmllang)
+
+					let {_highlightResult, country_names, country_code} = suggestion;
+					const country = (country_names.hasOwnProperty(htmllang)) ? country_names[htmllang] : null;
+					const localize = ['airport', 'city'];
+
+
+					localize.forEach(k => {
+
+						if(_highlightResult.hasOwnProperty(k))
 						{
-							country_lang = country_names[0][prop];
+							const localizedKey = `${k}_names`;
+							const loc = _highlightResult[localizedKey];
+
+							if(loc)
+							{
+								if(loc.hasOwnProperty(htmllang))
+								{
+									_highlightResult[k] = loc[htmllang];
+								}
+							}
 						}
-						else
+					});
+
+					const {airport, iata, icao, city} = _highlightResult;
+		
+					let flagUrl = jsonsrc()+"img/flags/"+country_code+'.svg';
+					flagUrl = flagUrl.toLowerCase();
+					
+					let result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> <span class="iata"></span></div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
+					result.find('.sairport > .airport').html(airport.value);
+
+					if(icao)
+					{
+						if(icao.hasOwnProperty('value'))
 						{
-							country_lang = country_names[0]['en'];
+							if(icao.value)
+							{
+								result.find('.sairport > .iata').html(`(${iata.value})`);
+							}
+						}
+					}
+					else
+					{
+						if(iata.value.length === 3)
+						{
+							result.find('.sairport > .iata').html(`(${iata.value})`);
 						}
 					}
 					
-					
-					const country_flag = suggestion.country_code;
-					let flag_url = jsonsrc()+"img/flags/"+country_flag+'.svg';
-					flag_url = flag_url.toLowerCase();
-					
-					//console.log(suggestion);
-
-					let result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> (<span class="iata"></span>)</div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
-					result.find('.sairport > .airport').html(suggestion._highlightResult.airport.value);
-					result.find('.sairport > .iata').html(suggestion._highlightResult.iata.value);
-					result.find('.slocation > .city').html(suggestion._highlightResult.city.value);
-					result.find('.slocation > .country').html(country_lang);
-					result.find('.sflag > img').attr({'src': flag_url});
+					result.find('.slocation > .city').html(city.value);
+					result.find('.slocation > .country').html(country);
+					result.find('.sflag > img').attr({'src': flagUrl});
 					return result.html();
 				}
 			}
 		}]).on('autocomplete:selected', function(event, suggestion, dataset) {
-			jQuery('.aircraft_lat').val(suggestion._geoloc.lat);
-			jQuery('.aircraft_lon').val(suggestion._geoloc.lng);
-			jQuery('.aircraft_base_name').val(suggestion.airport);
-			jQuery('.aircraft_base_city').val(suggestion.city+', '+suggestion.country_code);
+
+			const {_geoloc, airport, city, country_code} = suggestion;
+
+			jQuery('.aircraft_lat').val(_geoloc.lat);
+			jQuery('.aircraft_lon').val(_geoloc.lng);
+			jQuery('.aircraft_base_name').val(airport);
+			jQuery('.aircraft_base_city').val(city+', '+country_code);
 		});
 		
 		jQuery(this).focus(function(){

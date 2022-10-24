@@ -310,25 +310,61 @@ jQuery('.aircraft_calculator').each(function(){
 			}),
 			displayKey: 'airport',
 			templates: {
-				suggestion: function(suggestion) {
+				suggestion: suggestion => {
 
 					let htmllang = jQuery('html').attr('lang');
 					htmllang = htmllang.slice(0, 2);
 					htmllang.toLowerCase();
-					const country_names = suggestion.country_names;
-					const country_flag = suggestion.country_code;
-					let flag_url = jsonsrc() + "img/flags/" + country_flag + '.svg';
-					flag_url = flag_url.toLowerCase();
+					const localize = ['airport', 'city'];
+
+					let {country_names, country_code, _highlightResult} = suggestion;
+
+					localize.forEach(k => {
+
+						if(_highlightResult.hasOwnProperty(k))
+						{
+							const localizedKey = `${k}_names`;
+							const loc = _highlightResult[localizedKey];
+
+							if(loc)
+							{
+								if(loc.hasOwnProperty(htmllang))
+								{
+									_highlightResult[k] = loc[htmllang];
+								}
+							}
+						}
+					});
+
+
+					const {airport, iata, city, icao} = _highlightResult;
+
+					const country = (country_names.hasOwnProperty(htmllang)) ? country_names[htmllang] : null;
+					let flag_url = String(jsonsrc() + "img/flags/" + country_code + '.svg').toLowerCase();
 					const result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> <strong class="iata"></strong></div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
-					result.find('.sairport > .airport').html(suggestion._highlightResult.airport.value);
+					result.find('.sairport > .airport').html(airport.value);
 					
-					if(suggestion._highlightResult.hasOwnProperty('iata'))
+
+					if(icao)
 					{
-						result.find('.sairport > .iata').html(suggestion._highlightResult.iata.value);
+						if(icao.hasOwnProperty('value'))
+						{
+							if(icao.value)
+							{
+								result.find('.sairport > .iata').html(`(${iata.value})`);
+							}
+						}
+					}
+					else
+					{
+						if(iata.value.length === 3)
+						{
+							result.find('.sairport > .iata').html(`(${iata.value})`);
+						}
 					}
 					
-					result.find('.slocation > .city').html(suggestion._highlightResult.city.value);
-					result.find('.slocation > .country').html(country_name(htmllang, country_names, suggestion.country_code));
+					result.find('.slocation > .city').html(city.value);
+					result.find('.slocation > .country').html(country);
 					result.find('.sflag > img').attr({
 						'src': flag_url
 					});
