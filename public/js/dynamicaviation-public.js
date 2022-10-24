@@ -296,8 +296,9 @@ const algolia_execute = () => {
 
 jQuery('.aircraft_calculator').each(function(){
 
+	const htmllang = (String(jQuery('html').attr('lang')).slice(0, 2)).toLowerCase() || 'en';
 	const thisForm = jQuery(this);
-	
+
 	jQuery(this).find('.aircraft_list').each(function(){
 		
 		const this_field = jQuery(this);
@@ -312,9 +313,8 @@ jQuery('.aircraft_calculator').each(function(){
 			templates: {
 				suggestion: suggestion => {
 
-					let htmllang = jQuery('html').attr('lang');
-					htmllang = htmllang.slice(0, 2);
-					htmllang.toLowerCase();
+					
+
 					const localize = ['airport', 'city'];
 
 					let {country_names, country_code, _highlightResult} = suggestion;
@@ -373,33 +373,30 @@ jQuery('.aircraft_calculator').each(function(){
 			}
 		}]).on('autocomplete:selected', function(event, suggestion) {
 			
-			let selectedAirport = null
-			
-			if(suggestion.hasOwnProperty('iata'))
-			{
-				if(suggestion.iata != null)
-				{
-					selectedAirport = suggestion.iata;
-				}
-				else
-				{
-					 selectedAirport = 'IATA missing... '+suggestion.airport;
-				}
-			}
-			
-			jQuery(thisForm).find('#'+jQuery(this_field).attr('id')+'_l').val(suggestion.airport+' ('+suggestion.iata+'), '+suggestion.city+' ('+suggestion.country_code+')');
 			
 
+			let {iata, icao, airport, airport_names, city, country_code, _geoloc} = suggestion;
+
+			airport = (typeof airport_names !== 'undefined')
+				? (airport_names.hasOwnProperty(htmllang)) 
+				? airport_names[htmllang] 
+				: airport
+				: airport;
+			
+			jQuery(thisForm)
+				.find('#'+jQuery(this_field).attr('id')+'_l')
+				.val(`${airport}${icao || iata.length === 3 ? ' ('+ iata + ')':  ''}, ${city}, ${country_code}`);
+			
 			jQuery(this_field).attr({
-				'data-iata': suggestion.iata,
-				'data-lat': suggestion._geoloc.lat,
-				'data-lon': suggestion._geoloc.lng
-			}).addClass('aircraft_selected').val(selectedAirport);	
+				'data-iata': iata,
+				'data-lat': _geoloc.lat,
+				'data-lon': _geoloc.lng
+			}).addClass('aircraft_selected').val(iata);	
 
 			jQuery(this_field).blur(() => {
 				if (jQuery(this_field).hasClass('aircraft_selected'))
 				{
-					jQuery(this_field).val(selectedAirport);
+					jQuery(this_field).val(iata);
 				}
 				else
 				{

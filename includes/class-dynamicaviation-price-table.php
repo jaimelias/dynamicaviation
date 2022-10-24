@@ -56,6 +56,7 @@ class Dynamic_Aviation_Price_Table {
 			$count = 0;
 			$algolia_full = $this->algolia_full();
 			$routes = array();
+			$current_language = current_language();
 
 			while ($wp_query->have_posts() )
 			{
@@ -118,7 +119,11 @@ class Dynamic_Aviation_Price_Table {
 						{
 							if($destination_iata === $algolia_full[$d]['iata'])
 							{
-								$destination_airport = $algolia_full[$d]['airport'];
+								$destination_airport = (array_key_exists('airport_names', $algolia_full[$d])) 
+									? (array_key_exists($current_language, $algolia_full[$d]['airport_names']))
+									? $algolia_full[$d]['airport_names'][$current_language]
+									: $algolia_full[$d]['airport']
+									: $algolia_full[$d]['airport'];
 								$destination_city = $algolia_full[$d]['city'];
 								$destination_country_code = $algolia_full[$d]['country_code'];
 							}
@@ -129,7 +134,11 @@ class Dynamic_Aviation_Price_Table {
 						{
 							if($origin_iata == $algolia_full[$y]['iata'])
 							{
-								$origin_airport = $algolia_full[$y]['airport'];
+								$origin_airport = (array_key_exists('airport_names', $algolia_full[$y])) 
+									? (array_key_exists($current_language, $algolia_full[$y]['airport_names']))
+									? $algolia_full[$y]['airport_names'][$current_language]
+									: $algolia_full[$y]['airport']
+									: $algolia_full[$y]['airport'];
 								$origin_city = $algolia_full[$y]['city'];
 								$origin_country_code = $algolia_full[$y]['country_code'];
 							}
