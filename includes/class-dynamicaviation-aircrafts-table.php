@@ -510,7 +510,7 @@ class Dynamic_Aviation_Aircrafts_Table {
         {
             $output = '<hr/><h4>'.esc_html(sprintf(__('Alternative transport options to %s', 'dynamicaviation'), $this->get()->aircraft_destination_l)).'</h4>';
 
-            $output .= '<table class="bottom-40 pure-table pure-table-bordered text-center small"><thead><tr>';
+            $output .= '<table class="bottom-40 pure-table pure-table-bordered pure-table-striped text-center small"><thead><tr>';
 
             $output .= '<th>'.__('Transport', 'dynamicaviation').'</th>';
 
