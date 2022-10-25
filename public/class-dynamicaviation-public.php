@@ -553,7 +553,7 @@ class Dynamic_Aviation_Public {
 					$url = '<url>';
 					$url .= '<loc>'.esc_url(home_url().'/fly/'.$this->utilities->sanitize_pathname($all_airports[$x]['airport'])).'/</loc>';
 					$url .= '<image:image>';
-					$url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.$this->utilities->sanitize_pathname($all_airports[$x]['airport'])).'.jpg</image:loc>';
+					$url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.$this->utilities->sanitize_pathname($all_airports[$x]['airport'])).'.png</image:loc>';
 					$url .= '</image:image>';
 					$url .= '<mobile:mobile/>';
 					$url .= '<changefreq>weekly</changefreq>';
@@ -568,7 +568,7 @@ class Dynamic_Aviation_Public {
 						$pll_url = '<url>';
 						$pll_url .= '<loc>'.esc_url(home_url().'/'.$language_list[0].'/fly/'.$this->utilities->sanitize_pathname($all_airports[$y]['airport'])).'/</loc>';
 						$pll_url .= '<image:image>';
-						$pll_url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.$this->utilities->sanitize_pathname($all_airports[$y]['airport'])).'.jpg</image:loc>';
+						$pll_url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.$this->utilities->sanitize_pathname($all_airports[$y]['airport'])).'.png</image:loc>';
 						$pll_url .= '</image:image>';
 						$pll_url .= '<mobile:mobile/>';
 						$pll_url .= '<changefreq>weekly</changefreq>';

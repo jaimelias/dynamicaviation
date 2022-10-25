@@ -48,7 +48,7 @@ class Dynamic_Aviation_Admin {
 	public function custom_rewrite_basic()
 	{
 		add_rewrite_rule('^fly/([^/]*)/?', 'index.php?fly=$matches[1]','top');
-		add_rewrite_rule('^cacheimg/([^/]*)/?.jpg', 'index.php?cacheimg=$matches[1]','top');
+		add_rewrite_rule('^cacheimg/([^/]*)/?.png', 'index.php?cacheimg=$matches[1]','top');
 		add_rewrite_rule('^instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[1]','top');
 		add_rewrite_rule('^request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[1]','top');
 
@@ -101,10 +101,10 @@ class Dynamic_Aviation_Admin {
 		{
 			if(count($dirname_arr) > 0)
 			{
-				if(in_array('cacheimg', $dirname_arr) && str_ends_with($basename, '.jpg'))
+				if(in_array('cacheimg', $dirname_arr) && str_ends_with($basename, '.png'))
 				{
 
-					$headers['Content-Type'] = 'image/jpeg';
+					$headers['Content-Type'] = 'image/png';
 				}
 			}
 		}
@@ -124,19 +124,24 @@ class Dynamic_Aviation_Admin {
 		{
 			if(count($dirname_arr) > 0)
 			{
-				if(in_array('cacheimg', $dirname_arr) && str_ends_with($basename, '.jpg'))
+				if(in_array('cacheimg', $dirname_arr) && str_ends_with($basename, '.png'))
 				{
-					header('Content-Type: image/jpeg');
+					header('Content-Type: image/png');
 
 					$url = $this->utilities->airport_url_string($this->utilities->airport_data($filename));
-		
-					$ch = curl_init ($url);
-					curl_setopt($ch, CURLOPT_HEADER, 0);
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-					curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
-					$raw = curl_exec($ch);			
-					curl_close ($ch);
-					exit($raw);
+
+					$headers = array(
+						'Content-Type' => 'image/png'
+					);
+					
+					$resp = wp_remote_get($url, array(
+						'headers' => $headers
+					));
+					
+					if($resp['response']['code'] === 200)
+					{
+						exit($resp['body']);
+					}
 				}
 			}
 		}

@@ -12,7 +12,7 @@ class Dynamic_Aviation_Utilities {
 	public function airport_img_url($json)
 	{
 		$airport = $json['airport'];
-		$url = home_url('cacheimg/'.$this->sanitize_pathname($airport).'.jpg');		
+		$url = home_url('cacheimg/'.$this->sanitize_pathname($airport).'.png');		
 		return $url;
 	}
 
