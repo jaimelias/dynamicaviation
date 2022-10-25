@@ -442,10 +442,20 @@ class Dynamic_Aviation_Aircrafts_Table {
 
     public function connected_packages()
     {
+        if(!function_exists('package_field'))
+        {
+            return '';
+        }
+
         global $polylang;
         $output = '';
         $current_language = current_language();
         $connected_ids = $this->get_destinations_contected_packages_ids();
+
+        if(count($connected_ids) === 0)
+        {
+            return '';
+        }
 
         if(isset($polylang))
         {
