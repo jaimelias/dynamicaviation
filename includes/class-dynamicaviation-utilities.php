@@ -4,6 +4,11 @@
 class Dynamic_Aviation_Utilities {
 
 
+	public function __construct()
+	{
+		$this->wp_cache_expires_seconds = 60; 
+	}
+
 	public function airport_img_url($json)
 	{
 		$airport = $json['airport'];
@@ -187,89 +192,100 @@ class Dynamic_Aviation_Utilities {
 		  return $url;
 	  }
 
-	  public function return_json($query_var = null) {
+	  public function airport_data($query_var = null) {
 		
-		$algolia_token = get_option('algolia_token');
-		$algolia_index = get_option('algolia_index');
-		$algolia_id = get_option('algolia_id');
-		
-		$curl = curl_init();
-		
-		$headers = array();
-		$headers[] = 'X-Algolia-API-Key: '.$algolia_token;
-		$headers[] = 'X-Algolia-Application-Id: '.$algolia_id;
+		$output = array();
 
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-		
-		if($query_var)
+		if(!$query_var)
 		{
-			$query_param = '?query='.$query_var.'&hitsPerPage=1';
-		}
-		else
-		{
-			if(get_query_var( 'fly' ) != '')
+			if(get_query_var( 'fly' ))
 			{
 				$query_var = get_query_var( 'fly' );
-				$query_param = '?query='.$query_var.'&hitsPerPage=1';
 			}
-			if(get_query_var( 'cacheimg' ) != '')
+			if(get_query_var( 'cacheimg' ))
 			{
-				$query_var = get_query_var( 'cacheimg' );
-				$query_param = '?query='.$query_var.'&hitsPerPage=1';
-			}
-			else
-			{
-				$query_param = 'browse?cursor=';
+				$query_var = get_query_var( 'cacheimg' );	
 			}
 		}
 
-		curl_setopt_array($curl, array(
-		CURLOPT_RETURNTRANSFER => 1,
-		CURLOPT_REFERER => esc_url(home_url()),
-		CURLOPT_URL => 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param,
-		));
-		$resp = curl_exec($curl);
-		$resp = json_decode($resp, true);
-			
-		
-		if($query_var)
+		if(!$query_var)
 		{
-			if(array_key_exists('hits', $resp))
-			{
-				$hits = $resp['hits'];
-				
-				if(is_array($hits))
-				{
-					for($x = 0; $x < count($hits); $x++)
-					{
-						if($query_var === $this->sanitize_pathname($hits[$x]['airport']))
-						{
-							return $hits[$x];
-						}
-					}			
-					
-				}
-			}
+			return $this->all_airports_data();
+		}
+
+		$query_param = '?query='.$query_var.'&hitsPerPage=1';
+		$which_var = 'dynamicaviation_airport_data_'.$query_var;
+		global $$which_var;
+		
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
 		}
 		else
 		{
-			return $resp;
+
+			$algolia_token = get_option('algolia_token');
+			$algolia_index = get_option('algolia_index');
+			$algolia_id = get_option('algolia_id');
+
+			$url = 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param;
+			
+			$headers = array(
+				'X-Algolia-API-Key' => $algolia_token, 
+				'X-Algolia-Application-Id' =>$algolia_id,
+				'Content-Type' => 'application/json'
+			);
+
+			$resp = wp_remote_get($url, array(
+				'headers' => $headers
+			));
+
+			if($resp['response']['code'] === 200)
+			{
+
+				$body = json_decode($resp['body'], true);
+
+				if(array_key_exists('hits', $body))
+				{
+					$hits = $body['hits'];
+					
+					if(is_array($hits))
+					{
+						for($x = 0; $x < count($hits); $x++)
+						{
+							if($query_var === $this->sanitize_pathname($hits[$x]['airport']))
+							{
+								$output = $hits[$x];
+							}
+						}			
+						
+					}
+				}
+			}
+
+			$GLOBALS[$which_var] = $output;
 		}
-		
+
+		return $output;
 	}
 
 	public function airport_url_string($json)
 	{
-		//json
-		$_geoloc = $json['_geoloc'];
-		
-		//mapbox options
-		$mapbox_token = get_option('mapbox_token');
-		
-		//map position
-		$mapbox_marker = 'pin-l-airport+dd3333('.$_geoloc['lng'].','.$_geoloc['lat'].')';
 
-		return 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/660x440?access_token='.esc_html($mapbox_token);				
+		if(is_array($json))
+		{
+			if(array_key_exists('_geoloc', $json))
+			{
+				$_geoloc = $json['_geoloc'];
+				$mapbox_token = get_option('mapbox_token');
+				$mapbox_marker = 'pin-l-airport+dd3333('.$_geoloc['lng'].','.$_geoloc['lat'].')';
+				$url = 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/660x440?access_token='.esc_html($mapbox_token);				
+				
+				//write_log($url);
+
+				return $url;
+			}
+		}
 	}
 
 	public function sanitize_items_per_line($sanitize_func, $str, $max)
@@ -291,15 +307,15 @@ class Dynamic_Aviation_Utilities {
 		return explode("\r\n", html_entity_decode($str));
 	}
 
-	public function algolia_full()
+	public function all_airports_data()
 	{
 		$output = array();
-		$which_var = 'dynamicaviation_algolia_full';
+		$which_var = 'dynamicaviation_all_airports_data';
 		global $$which_var;
 
 		if(isset($$which_var))
 		{
-			return $$which_var;
+			$output = $$which_var;
 		}
 		else
 		{
@@ -307,23 +323,28 @@ class Dynamic_Aviation_Utilities {
 			$algolia_token = get_option('algolia_token');
 			$algolia_index = get_option('algolia_index');
 			$algolia_id = get_option('algolia_id');
-			$headers = array('X-Algolia-API-Key: '.$algolia_token, 'X-Algolia-Application-Id: '.$algolia_id);
 			$url = 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param;
-			$curl_arr = array(
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_REFERER => esc_url(home_url()),
-				CURLOPT_URL => esc_url($url)
-			);
 
-			$curl = curl_init();
-			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);	
-			curl_setopt_array($curl, $curl_arr);
-			$resp = curl_exec($curl);
-			$resp = json_decode($resp, true);
-			$output = $resp['hits'];
-			$GLOBALS[$which_var] = $output;
-			return $output;
-		}
+			$headers = array(
+				'X-Algolia-API-Key' => $algolia_token, 
+				'X-Algolia-Application-Id' => $algolia_id,
+				'Content-Type' => 'application/json'
+			);
+			
+			$resp = wp_remote_get($url, array(
+				'headers' => $headers
+			));
+
+
+			if($resp['response']['code'] === 200)
+			{
+				$body = json_decode($resp['body'], true);
+				$output = $body['hits'];
+				$GLOBALS[$which_var] = $output;
+			}
+		}		
+
+		return $output;
 	}
 
 }

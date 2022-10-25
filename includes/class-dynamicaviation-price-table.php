@@ -18,7 +18,7 @@ class Dynamic_Aviation_Price_Table {
 	public function table($iata = '')
 	{
 		$output = '';
-		global $airport_array;
+		$airport_array = $this->utilities->airport_data();
 		$is_aircraft_page = is_singular('aircrafts');
 		$is_destination_page = get_query_var('fly');
 
@@ -49,7 +49,7 @@ class Dynamic_Aviation_Price_Table {
 			$count = 0;
 			$routes = array();
 			$current_language = current_language();
-			$algolia_full = $this->utilities->algolia_full();
+			$all_airports_data = $this->utilities->all_airports_data();
 
 			while ($wp_query->have_posts() )
 			{
@@ -63,7 +63,7 @@ class Dynamic_Aviation_Price_Table {
 				{
 					return __('Local price table is null or invalid.', 'dynamicaviation');
 				}
-				if(!is_array($algolia_full))
+				if(!is_array($all_airports_data))
 				{
 					return __('Database is not or invalid.', 'dynamicaviation');
 				}
@@ -81,7 +81,7 @@ class Dynamic_Aviation_Price_Table {
 
 					$origin_iata = $table_price[$x][0];
 					$destination_iata = $table_price[$x][1];
-
+					$destination_slug = '';
 
 					if($iata)
 					{
@@ -108,32 +108,33 @@ class Dynamic_Aviation_Price_Table {
 
 						$this_transport_title = $this->utilities->transport_title_plural($post->ID);
 
-						for($d = 0; $d < count($algolia_full); $d++)
+						for($d = 0; $d < count($all_airports_data); $d++)
 						{
-							if($destination_iata === $algolia_full[$d]['iata'])
+							if($destination_iata === $all_airports_data[$d]['iata'])
 							{
-								$destination_airport = (array_key_exists('airport_names', $algolia_full[$d])) 
-									? (array_key_exists($current_language, $algolia_full[$d]['airport_names']))
-									? $algolia_full[$d]['airport_names'][$current_language]
-									: $algolia_full[$d]['airport']
-									: $algolia_full[$d]['airport'];
-								$destination_city = $algolia_full[$d]['city'];
-								$destination_country_code = $algolia_full[$d]['country_code'];
+								$destination_slug = $all_airports_data[$d]['airport'];
+								$destination_airport = (array_key_exists('airport_names', $all_airports_data[$d])) 
+									? (array_key_exists($current_language, $all_airports_data[$d]['airport_names']))
+									? $all_airports_data[$d]['airport_names'][$current_language]
+									: $all_airports_data[$d]['airport']
+									: $all_airports_data[$d]['airport'];
+								$destination_city = $all_airports_data[$d]['city'];
+								$destination_country_code = $all_airports_data[$d]['country_code'];
 							}
 						}
 
 
-						for($y = 0; $y < count($algolia_full); $y++)
+						for($y = 0; $y < count($all_airports_data); $y++)
 						{
-							if($origin_iata == $algolia_full[$y]['iata'])
+							if($origin_iata == $all_airports_data[$y]['iata'])
 							{
-								$origin_airport = (array_key_exists('airport_names', $algolia_full[$y])) 
-									? (array_key_exists($current_language, $algolia_full[$y]['airport_names']))
-									? $algolia_full[$y]['airport_names'][$current_language]
-									: $algolia_full[$y]['airport']
-									: $algolia_full[$y]['airport'];
-								$origin_city = $algolia_full[$y]['city'];
-								$origin_country_code = $algolia_full[$y]['country_code'];
+								$origin_airport = (array_key_exists('airport_names', $all_airports_data[$y])) 
+									? (array_key_exists($current_language, $all_airports_data[$y]['airport_names']))
+									? $all_airports_data[$y]['airport_names'][$current_language]
+									: $all_airports_data[$y]['airport']
+									: $all_airports_data[$y]['airport'];
+								$origin_city = $all_airports_data[$y]['city'];
+								$origin_country_code = $all_airports_data[$y]['country_code'];
 							}
 						}
 
@@ -176,7 +177,7 @@ class Dynamic_Aviation_Price_Table {
 						}
 						else
 						{
-							$destination_url = home_lang() . 'fly/' . $this->utilities->sanitize_pathname($destination_airport);
+							$destination_url = home_lang() . 'fly/' . $this->utilities->sanitize_pathname($destination_slug);
 							$destination_link = '<a href="'.esc_url($destination_url).'" title="'.esc_attr(sprintf(__('Flights to %s', 'dynamicaviation'), $destination_airport, $destination_city)).'">'.esc_html($destination_airport).'</a>';
 							$row .= '<td><strong>'.$destination_link.'</strong><br/><small class="text-muted">('.esc_html($destination_iata).')</small>, <span>'.esc_html($destination_city.', '.$destination_country_code).'</span></td>';
 						}

@@ -128,7 +128,7 @@ class Dynamic_Aviation_Admin {
 				{
 					header('Content-Type: image/jpeg');
 
-					$url = $this->utilities->airport_url_string($this->utilities->return_json($filename));
+					$url = $this->utilities->airport_url_string($this->utilities->airport_data($filename));
 		
 					$ch = curl_init ($url);
 					curl_setopt($ch, CURLOPT_HEADER, 0);

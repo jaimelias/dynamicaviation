@@ -71,7 +71,7 @@ class Dynamic_Aviation_Destination_Details {
     public function template()
     {
 
-        global $airport_array;
+        $airport_array = $this->utilities->airport_data();
         $json = $airport_array;
         $iata  = $json['iata'];
         $icao = $json['icao'];
