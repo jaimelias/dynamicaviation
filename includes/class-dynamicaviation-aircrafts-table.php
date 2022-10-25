@@ -126,7 +126,7 @@ class Dynamic_Aviation_Aircrafts_Table {
 
             <hr/>
             
-            <table class="bottom-40 pure-table pure-table-bordered text-center instant_quote_table small">
+            <table class="bottom-40 pure-table pure-table-bordered pure-table-striped text-center instant_quote_table small">
                 <thead>
                     <tr>
                         <th <?php echo (!$this->is_mobile) ? ' colspan="2" ' : '' ;?>><?php echo (esc_html__('Flights', 'dynamicaviation')); ?></th>
