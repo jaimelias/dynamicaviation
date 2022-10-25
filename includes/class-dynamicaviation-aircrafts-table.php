@@ -474,6 +474,13 @@ class Dynamic_Aviation_Aircrafts_Table {
             }
         }
 
+
+        if(count($connected_ids) === 0)
+        {
+            return '';
+        }
+
+
         //limits packages to minutes and hours
         $meta_query = array(
             'key' => 'package_length_unit',
