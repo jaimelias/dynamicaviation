@@ -432,13 +432,30 @@ class Dynamic_Aviation_Public {
 			if(!empty($airport_array))
 			{
 				$output = '';
-				$json = $airport_array;
-				$airport = $json['airport'];
-				$iata  = $json['iata'];
-				$icao = $json['icao'];
+				$addressArray = array();
+				$airport = $airport_array['airport'];
+				$iata  = $airport_array['iata'];
+				$icao = $airport_array['icao'];
 				$codes = '('.$iata.')';
-				$city = $json['city'];
-				$country_name = $json['country_names'];
+				$city = $airport_array['city'];
+				$country_name = $airport_array['country_names'];
+
+				if(array_key_exists('airport_names', $airport_array))
+				{
+					if(array_key_exists($this->current_language, $airport_array['airport_names']))
+					{
+						$airport = $airport_array['airport_names'][$this->current_language];
+					}
+				}
+
+
+				$addressArray[] = ($iata && $icao) ? $airport . ' ('.$iata.')' : $airport;
+
+				if($airport !== $city)
+				{
+					$addressArray[] = $city;
+				}
+
 				
 				if($this->current_language)
 				{
@@ -451,8 +468,9 @@ class Dynamic_Aviation_Public {
 						$country_lang = $country_name['en'];
 					}
 				}
+
+				$addressArray[] = $country_lang;
 				
-				$addressArray = array(($airport.' '.$codes), $city, $country_lang);
 				$address = implode(', ', $addressArray);
 				$translations = pll_the_languages(array('raw'=>1));
 				
@@ -461,18 +479,17 @@ class Dynamic_Aviation_Public {
 					if($v['slug'] == pll_default_language())
 					{
 						$hreflang = $v['slug'].'" href="'.$v['url'].'fly/'.$this->utilities->sanitize_pathname($airport);
-						$output .= '<link rel="alternate" hreflang="'.($hreflang).'/" />';	
+						$output .= '<link rel="alternate" hreflang="'.esc_attr($hreflang).'/" />';	
 					}
 					else
 					{
 						$hreflang = $v['slug'].'" href="'.home_url('/').$v['slug'].'/fly/'.$this->utilities->sanitize_pathname($airport);
-						$output .= '<link rel="alternate" hreflang="'.($hreflang).'/" />';				
+						$output .= '<link rel="alternate" hreflang="'.esc_attr($hreflang).'/" />';				
 					}
 				}
 				
-				$content = __('Private Charter Flight', 'dynamicaviation').' '.$address.' '.__('Airplanes and helicopter rides in', 'dynamicaviation') .' '. $airport;
-				$output .= '<meta name="description" content="'.esc_attr($content).'" />';
-				$output .= '<link rel="canonical" href="'.esc_url(home_lang().'fly/'.$this->utilities->sanitize_pathname($airport)).'" />';
+				$output .= '<meta name="description" content="'.esc_attr(sprintf(__('Private charter flights to %s. Jets, planes and helicopter rental services in %s.', 'dynamicaviation'), $address, $airport)).'" />';
+				$output .= '<link rel="canonical" href="'.esc_url(home_lang().'fly/'.$this->utilities->sanitize_pathname($airport_array['airport'])).'" />';
 			
 				echo $output;			
 			}
@@ -480,12 +497,15 @@ class Dynamic_Aviation_Public {
 		if(is_singular('aircrafts'))
 		{
 			ob_start();
-			require_once(plugin_dir_path( __FILE__ ).'partials/metatags-aircraft.php');
+			?>
+				<meta name="description" content="<?php the_excerpt(); ?>" />
+				<link rel="canonical" href="<?php echo esc_url(get_the_permalink()); ?>" />
+			<?php
 			$output = ob_get_contents();
 			ob_end_clean();
 			echo $output;			
 		}
-	}	
+	}
 	public function main_wp_query($query)
 	{
 		if(!is_admin())

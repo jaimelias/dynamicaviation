@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Panama Jet Hub\n"
 "POT-Creation-Date: 2020-09-29 04:29+0000\n"
-"PO-Revision-Date: 2022-10-25 20:30+0000\n"
+"PO-Revision-Date: 2022-10-25 21:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish (Spain)\n"
 "Language: es_ES\n"
@@ -28,7 +28,7 @@ msgstr "%s %s %s en %s"
 msgid "%s (%s), %s"
 msgstr "%s (%s), %s"
 
-#: public/class-dynamicaviation-public.php:825
+#: public/class-dynamicaviation-public.php:845
 #, php-format
 msgid "%s for rent in %s. %s Service %s %s in %s, %s from %s per hour."
 msgstr ""
@@ -72,7 +72,7 @@ msgstr "Aeronave"
 
 #: includes/class-dynamicaviation-post-type.php:18
 #: includes/class-dynamicaviation-post-type.php:19
-#: public/class-dynamicaviation-public.php:859
+#: public/class-dynamicaviation-public.php:879
 msgid "Aircrafts"
 msgstr "Aeronaves"
 
@@ -93,7 +93,6 @@ msgid "Airliner"
 msgstr "Avión"
 
 #: public/class-dynamicaviation-public.php:222
-#: public/class-dynamicaviation-public.php:473
 msgid "Airplanes and helicopter rides in"
 msgstr "Aviones y tours en helicóptero en"
 
@@ -562,7 +561,7 @@ msgstr ""
 #: includes/class-dynamicaviation-meta-box.php:132
 #: includes/class-dynamicaviation-price-table.php:253
 #: includes/class-dynamicaviation-search-form.php:58
-#: public/class-dynamicaviation-public.php:849
+#: public/class-dynamicaviation-public.php:869
 #: public/general_email_template.php:28 public/general_email_template.php:30
 #: public/quote_email_template.php:39 public/quote_email_template.php:41
 msgid "Passengers"
@@ -584,7 +583,7 @@ msgstr "libras"
 
 #: includes/class-dynamicaviation-aircraft-single.php:22
 #: includes/class-dynamicaviation-meta-box.php:157
-#: public/class-dynamicaviation-public.php:850
+#: public/class-dynamicaviation-public.php:870
 msgid "Price Per Hour"
 msgstr "Precio por hora"
 
@@ -594,9 +593,17 @@ msgstr "Precios por vuelo"
 
 #: public/class-dynamicaviation-public.php:221
 #: public/class-dynamicaviation-public.php:222
-#: public/class-dynamicaviation-public.php:473
 msgid "Private Charter Flight"
 msgstr "Vuelo charter privado"
+
+#: public/class-dynamicaviation-public.php:491
+#, php-format
+msgid ""
+"Private charter flights to %s. Jets, planes and helicopter rental services "
+"in %s."
+msgstr ""
+"Vuelos charter privados a %s. Servicio de alquiler de jets, avionetas y "
+"helicópteros en %s."
 
 #: includes/class-dynamicaviation-aircrafts-table.php:254
 msgid "Quote"
@@ -697,7 +704,7 @@ msgstr "Avioneta"
 
 #: includes/class-dynamicaviation-aircraft-single.php:19
 #: includes/class-dynamicaviation-meta-box.php:120
-#: public/class-dynamicaviation-public.php:848
+#: public/class-dynamicaviation-public.php:868
 msgid "Type"
 msgstr "Tipo"
 
