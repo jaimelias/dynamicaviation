@@ -272,6 +272,60 @@ class Dynamic_Aviation_Utilities {
 		return 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/660x440?access_token='.esc_html($mapbox_token);				
 	}
 
+	public function sanitize_items_per_line($sanitize_func, $str, $max)
+	{
+		if(!$max)
+		{
+			$max = 20;
+		}
+
+		$row = explode("\r\n", html_entity_decode($str));
+		
+		$arr = array_slice(array_unique(array_filter(array_map($sanitize_func, $row))), 0, $max) ;
+
+		return implode("\r\n", $arr);
+	}
+
+	public function items_per_line_to_array($str)
+	{
+		return explode("\r\n", html_entity_decode($str));
+	}
+
+	public function algolia_full()
+	{
+		$output = array();
+		$which_var = 'dynamicaviation_algolia_full';
+		global $$which_var;
+
+		if(isset($$which_var))
+		{
+			return $$which_var;
+		}
+		else
+		{
+			$query_param = 'browse?cursor=';
+			$algolia_token = get_option('algolia_token');
+			$algolia_index = get_option('algolia_index');
+			$algolia_id = get_option('algolia_id');
+			$headers = array('X-Algolia-API-Key: '.$algolia_token, 'X-Algolia-Application-Id: '.$algolia_id);
+			$url = 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param;
+			$curl_arr = array(
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_REFERER => esc_url(home_url()),
+				CURLOPT_URL => esc_url($url)
+			);
+
+			$curl = curl_init();
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);	
+			curl_setopt_array($curl, $curl_arr);
+			$resp = curl_exec($curl);
+			$resp = json_decode($resp, true);
+			$output = $resp['hits'];
+			$GLOBALS[$which_var] = $output;
+			return $output;
+		}
+	}
+
 }
 
 

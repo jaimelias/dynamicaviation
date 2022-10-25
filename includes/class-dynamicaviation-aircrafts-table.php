@@ -123,7 +123,7 @@ class Dynamic_Aviation_Aircrafts_Table {
 
             <hr/>
             
-            <table class="margin-bottom pure-table pure-table-bordered text-center instant_quote_table small">
+            <table class="bottom-40 pure-table pure-table-bordered text-center instant_quote_table small">
                 <thead>
                     <tr>
                         <th><?php echo (esc_html__('Flights', 'dynamicaviation')); ?></th>
@@ -145,7 +145,7 @@ class Dynamic_Aviation_Aircrafts_Table {
             $content = ob_get_contents();
             ob_end_clean();	
             endif;
-		
+
 		    return $content;
     }
 
@@ -154,6 +154,7 @@ class Dynamic_Aviation_Aircrafts_Table {
     {
         $table = '';
         $aircraft_url = home_lang().$post->post_type.'/'.$post->post_name;
+        $is_mobile = wp_is_mobile();
 
 		for($x = 0; $x < count($table_price); $x++)
 		{
@@ -210,6 +211,7 @@ class Dynamic_Aviation_Aircrafts_Table {
 				}
 				else
 				{
+                    $aircraft_description .= '<a href="'.esc_url($aircraft_url).'">'.get_the_post_thumbnail($post->ID, array( 100, 100), array('class' => 'img-responsive')).'</a><br/>';
 					$aircraft_description .= '<a class="strong" href="'.esc_url($aircraft_url).'">'.esc_html($post->post_title).'</a>';
 					$aircraft_description .= '<br/>';
 					$aircraft_description .= '<small>'.esc_html($this->utilities->aircraft_type(aviation_field( 'aircraft_type' ))).'</small>';
@@ -227,6 +229,7 @@ class Dynamic_Aviation_Aircrafts_Table {
 				}			
 				
 				$row = '<tr>';
+				
 				$row .= '<td>'.$aircraft_description.'</td>';
 				
 				if(!wp_is_mobile())
@@ -238,7 +241,7 @@ class Dynamic_Aviation_Aircrafts_Table {
 				$row .= '<td>';
 				
 				$select_label = __('Quote', 'dynamicaviation');	
-				$row .= '<button class="strong button-success pure-button" data-aircraft="'.esc_html(htmlentities(json_encode($flight_array))).'"><i class="fas fa-envelope" aria-hidden="true"></i> '.esc_html($select_label).'</button>';			
+				$row .= '<button class="strong small button-success pure-button" data-aircraft="'.esc_html(htmlentities(json_encode($flight_array))).'"><i class="fas fa-envelope" aria-hidden="true"></i> '.esc_html($select_label).'</button>';			
 				$row .= '</td>';
 				$row .= "</tr>";				
 				$table .= $row;
@@ -331,7 +334,6 @@ class Dynamic_Aviation_Aircrafts_Table {
         
         if ($wp_query->have_posts())
         {
-
             $output .= $this->pax_template();
             $output .= '<p class="large"><strong>'.esc_html(__('Departure', 'dynamicaviation')).':</strong> '.$this->departure_itinerary().'</p>';
             
@@ -370,6 +372,7 @@ class Dynamic_Aviation_Aircrafts_Table {
             {
                 $output .= $this->table_container($rows);
                 $output .= $this->request_form(true);
+                $output .= $this->connected_packages();
             }
             else
             {
@@ -382,6 +385,138 @@ class Dynamic_Aviation_Aircrafts_Table {
             $output = $this->not_found();
             $output .= $this->request_form(false);
         }
+
+        return $output;
+    }
+
+    public function get_destinations_contected_packages_ids()
+    {
+        $output = array();
+        $current_language = current_language();
+
+        $query_origin = array(
+            'key' => 'aircraft_base_iata',
+            'value' => $this->get()->aircraft_origin,
+            'compare' => '='
+        );
+
+        $query_destination = array(
+            'key' => 'aircraft_base_iata',
+            'value' => $this->get()->aircraft_destination,
+            'compare' => '='
+        );
+
+		$args = array(
+			'post_type' => 'destinations',
+			'posts_per_page' => 200, 
+			'post_parent' => 0,
+            'lang' => $current_language,
+            'meta_query' => array('relation' => 'OR', $query_origin,  $query_destination)
+		);
+
+        $wp_query = new WP_Query( $args );
+
+        if ( $wp_query->have_posts() )
+        {
+            while ( $wp_query->have_posts() )
+            {
+                $wp_query->the_post();
+                $base_iata = aviation_field('aircraft_base_iata');
+
+                if($base_iata)
+                {
+                    $connected_ids = $this->utilities->items_per_line_to_array(aviation_field('aircraft_connected_packages'));
+
+                    for($x = 0; $x < count($connected_ids); $x++ )
+                    {
+                        $output[] = $connected_ids[$x];
+                    }
+                }
+            }
+
+            wp_reset_postdata();
+        }
+
+        return $output;
+    }
+
+    public function connected_packages()
+    {
+        global $polylang;
+        $output = '';
+        $current_language = current_language();
+        $connected_ids = $this->get_destinations_contected_packages_ids();
+
+        if(isset($polylang))
+        {
+            for($x = 0; $x < count($connected_ids); $x++)
+            {
+                $localized_id = pll_get_post($connected_ids[$x], $current_language);
+
+                if($localized_id)
+                {
+                    $connected_ids[$x] = $localized_id;
+                }
+                else
+                {
+                    unset($connected_ids[$x]);
+                }
+            }
+        }
+
+        //limits packages to minutes and hours
+        $meta_query = array(
+            'key' => 'package_length_unit',
+            'value' => '1',
+            'compare' => '<='
+        );        
+
+		$args = array(
+			'post_type' => 'packages',
+			'posts_per_page' => 200, 
+			'post_parent' => 0,
+            'lang' => $current_language,
+            'post__in' => $connected_ids,
+            'meta_query' => array($meta_query)
+		);
+
+        $wp_query = new WP_Query( $args );
+
+        if ( $wp_query->have_posts() )
+        {
+            $output = '<hr/><h4>'.esc_html(sprintf(__('Alternative transport options to %s', 'dynamicaviation'), $this->get()->aircraft_destination_l)).'</h4>';
+
+            $output .= '<table class="bottom-40 pure-table pure-table-bordered text-center small"><thead><tr>';
+
+            $output .= '<th>'.__('Transport', 'dynamicaviation').'</th>';
+
+            $output .= '<th>'.__('Duration', 'dynamicaviation').'</th>';
+            
+            $output .= '</tr></thead><tbody>';
+
+            while ( $wp_query->have_posts() )
+            {
+                $wp_query->the_post();
+
+                global $post;
+                $duration = floatval(package_field('package_duration', $post->ID));
+                $duration_unit = intval(package_field('package_length_unit', $post->ID));
+
+                if($duration_unit === 0 )
+                {
+                    $duration = $duration / 60;
+                }
+
+                $output .= '<tr>';
+                $output .= '<td><strong><a href="'.esc_url(get_the_permalink()).'">'.esc_html($post->post_title).'</a></strong></td>'; 
+                $output .= '<td><i class="fas fa-clock" aria-hidden="true"></i> '.esc_html($this->utilities->convertNumberToTime($duration)).'</td>';
+                $output .= '</tr>';
+            }
+
+            $output .= '</tbody></table>';
+
+            wp_reset_postdata();
+        }  
 
         return $output;
     }

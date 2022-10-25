@@ -50,7 +50,7 @@ class Dynamic_Aviation {
 		new Dynamic_Aviation_Admin( $this->get_plugin_name(), $this->get_version(),  $utilities);
 		new Dynamic_Aviation_Settings($utilities);
 		new Dynamic_Aviation_Post_Type();
-		new Dynamic_Aviation_Meta_Box();	
+		new Dynamic_Aviation_Meta_Box($utilities);	
 	}
 
 	private function define_public_hooks() 

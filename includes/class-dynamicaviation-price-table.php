@@ -22,16 +22,9 @@ class Dynamic_Aviation_Price_Table {
 		$is_aircraft_page = is_singular('aircrafts');
 		$is_destination_page = get_query_var('fly');
 
-		if($iata === '')
+		if($iata === '' && !$is_aircraft_page)
 		{
-			if($is_aircraft_page)
-			{
-				$query_args['p'] = get_the_ID();
-			}
-			else 
-			{
-				$iata = $airport_array['iata'];
-			}
+			$iata = $airport_array['iata'];
 		}
 		
 		$args = array(
@@ -54,9 +47,9 @@ class Dynamic_Aviation_Price_Table {
 		{
 
 			$count = 0;
-			$algolia_full = $this->algolia_full();
 			$routes = array();
 			$current_language = current_language();
+			$algolia_full = $this->utilities->algolia_full();
 
 			while ($wp_query->have_posts() )
 			{
@@ -272,40 +265,6 @@ class Dynamic_Aviation_Price_Table {
 		}	
 	}
 
-	public static function algolia_full()
-	{
-		$output = array();
-		$which_var = 'dynamicaviation_algolia_full';
-		global $$which_var;
-
-		if(isset($$which_var))
-		{
-			return $$which_var;
-		}
-		else
-		{
-			$query_param = 'browse?cursor=';
-			$algolia_token = get_option('algolia_token');
-			$algolia_index = get_option('algolia_index');
-			$algolia_id = get_option('algolia_id');
-			$headers = array('X-Algolia-API-Key: '.$algolia_token, 'X-Algolia-Application-Id: '.$algolia_id);
-			$url = 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param;
-			$curl_arr = array(
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_REFERER => esc_url(home_url()),
-				CURLOPT_URL => esc_url($url)
-			);
-
-			$curl = curl_init();
-			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);	
-			curl_setopt_array($curl, $curl_arr);
-			$resp = curl_exec($curl);
-			$resp = json_decode($resp, true);
-			$output = $resp['hits'];
-			$GLOBALS[$which_var] = $output;
-			return $output;
-		}
-	}
 }
 
 

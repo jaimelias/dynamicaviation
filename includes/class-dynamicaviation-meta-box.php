@@ -3,8 +3,9 @@
 class Dynamic_Aviation_Meta_Box
 {
 
-	public function __construct()
+	public function __construct($utilities)
 	{
+		$this->utilities = $utilities;
 		add_action( 'save_post', array(&$this, 'save') );
 		add_action( 'add_meta_boxes', array(&$this, 'add_meta_box') );
 	}
@@ -50,6 +51,25 @@ class Dynamic_Aviation_Meta_Box
 	{
 		$this->echo_nonce();
 		$this->base_field();
+		$this->connected_packages_field();
+	}
+
+	public function connected_packages_field()
+	{
+		?>
+
+		<p><label for="aircraft_connected_packages"><?php echo esc_html(__('Connected Package IDs', 'dynamicaviation' )); ?></label>
+		
+			<br/>
+
+			<textarea rows="10" cols="20" name="aircraft_connected_packages" id="aircraft_connected_packages"><?php echo esc_textarea($this->utilities->sanitize_items_per_line('intval', aviation_field('aircraft_connected_packages'), 20)); ?></textarea>
+
+
+			<br/>
+			<?php echo esc_html(__('One ID per line', 'dynamicaviation')); ?>
+		</p>
+
+		<?php
 	}
 
 	public function aircraft_fields($post) {
@@ -195,24 +215,10 @@ class Dynamic_Aviation_Meta_Box
 			update_post_meta( $post_id, 'aircraft_year_of_construction', esc_attr( $_POST['aircraft_year_of_construction'] ) );
 		if ( isset( $_POST['aircraft_price_per_hour'] ) )
 			update_post_meta( $post_id, 'aircraft_price_per_hour', esc_attr( $_POST['aircraft_price_per_hour'] ) );			
-	}
+		if ( isset( $_POST['aircraft_connected_packages'] ) )
+			update_post_meta( $post_id, 'aircraft_connected_packages', esc_textarea($this->utilities->sanitize_items_per_line('intval',  $_POST['aircraft_connected_packages'], 20 )) );				
 
-	/*
-		Usage: aviation_field( 'aircraft_type' )
-		Usage: aviation_field( 'aircraft_base_iata' )
-		Usage: aviation_field( 'aircraft_base_lat' )
-		Usage: aviation_field( 'aircraft_base_lon' )
-		Usage: aviation_field( 'aircraft_passengers' )
-		Usage: aviation_field( 'aircraft_range' )
-		Usage: aviation_field( 'aircraft_cruise_speed' )
-		Usage: aviation_field( 'aircraft_max_altitude' )
-		Usage: aviation_field( 'aircraft_takeoff_field' )
-		Usage: aviation_field( 'aircraft_manufacturer' )
-		Usage: aviation_field( 'aircraft_model' )
-		Usage: aviation_field( 'aircraft_year_of_construction' )
-		Usage: aviation_field( 'aircraft_price_per_hour' )
-	*/
-	
+	}
 }
 
 
