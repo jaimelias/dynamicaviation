@@ -31,7 +31,7 @@ class Dynamic_Aviation_Public {
 		add_filter('the_title', array(&$this, 'modify_title'));
 		add_filter('the_excerpt', array(&$this, 'modify_excerpt'));
 		add_filter('aircraftpack_enable_open_graph', array(&$this, 'dequeue_canonical'));
-		add_filter('template_include', array(&$this, 'package_template'), 10 );
+		add_filter('template_include', array(&$this, 'package_template'), 100 );
 		add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);		
 		add_filter('body_class', array(&$this, 'remove_body_class'), 100);
 
@@ -523,7 +523,7 @@ class Dynamic_Aviation_Public {
 	{
 		if(!is_admin())
 		{
-			if(get_query_var( 'fly' ) && $query->is_main_query())
+			if(isset($query->query_vars['fly']) && $query->is_main_query())
 			{
 				global $polylang;
 				
@@ -536,12 +536,12 @@ class Dynamic_Aviation_Public {
 				$query->set('post_type', 'page');
 				$query->set( 'posts_per_page', 1 );
 			}
-			elseif( Dynamic_Aviation_Validators::valid_aircraft_search() || Dynamic_Aviation_Validators::valid_aircraft_quote())
+			elseif(isset($query->query_vars['instant_quote']) || isset($query->query_vars['request_submitted']))
 			{
 				if($query->is_main_query())
 				{
 					$query->set('post_type', 'page');
-					$query->set( 'posts_per_page', 1 );				
+					$query->set( 'posts_per_page', 1 );
 				}
 			}
 			elseif(is_post_type_archive('aircrafts') && $query->is_main_query())
@@ -628,7 +628,7 @@ class Dynamic_Aviation_Public {
 			$new_template = locate_template( array( 'page.php' ) );
 			return $new_template;			
 		}
-		if(get_query_var( 'fly' ) || Dynamic_Aviation_Validators::valid_aircraft_search() || is_singular('aircrafts') || is_singular('destinations'))
+		if(get_query_var( 'fly' ) || get_query_var( 'instant_quote' )  || is_singular('aircrafts') || is_singular('destinations'))
 		{
 			$new_template = locate_template( array( 'page.php' ) );
 			return $new_template;			

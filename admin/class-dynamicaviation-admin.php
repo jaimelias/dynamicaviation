@@ -21,6 +21,7 @@ class Dynamic_Aviation_Admin {
 		add_action('init', array(&$this, 'custom_rewrite_tag'), 10, 0);
 		add_action( 'wp_headers', array(&$this, 'cacheimage_header') );
 		add_action( 'plugins_loaded', array(&$this, 'cacheimage') );
+		add_filter('query_vars', array(&$this, 'registering_custom_query_var'));
 	}
 
 	public function enqueue_styles()
@@ -67,7 +68,6 @@ class Dynamic_Aviation_Admin {
 		{
 			$language_list = implode('|', $language_list);
 			add_rewrite_rule('('.$language_list.')/fly/([^/]*)/?', 'index.php?fly=$matches[2]','top');
-			add_rewrite_rule('('.$language_list.')/aircraft/([^/]*)/?', 'index.php?aircraft=$matches[2]','top');
 			add_rewrite_rule('('.$language_list.')/instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[2]','top');
 			add_rewrite_rule('('.$language_list.')/request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[2]','top');
 		}		
@@ -77,16 +77,8 @@ class Dynamic_Aviation_Admin {
 	{
 		add_rewrite_tag('%fly%', '([^&]+)');
 		add_rewrite_tag('%cacheimg%', '([^&]+)');
-		add_rewrite_tag('%aircraft%', '([^&]+)');
 		add_rewrite_tag('%instant_quote%', '([^&]+)');
 		add_rewrite_tag('%request_submitted%', '([^&]+)');
-	}
-
-
-	public function query_vars_die($vars)
-	{
-		$vars[] = 'cacheimg';
-		return $vars;
 	}
 
 	public function cacheimage_header($headers)
@@ -111,6 +103,15 @@ class Dynamic_Aviation_Admin {
 
 		return $headers;
 	}
+
+	public function registering_custom_query_var($query_vars)
+	{
+		$query_vars[] = 'fly';
+		$query_vars[] = 'cacheimg';
+		$query_vars[] = 'instant_quote';
+		$query_vars[] = 'request_submitted';
+		return $query_vars;
+	}	
 
 	public function cacheimage()
 	{

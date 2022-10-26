@@ -17,22 +17,25 @@ class Dynamic_Aviation {
 	}
 
 	private function load_dependencies() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-loader.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-i18n.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-sendgrid-mailer.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-utilities.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-validators.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-dynamicaviation-settings.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-post-type.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-meta-box.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-dynamicaviation-admin.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-dynamicaviation-public.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-shortcodes.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-search-form.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-price-table.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-aircraft-single.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-aircrafts-table.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-dynamicaviation-destination-details.php';
+
+		$plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
+
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-loader.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-i18n.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-sendgrid-mailer.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-utilities.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-validators.php';
+		require_once $plugin_dir_path . 'admin/class-dynamicaviation-settings.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-post-type.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-meta-box.php';
+		require_once $plugin_dir_path . 'admin/class-dynamicaviation-admin.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-public.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-shortcodes.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-search-form.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-price-table.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-aircraft-single.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-quote-table.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-destination-details.php';
 
 		$this->loader = new Dynamic_Aviation_Loader();
 	}
