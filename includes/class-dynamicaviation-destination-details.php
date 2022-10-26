@@ -45,8 +45,10 @@ class Dynamic_Aviation_Destination_Details {
             while ( $wp_query->have_posts() )
             {
                 $wp_query->the_post();
+                
                 global $post;
-                $output .= '<div class="entry-content">'.get_the_content().'</div>';
+
+                $output .= '<div class="entry-content">'.do_blocks($post->post_content).'</div>';
 
                 if( $can_user_edit )
                 {
