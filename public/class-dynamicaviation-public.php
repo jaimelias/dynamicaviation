@@ -265,7 +265,20 @@ class Dynamic_Aviation_Public {
 			{
 				if(count($airport_array) > 0)
 				{
-					$airport = $airport_array['airport'] . ', ' . $airport_array['city'];
+
+					$country = '';
+
+					if(array_key_exists('country_names', $airport_array))
+					{
+						if(array_key_exists($this->current_language, $airport_array['country_names']))
+						{
+							$country .= ', ' . $airport_array['country_names'][$this->current_language];
+						}
+					}					
+
+					$airport = ($airport_array['airport'] !== $airport_array['city']) 
+						? $airport_array['airport'] . ', ' . $airport_array['city']
+						: $airport_array['airport'] . $country;
 
 					if(array_key_exists('airport_names', $airport_array))
 					{

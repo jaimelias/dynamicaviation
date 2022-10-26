@@ -222,8 +222,36 @@ class Dynamic_Aviation_Price_Table {
 				$origin = $v['origin'];
 				$destination = $v['destination'];
 				$transport_title = $v['transport_title'];
-				$label_origin = sprintf(__('%s (%s), %s', 'dynamicaviation'), $origin['airport'], $origin['iata'], $origin['city']);
-				$label_destination = sprintf(__('to %s (%s), %s', 'dynamicaviation'), $destination['airport'], $destination['iata'], $destination['city']);
+
+				if(strlen($origin['iata']) === 3)
+				{
+					$label_origin = sprintf(__('%s (%s)', 'dynamicaviation'), $origin['airport'], $origin['iata']);
+				}
+				else
+				{
+					$label_origin = $origin['airport'];
+				}
+
+				if($origin['airport'] !== $origin['city'])
+				{
+					$label_origin .= ', ' . $origin['city'];
+				}
+				
+				if(strlen($destination['iata']) === 3)
+				{
+					$label_destination = sprintf(__('to %s (%s)', 'dynamicaviation'), $destination['airport'], $destination['iata']);
+				}
+				else
+				{
+					$label_destination = sprintf(__('to %s', 'dynamicaviation'), $destination['airport']);
+				}
+
+				if($destination['airport'] !== $destination['city'])
+				{
+					$label_destination .= ', ' . $destination['city'];
+				}
+
+				
 				$table = '<div itemscope itemtype="http://schema.org/Table">';
 				
 				if(!$is_aircraft_page)
