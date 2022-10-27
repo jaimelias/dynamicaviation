@@ -10,17 +10,18 @@ class Dynamic_Aviation_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->utilities = $utilities;
-		$this->init();
+		
+		add_action('init', array(&$this, 'init'), 1);
+		add_action( 'admin_enqueue_scripts', array(&$this, 'enqueue_styles'), 11);
+		add_action( 'admin_enqueue_scripts',  array(&$this, 'enqueue_scripts'));		
+		add_action('init', array(&$this, 'add_rewrite_rule'));
+		add_action('init', array(&$this, 'add_rewrite_tag'), 10, 0);
+		add_filter('query_vars', array(&$this, 'registering_custom_query_var'));
 	}
 
 	public function init()
 	{
-		add_action( 'admin_enqueue_scripts', array(&$this, 'enqueue_styles'), 11);
-		add_action( 'admin_enqueue_scripts',  array(&$this, 'enqueue_scripts'));		
-		add_action('init', array(&$this, 'custom_rewrite_basic'));
-		add_action('init', array(&$this, 'custom_rewrite_tag'), 10, 0);
-		add_action( 'wp_headers', array(&$this, 'cacheimg_header') );
-		add_filter('query_vars', array(&$this, 'registering_custom_query_var'));
+		$this->get_languages = get_languages();
 	}
 
 	public function enqueue_styles()
@@ -45,70 +46,41 @@ class Dynamic_Aviation_Admin {
 		}
 	}
 	
-	public function custom_rewrite_basic()
+	public function add_rewrite_rule()
 	{
 		add_rewrite_rule('^fly/([^/]*)/?', 'index.php?fly=$matches[1]','top');
-		add_rewrite_rule('^cacheimg/([^/]*)/?.png', 'index.php?cacheimg=$matches[1]','top');
+		
 		add_rewrite_rule('^instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[1]','top');
-		add_rewrite_rule('^request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[1]','top');
 
-		$languages = get_languages();
-		$language_list = array();
+		$languages = $this->get_languages;
+		$arr = array();
 
 		for($x = 0; $x < count($languages); $x++)
 		{
 			if($languages[$x] != pll_default_language())
 			{
-				array_push($language_list, $languages[$x]);
+				$arr[] = $languages[$x];
 			}
 		}
 
-		if(count($language_list) > 0)
+		if(count($arr) > 0)
 		{
-			$language_list = implode('|', $language_list);
-			add_rewrite_rule('('.$language_list.')/fly/([^/]*)/?', 'index.php?fly=$matches[2]','top');
-			add_rewrite_rule('('.$language_list.')/instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[2]','top');
-			add_rewrite_rule('('.$language_list.')/request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[2]','top');
+			$arr = implode('|', $arr);
+			add_rewrite_rule('('.$arr.')/fly/([^/]*)/?', 'index.php?fly=$matches[2]','top');
+			add_rewrite_rule('('.$arr.')/instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[2]','top');
 		}		
 	}
 
-	public function custom_rewrite_tag()
+	public function add_rewrite_tag()
 	{
 		add_rewrite_tag('%fly%', '([^&]+)');
-		add_rewrite_tag('%cacheimg%', '([^&]+)');
 		add_rewrite_tag('%instant_quote%', '([^&]+)');
-		add_rewrite_tag('%request_submitted%', '([^&]+)');
-	}
-
-	public function cacheimg_header($headers)
-	{
-		$path = pathinfo($_SERVER['REQUEST_URI']);
-		$dirname = $path['dirname'];
-		$basename = $path['basename'];
-		$dirname_arr = array_values(array_filter(explode('/', $dirname)));
-		$filename = $path['filename'];
-
-		if(is_array($dirname_arr))
-		{
-			if(count($dirname_arr) > 0)
-			{
-				if(in_array('cacheimg', $dirname_arr) && str_ends_with($basename, '.png'))
-				{
-
-					$headers['Content-Type'] = 'image/png';
-				}
-			}
-		}
-
-		return $headers;
 	}
 
 	public function registering_custom_query_var($query_vars)
 	{
 		$query_vars[] = 'fly';
-		$query_vars[] = 'cacheimg';
 		$query_vars[] = 'instant_quote';
-		$query_vars[] = 'request_submitted';
 		return $query_vars;
 	}
 }

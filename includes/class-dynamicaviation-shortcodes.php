@@ -4,9 +4,8 @@
 class Dynamic_Aviation_Shortcodes {
     
     
-    public function __construct($utilities, $price_table)
+    public function __construct($utilities)
     {
-		$this->price_table = $price_table;
         $this->init();
     }
 
@@ -26,7 +25,7 @@ class Dynamic_Aviation_Shortcodes {
 
 				if($iata)
 				{
-					$content = $this->price_table->table(strtoupper($iata));
+					$content = apply_filters('dy_aviation_price_table', strtoupper($iata));
 				}
 			}
 		}

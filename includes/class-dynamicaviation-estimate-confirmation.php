@@ -5,23 +5,74 @@ class Dynamic_Aviation_Estimate_Confirmation
 {
     public function __construct($plugin_name, $version, $utilities)
     {
+		$this->plugin_name = $plugin_name;
         $this->utilities = $utilities;
         $this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
-        add_action('init', array(&$this, 'init'));
-        add_action( 'parse_query', array( &$this, 'submit' ), 1);
+		$this->valid_recaptcha = false;
+
+		//sets OOP vars
+        add_action('init', array(&$this, 'init'), 1);
+        
+		//filters custom wordpress outputs
         add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);
 		add_filter('wp_title', array(&$this, 'modify_wp_title'), 100);
         add_filter('the_title', array(&$this, 'modify_title'), 100);
         add_filter('the_content', array(&$this, 'modify_content'), 100);
+
+		//changes the template to page.php in the theme
         add_filter('template_include', array(&$this, 'locate_template'), 100 );
-        add_action('pre_get_posts', array(&$this, 'main_wp_query'), 100);	
+
+		//sets custom params to the post before wp_query
+        add_action('pre_get_posts', array(&$this, 'main_wp_query'), 100);
+
+		//adds the query var
+		add_filter('query_vars', array(&$this, 'registering_custom_query_var'));
+		add_action('init', array(&$this, 'add_rewrite_rule'), 100);
+		add_action('init', array(&$this, 'add_rewrite_tag'), 100);
+
+		//process the submit of the quote form
+		add_action( 'parse_query', array( &$this, 'form_submit' ), 100);
     }
 
     public function init()
     {
+		$this->get_languages = get_languages();
 		$this->site_name = get_bloginfo('name');
 		$this->current_language = current_language();
-    }
+		$this->valid_recaptcha = (Dynamic_Aviation_Validators::validate_recaptcha()) ? true : false;
+    }	
+
+	public function add_rewrite_rule()
+	{
+		add_rewrite_rule('^request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[1]','top');
+		$languages = $this->get_languages;
+		$arr = array();
+
+		for($x = 0; $x < count($languages); $x++)
+		{
+			if($languages[$x] != pll_default_language())
+			{
+				$arr[] = $languages[$x];
+			}
+		}
+
+		if(count($arr) > 0)
+		{
+			$arr = implode('|', $arr);
+			add_rewrite_rule('('.$arr.')/request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[2]','top');
+		}		
+	}
+
+	public function add_rewrite_tag()
+	{
+		add_rewrite_tag('%request_submitted%', '([^&]+)');
+	}
+
+	public function registering_custom_query_var($query_vars)
+	{
+		$query_vars[] = 'request_submitted';
+		return $query_vars;
+	}
 
     public function main_wp_query($query)
     {
@@ -44,11 +95,10 @@ class Dynamic_Aviation_Estimate_Confirmation
 
     public function modify_content($content)
     {
-		if(Dynamic_Aviation_Validators::valid_aircraft_quote())
+		if($this->validate_form_submit())
 		{
-			global $VALID_JET_RECAPTCHA;
 			
-			if(isset($VALID_JET_RECAPTCHA))
+			if($this->valid_recaptcha)
 			{				
 				$content = '<p class="minimal_success">'.esc_html(__('Request received. Our sales team will be in touch with you soon.', 'dynamicaviation')).'</p>';
 			}
@@ -63,7 +113,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 
     public function modify_title($title)
     {
-		if(Dynamic_Aviation_Validators::valid_aircraft_quote())
+		if($this->validate_form_submit())
 		{
 			$title = esc_html(__('Request Submitted', "dynamicaviation"));
 		}
@@ -73,7 +123,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 
     public function modify_wp_title($title)
     {
-		if(Dynamic_Aviation_Validators::valid_aircraft_quote())
+		if($this->validate_form_submit())
 		{
 			$title =  __('Request Submitted', 'dynamicaviation').' | '.$this->site_name;
 		}
@@ -81,15 +131,16 @@ class Dynamic_Aviation_Estimate_Confirmation
         return $title;
     }
 
-	public function submit()
+	public function form_submit()
 	{
-		global $VALID_JET_RECAPTCHA;
-		
-		if(!isset($VALID_JET_RECAPTCHA))
+		$which_var = $this->plugin_name . 'form_submit';
+		global $$which_var;
+
+		if(!isset($$which_var))
 		{
-			if(Dynamic_Aviation_Validators::valid_aircraft_quote())
+			if($this->valid_recaptcha)
 			{
-				if(Dynamic_Aviation_Validators::validate_recaptcha())
+				if($this->validate_form_submit())
 				{
 					$data = $_POST;
 					$data['lang'] = $this->current_language;
@@ -99,7 +150,8 @@ class Dynamic_Aviation_Estimate_Confirmation
 						$subject = sprintf(__('%s, Your request has been sent to our specialists at %s!', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'));
 						require_once( $this->plugin_dir_path . 'public/general_email_template.php');
 					}
-					else{
+					else
+					{
 						$this_id = sanitize_text_field($_POST['aircraft_id']);
 						$subject = sprintf(__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'), sanitize_text_field($data['aircraft_price']));
 						$is_commercial = (aviation_field('aircraft_commercial', $this_id) == 1) ? true : false;
@@ -117,11 +169,34 @@ class Dynamic_Aviation_Estimate_Confirmation
 
 					sg_mail($args);
 
+					$GLOBALS[$which_var] = true;
 					//self::webhook(json_encode($data));
-					$GLOBALS['VALID_JET_RECAPTCHA'] = true;
-				}
-			}			
+				}			
+			}
 		}
-	}    
+	}
+
+
+	public function validate_form_submit()
+	{
+		$output = false;
+		$which_var = $this->plugin_name . 'validate_form_submit';
+		global $$which_var;
+		
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
+		}
+		else
+		{
+			if(get_query_var('request_submitted') && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']) && isset($_POST['first_name']) && isset($_POST['lastname']) && isset($_POST['email']) && isset($_POST['phone']) && isset($_POST['country']) && isset($_POST['g-recaptcha-response']) && isset($_POST['aircraft_origin'])  && isset($_POST['aircraft_destination'])  && isset($_POST['aircraft_departure_date'])  && isset($_POST['aircraft_departure_hour']) && isset($_POST['departure_itinerary']) && isset($_POST['aircraft_return_date']) && isset($_POST['aircraft_return_hour']) && isset($_POST['return_itinerary']))
+			{
+				$output = true;
+				$GLOBALS[$which_var] = $output;
+			}	
+		}
+
+		return $output;
+	}
 
 }

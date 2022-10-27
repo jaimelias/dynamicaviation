@@ -40,6 +40,7 @@ class Dynamic_Aviation {
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-quote-table.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-destination-details.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-confirmation.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-image.php';
 
 		$this->loader = new Dynamic_Aviation_Loader();
 	}
@@ -53,7 +54,6 @@ class Dynamic_Aviation {
 
 	private function define_admin_hooks($utilities) {
 
-		
 		new Dynamic_Aviation_Admin( $this->get_plugin_name(), $this->get_version(),  $utilities);
 		new Dynamic_Aviation_Settings($utilities);
 		new Dynamic_Aviation_Post_Type();
@@ -66,9 +66,9 @@ class Dynamic_Aviation {
 
 		new Dynamic_Aviation_Search_Form($utilities);
 
-		$price_table = new Dynamic_Aviation_Price_Table($utilities);
+		new Dynamic_Aviation_Price_Table($utilities);
 
-		new Dynamic_Aviation_Shortcodes($utilities, $price_table);		
+		new Dynamic_Aviation_Shortcodes($utilities);		
 		
 		new Dynamic_Aviation_Aircraft_Single($utilities);
 
@@ -77,6 +77,8 @@ class Dynamic_Aviation {
 		new Dynamic_Aviation_Destination_Details($utilities);
 
 		new Dynamic_Aviation_Estimate_Confirmation($this->get_plugin_name(), $this->get_version(), $utilities);
+
+		new Dynamic_Aviation_Image($this->get_plugin_name(), $this->get_version(), $utilities);
 	}
 
 	public function run() {

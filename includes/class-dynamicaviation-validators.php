@@ -74,28 +74,6 @@ class Dynamic_Aviation_Validators{
 
 		return $output;
 	}
-	
-	public static function valid_aircraft_quote()
-	{
-		$output = false;
-		$which_var = 'aviation_valid_aircraft_quote';
-		global $$which_var;
-		
-		if(isset($$which_var))
-		{
-			$output = $$which_var;
-		}
-		else
-		{
-			if(get_query_var('request_submitted') && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']) && isset($_POST['first_name']) && isset($_POST['lastname']) && isset($_POST['email']) && isset($_POST['phone']) && isset($_POST['country']) && isset($_POST['g-recaptcha-response']) && isset($_POST['aircraft_origin'])  && isset($_POST['aircraft_destination'])  && isset($_POST['aircraft_departure_date'])  && isset($_POST['aircraft_departure_hour']) && isset($_POST['departure_itinerary']) && isset($_POST['aircraft_return_date']) && isset($_POST['aircraft_return_hour']) && isset($_POST['return_itinerary']))
-			{
-				$output = true;
-				$GLOBALS[$which_var] = $output;
-			}	
-		}
-
-		return $output;
-	}
 
 	public static function validate_hash()
 	{

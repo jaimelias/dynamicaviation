@@ -12,7 +12,7 @@ class Dynamic_Aviation_Price_Table {
 
     public function init()
     {
-        add_filter('dy_aviation_price_table', array(&$this, 'table'));
+        add_filter('dy_aviation_price_table', array(&$this, 'table'), 1, 1);
     }
 
 	public function table($iata = '')

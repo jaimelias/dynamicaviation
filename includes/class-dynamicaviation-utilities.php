@@ -8,7 +8,6 @@ class Dynamic_Aviation_Utilities {
 	{
 		$this->wp_cache_expires_seconds = 60;
 		add_action('init', array(&$this, 'init'), 1);
-		add_action( 'init', array(&$this, 'cacheimg'), 999 );
 	}
 
 	public function init()
@@ -24,7 +23,7 @@ class Dynamic_Aviation_Utilities {
 		{
 			if(array_key_exists('airport', $json))
 			{
-				return home_url('cacheimg/'.$this->sanitize_pathname($json['airport']).'.png');
+				return home_url(apply_filters('dy_aviation_image_pathname', '') . '/' .$this->sanitize_pathname($json['airport']).'.png');
 			}
 		}
 	}
@@ -155,10 +154,6 @@ class Dynamic_Aviation_Utilities {
 			if(get_query_var( 'fly' ))
 			{
 				$query_var = get_query_var( 'fly' );
-			}
-			if(get_query_var( 'cacheimg' ))
-			{
-				$query_var = get_query_var( 'cacheimg' );	
 			}
 		}
 
@@ -291,41 +286,6 @@ class Dynamic_Aviation_Utilities {
 		}		
 
 		return $output;
-	}
-
-	public function cacheimg()
-	{
-		$path = pathinfo($_SERVER['REQUEST_URI']);
-		$dirname = $path['dirname'];
-		$basename = $path['basename'];
-		$dirname_arr = array_values(array_filter(explode('/', $dirname)));
-		$filename = $path['filename'];
-
-		if(is_array($dirname_arr))
-		{
-			if(count($dirname_arr) > 0)
-			{
-				if(in_array('cacheimg', $dirname_arr) && str_ends_with($basename, '.png'))
-				{
-					header('Content-Type: image/png');
-
-					$url = $this->airport_url_string($this->airport_data($filename));
-
-					$headers = array(
-						'Content-Type' => 'image/png'
-					);
-					
-					$resp = wp_remote_get($url, array(
-						'headers' => $headers
-					));
-					
-					if($resp['response']['code'] === 200)
-					{
-						exit($resp['body']);
-					}
-				}
-			}
-		}
 	}
 
 }

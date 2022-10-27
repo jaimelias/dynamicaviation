@@ -26,7 +26,6 @@ class Dynamic_Aviation_Public {
 		add_filter('the_excerpt', array(&$this, 'modify_excerpt'));
 		add_filter('template_include', array(&$this, 'locate_template'), 100 );
 		add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);		
-		add_filter('body_class', array(&$this, 'remove_body_class'), 100);
 		add_filter('minimal_posted_on', array(&$this, 'minimalizr_hide_posted_on'), 100);
 		add_filter('minimal_archive_excerpt', array(&$this, 'minimalizr_modify_archive_excerpt'), 100);
 		add_filter('minimal_archive_title', array(&$this, 'minimalizr_modify_archive_title'), 100);
@@ -115,7 +114,7 @@ class Dynamic_Aviation_Public {
 									
 									if(($iata == $tp[0] || $iata == $tp[1]) && ($tp[0] != '' || $tp[1] != ''))
 									{
-										array_push($prices, floatval($tp[3]));
+										$prices[] = floatval($tp[3]);
 									}
 								}							
 							}
@@ -457,6 +456,7 @@ class Dynamic_Aviation_Public {
 			if($_GET['minimal-sitemap'] == 'airports')
 			{
 				global $polylang;
+
 				if(isset($polylang))
 				{
 					$languages = get_languages();
@@ -466,21 +466,27 @@ class Dynamic_Aviation_Public {
 					{
 						if($languages[$x] != pll_default_language())
 						{
-							array_push($language_list, $languages[$x]);
+							$language_list[] = $languages[$x];
 						}
 					}					
 				}
 				
 				$urllist = null;
 				$all_airports = $this->utilities->all_airports_data();
+				$image_pathname = apply_filters('dy_aviation_image_pathname', '');
 				
 				for($x = 0; $x < count($all_airports); $x++)
 				{
 					$url = '<url>';
 					$url .= '<loc>'.esc_url(home_url().'/fly/'.$this->utilities->sanitize_pathname($all_airports[$x]['airport'])).'/</loc>';
-					$url .= '<image:image>';
-					$url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.$this->utilities->sanitize_pathname($all_airports[$x]['airport'])).'.png</image:loc>';
-					$url .= '</image:image>';
+					
+					if($image_pathname)
+					{
+						$url .= '<image:image>';
+						$url .= '<image:loc>'.esc_url(home_url().'/'.$image_pathname.'/'.$this->utilities->sanitize_pathname($all_airports[$x]['airport'])).'.png</image:loc>';
+						$url .= '</image:image>';
+					}
+
 					$url .= '<mobile:mobile/>';
 					$url .= '<changefreq>weekly</changefreq>';
 					$url .= '</url>';
@@ -493,9 +499,14 @@ class Dynamic_Aviation_Public {
 					{
 						$pll_url = '<url>';
 						$pll_url .= '<loc>'.esc_url(home_url().'/'.$language_list[0].'/fly/'.$this->utilities->sanitize_pathname($all_airports[$y]['airport'])).'/</loc>';
-						$pll_url .= '<image:image>';
-						$pll_url .= '<image:loc>'.esc_url(home_url().'/cacheimg/'.$this->utilities->sanitize_pathname($all_airports[$y]['airport'])).'.png</image:loc>';
-						$pll_url .= '</image:image>';
+						
+						if($image_pathname)
+						{
+							$pll_url .= '<image:image>';
+							$pll_url .= '<image:loc>'.esc_url(home_url().'/'.$image_pathname.'/'.$this->utilities->sanitize_pathname($all_airports[$y]['airport'])).'.png</image:loc>';
+							$pll_url .= '</image:image>';
+						}
+
 						$pll_url .= '<mobile:mobile/>';
 						$pll_url .= '<changefreq>weekly</changefreq>';
 						$pll_url .= '</url>';
@@ -581,7 +592,8 @@ class Dynamic_Aviation_Public {
 			{
 				//recaptcha
 				wp_enqueue_script('invisible-recaptcha', 'https://www.google.com/recaptcha/api.js', '', 'async_defer_dynamicaviation', true );	
-				array_push($dep, 'invisible-recaptcha');
+
+				$dep[] = 'invisible-recaptcha';
 			}
 			
 			wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, time(), true );
@@ -719,19 +731,6 @@ class Dynamic_Aviation_Public {
 		$output = ob_get_contents();
 		ob_end_clean();
 		return $output;			
-	}
-	
-	public function remove_body_class($classes)
-	{
-		if(get_query_var('fly') || get_query_var('instant_quote') || get_query_var('request_submitted') || is_singular('aircrafts'))
-		{
-			if(in_array('blog', $classes))
-			{
-				unset($classes[array_search('blog', $classes)]);
-			}
-		}
-		
-		return $classes;
 	}
 
 	public function modify_excerpt($excerpt)
