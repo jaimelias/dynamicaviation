@@ -5,7 +5,7 @@ class Dynamic_Aviation_Aircrafts_Table {
 
     public function __construct($utilities) {
         $this->utilities = $utilities;
-
+        $this->set_params();
         add_action('init', array(&$this, 'init'));
 	}
 
@@ -16,26 +16,38 @@ class Dynamic_Aviation_Aircrafts_Table {
         add_filter('dy_aviation_aircrafts_table', array(&$this, 'template'));
     }
 
-    public function get()
+    public function set_params()
     {
-        return (object) array(
-            'aircraft_pax' => intval($_GET['aircraft_pax']),
-            'aircraft_flight' => intval($_GET['aircraft_flight']),
-            'aircraft_departure_date' => sanitize_text_field($_GET['aircraft_departure_date']),
-            'aircraft_origin_l' => sanitize_text_field($_GET['aircraft_origin_l']),
-            'aircraft_destination_l' => sanitize_text_field($_GET['aircraft_destination_l']),
-            'aircraft_departure_hour' => sanitize_text_field($_GET['aircraft_departure_hour']),
-            'aircraft_return_date' => sanitize_text_field($_GET['aircraft_return_date']),
-            'aircraft_return_hour' => sanitize_text_field($_GET['aircraft_return_hour']),
-            'aircraft_origin' => sanitize_text_field($_GET['aircraft_origin']),
-            'aircraft_destination' => sanitize_text_field($_GET['aircraft_destination'])
+        $this->param_names = array(
+            'aircraft_pax', 
+            'aircraft_flight', 
+            'aircraft_departure_date', 
+            'aircraft_origin_l', 
+            'aircraft_destination_l', 
+            'aircraft_departure_hour',
+            'aircraft_return_date',
+            'aircraft_return_hour',
+            'aircraft_origin',
+            'aircraft_destination',
         );
+
+        $this->get = (object) array();
+
+        for($x = 0; $x < count($this->param_names); $x++)
+        {
+            $k = $this->param_names[$x];
+
+            if(isset($_REQUEST[$k]))
+            {
+                $this->get->$k = sanitize_text_field($_REQUEST[$k]);
+            }
+        }
     }
     
     public function obj_to_inputs()
     {
         $output = '';
-        $obj = $this->get();
+        $obj = $this->get;
         $obj->departure_itinerary = $this->departure_itinerary();
         $obj->return_itinerary = $this->return_itinerary();
         $obj->channel = '';
@@ -43,10 +55,12 @@ class Dynamic_Aviation_Aircrafts_Table {
         $obj->landing_path = '';
         $obj->landing_domain = '';
 
+        $output .= "\r\n";
+
         foreach($obj as $key => $value)
         {
             $output .= '<input value="'.esc_attr($value).'" name="'.esc_attr($key).'" class="'.esc_attr($key).'" />';
-            $output .= "\n\t\t\t\t\t\t";
+            $output .= "\r\n";
         }
 
 
@@ -57,7 +71,7 @@ class Dynamic_Aviation_Aircrafts_Table {
     {
         return array(
             'key' => 'aircraft_passengers',
-            'value' => $this->get()->aircraft_pax,
+            'value' => $this->get->aircraft_pax,
             'type' => 'numeric',
             'compare' => '>='
         );       
@@ -83,19 +97,19 @@ class Dynamic_Aviation_Aircrafts_Table {
 
     public function pax_template()
     {
-        return '<p class="large"><strong>'.esc_html(__('Passengers', 'dynamicaviation')).':</strong> <span class="linkcolor">'.esc_html($this->get()->aircraft_pax).'</span></p>';
+        return '<p class="large"><strong>'.esc_html(__('Passengers', 'dynamicaviation')).':</strong> <span class="linkcolor">'.esc_html($this->get->aircraft_pax).'</span></p>';
     }
 
     public function departure_itinerary()
     {
         $output = '';
-        $output .= $this->get()->aircraft_origin_l;
+        $output .= $this->get->aircraft_origin_l;
         $output .= ' &rsaquo;&rsaquo;&rsaquo; ';
-        $output .= $this->get()->aircraft_destination_l;
+        $output .= $this->get->aircraft_destination_l;
         $output .= ' '.__('on', 'dynamicaviation').' ';
-        $output .= date_i18n(get_option( 'date_format' ), strtotime($this->get()->aircraft_departure_date));
+        $output .= date_i18n(get_option( 'date_format' ), strtotime($this->get->aircraft_departure_date));
         $output .= ' '.__('at', 'dynamicaviation').' ';
-        $output .= $this->get()->aircraft_departure_hour;
+        $output .= $this->get->aircraft_departure_hour;
         return $output;
     }
 
@@ -103,16 +117,16 @@ class Dynamic_Aviation_Aircrafts_Table {
     {
         $output = '';
 
-        if($this->get()->aircraft_flight === 1)
+        if($this->get->aircraft_flight === 1)
         {
             $output = '';            
-            $output .= $this->get()->aircraft_destination_l;
+            $output .= $this->get->aircraft_destination_l;
             $output .= ' &rsaquo;&rsaquo;&rsaquo; ';
-            $output .= $this->get()->aircraft_origin_l;
+            $output .= $this->get->aircraft_origin_l;
             $output .= ' '.__('on', 'dynamicaviation').' ';
-            $output .= date_i18n(get_option('date_format'), strtotime($this->get()->aircraft_return_date));
+            $output .= date_i18n(get_option('date_format'), strtotime($this->get->aircraft_return_date));
             $output .= ' '.__('at', 'dynamicaviation').' ';
-            $output .= $this->get()->aircraft_return_hour;
+            $output .= $this->get->aircraft_return_hour;
         }
 
         return $output;
@@ -135,7 +149,7 @@ class Dynamic_Aviation_Aircrafts_Table {
                             <th><?php echo (esc_html__('Duration', 'dynamicaviation')); ?></th>
                         <?php endif; ?>
                         
-                        <th colspan="2"><?php esc_html_e(($this->get()->aircraft_flight === 0) ? __('One Way', 'dynamicaviation') : __('Round Trip', 'dynamicaviation'));?></th>
+                        <th colspan="2"><?php esc_html_e(($this->get->aircraft_flight === 0) ? __('One Way', 'dynamicaviation') : __('Round Trip', 'dynamicaviation'));?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -167,7 +181,7 @@ class Dynamic_Aviation_Aircrafts_Table {
 		{
             $rates = $table_price[$x];
 
-            $diff = array_diff(array($this->get()->aircraft_origin, $this->get()->aircraft_destination), array($rates[0], $rates[1]));
+            $diff = array_diff(array($this->get->aircraft_origin, $this->get->aircraft_destination), array($rates[0], $rates[1]));
 
 			if(count($diff) === 0)
 			{
@@ -182,16 +196,16 @@ class Dynamic_Aviation_Aircrafts_Table {
 				
 				if($is_commercial)
 				{
-					$price = $price * $this->get()->aircraft_pax;
+					$price = $price * $this->get->aircraft_pax;
 				}
 
-				if($this->get()->aircraft_flight === 1)
+				if($this->get->aircraft_flight === 1)
 				{
 					$price = $price * 2;
 					$fees = $fees * 2;
 				}
 
-                $aircraft_price = $price + ($fees * $this->get()->aircraft_pax);
+                $aircraft_price = $price + ($fees * $this->get->aircraft_pax);
 
                 $flight_array = array(
                     'aircraft_price' => $aircraft_price,
@@ -209,7 +223,7 @@ class Dynamic_Aviation_Aircrafts_Table {
 
                     $aircraft_col .= '<strong>'.esc_html(__('Commercial Flight', 'dynamicaviation')).'</strong>';
 
-					$price_col = '<small class="text-muted">USD</small><br/><strong class="large">'.esc_html('$'.number_format($price, 0, '.', ',')).'</strong><br /><span class="small text-muted">'.esc_html('$'.number_format(($price / $this->get()->aircraft_pax), 0, '.', ',')).' '.esc_html(__('Per Person', 'dynamicaviation')).'</span>';
+					$price_col = '<small class="text-muted">USD</small><br/><strong class="large">'.esc_html('$'.number_format($price, 0, '.', ',')).'</strong><br /><span class="small text-muted">'.esc_html('$'.number_format(($price / $this->get->aircraft_pax), 0, '.', ',')).' '.esc_html(__('Per Person', 'dynamicaviation')).'</span>';
 					
 					if(floatval($fees) > 0)
 					{
@@ -346,7 +360,7 @@ class Dynamic_Aviation_Aircrafts_Table {
             $output .= $this->pax_template();
             $output .= '<p class="large"><strong>'.esc_html(__('Departure', 'dynamicaviation')).':</strong> '.$this->departure_itinerary().'</p>';
             
-            if($this->get()->aircraft_flight === 1)
+            if($this->get->aircraft_flight === 1)
             {
                 $output .= '<p class="large"><strong>'.esc_html(__('Return', 'dynamicaviation')).':</strong> '.$this->return_itinerary().'</p>';
             }
@@ -404,13 +418,13 @@ class Dynamic_Aviation_Aircrafts_Table {
 
         $query_origin = array(
             'key' => 'aircraft_base_iata',
-            'value' => $this->get()->aircraft_origin,
+            'value' => $this->get->aircraft_origin,
             'compare' => '='
         );
 
         $query_destination = array(
             'key' => 'aircraft_base_iata',
-            'value' => $this->get()->aircraft_destination,
+            'value' => $this->get->aircraft_destination,
             'compare' => '='
         );
 
@@ -508,7 +522,7 @@ class Dynamic_Aviation_Aircrafts_Table {
 
         if ( $wp_query->have_posts() )
         {
-            $output = '<hr/><h4>'.esc_html(sprintf(__('Alternative transport options to %s', 'dynamicaviation'), $this->get()->aircraft_destination_l)).'</h4>';
+            $output = '<hr/><h4>'.esc_html(sprintf(__('Alternative transport options to %s', 'dynamicaviation'), $this->get->aircraft_destination_l)).'</h4>';
 
             $output .= '<table class="bottom-40 pure-table pure-table-bordered pure-table-striped text-center small"><thead><tr>';
 

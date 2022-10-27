@@ -13,27 +13,20 @@ class Dynamic_Aviation_Public {
 		$this->version = $version;
 		$this->utilities =  $utilities;
 		add_action('init', array(&$this, 'init'));
-		add_action( 'parse_query', array( &$this, 'on_quote_submit' ), 1);
 		add_filter('minimal_sitemap', array(&$this, 'sitemap'), 10);
 		add_filter('dy_aviation_estimate_notes', array(&$this, 'estimate_notes'));
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
 		add_filter('wp_head', array(&$this, 'meta_tags'));
 		add_action('pre_get_posts', array(&$this, 'main_wp_query'), 100);		
-		
-		if($wp_version >= 4.4)
-		{
-			add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);
-		}
-
+		add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);		
 		add_filter('wp_title', array(&$this, 'modify_wp_title'), 100);
 		add_filter('the_content', array(&$this, 'modify_content'));
 		add_filter('the_title', array(&$this, 'modify_title'));
 		add_filter('the_excerpt', array(&$this, 'modify_excerpt'));
-		add_filter('template_include', array(&$this, 'package_template'), 100 );
+		add_filter('template_include', array(&$this, 'locate_template'), 100 );
 		add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);		
 		add_filter('body_class', array(&$this, 'remove_body_class'), 100);
-
 		add_filter('minimal_posted_on', array(&$this, 'minimalizr_hide_posted_on'), 100);
 		add_filter('minimal_archive_excerpt', array(&$this, 'minimalizr_modify_archive_excerpt'), 100);
 		add_filter('minimal_archive_title', array(&$this, 'minimalizr_modify_archive_title'), 100);
@@ -48,50 +41,6 @@ class Dynamic_Aviation_Public {
 	public function estimate_notes()
 	{
 		return get_option('dy_aviation_estimate_note_'.$this->current_language);
-	}
-
-	
-	public function on_quote_submit()
-	{
-		global $VALID_JET_RECAPTCHA;
-		
-		if(!isset($VALID_JET_RECAPTCHA))
-		{
-			if(Dynamic_Aviation_Validators::valid_aircraft_quote())
-			{
-				if(Dynamic_Aviation_Validators::validate_recaptcha())
-				{
-					$data = $_POST;
-					$data['lang'] = current_language();
-					
-					if(!isset($_POST['aircraft_id']))
-					{
-						$subject = sprintf(__('%s, Your request has been sent to our specialists at %s!', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'));
-						require_once('general_email_template.php');
-					}
-					else{
-						$this_id = sanitize_text_field($_POST['aircraft_id']);
-						$subject = sprintf(__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'), sanitize_text_field($data['aircraft_price']));
-						$is_commercial = (aviation_field('aircraft_commercial', $this_id) == 1) ? true : false;
-						$transport_title = $this->utilities->transport_title_singular($this_id);
-						require_once('quote_email_template.php');
-					}
-					
-					
-					$args = array(
-						'subject' => $subject,
-						'to' => sanitize_email($_POST['email']),
-						'message' => $email_template
-					);
-
-
-					sg_mail($args);
-
-					//self::webhook(json_encode($data));
-					$GLOBALS['VALID_JET_RECAPTCHA'] = true;
-				}
-			}			
-		}
 	}	
 	
 	public function ld_json($arr)
@@ -269,11 +218,7 @@ class Dynamic_Aviation_Public {
 			{
 				$title =  __('Destination Not Found', 'dynamicaviation') . ' | ' . $this->site_name;
 			}			
-		}
-		elseif(Dynamic_Aviation_Validators::valid_aircraft_quote())
-		{
-			$title =  __('Request Submitted', 'dynamicaviation').' | '.$this->site_name;
-		}		
+		}	
 		elseif(Dynamic_Aviation_Validators::valid_aircraft_search())
 		{
 			$s1 = sanitize_text_field($_GET['aircraft_origin']);
@@ -309,11 +254,7 @@ class Dynamic_Aviation_Public {
 			elseif(in_the_loop() && Dynamic_Aviation_Validators::valid_aircraft_search())
 			{
 				$title = esc_html(__("Find an Aircraft", "dynamicaviation"));
-			}
-			elseif(in_the_loop() && Dynamic_Aviation_Validators::valid_aircraft_quote())
-			{
-				$title = esc_html(__("Request Submitted", "dynamicaviation"));
-			}			
+			}		
 			elseif(in_the_loop() && get_query_var( 'fly' ))
 			{
 				$airport_array = $this->utilities->airport_data();
@@ -361,19 +302,6 @@ class Dynamic_Aviation_Public {
 			}
 			
 			return $output;
-		}
-		elseif(Dynamic_Aviation_Validators::valid_aircraft_quote())
-		{
-			global $VALID_JET_RECAPTCHA;
-			
-			if(isset($VALID_JET_RECAPTCHA))
-			{				
-				return '<p class="minimal_success">'.esc_html(__('Request received. Our sales team will be in touch with you soon.', 'dynamicaviation')).'</p>';
-			}
-			else
-			{
-				return '<p class="minimal_alert">'.esc_html(__('Invalid Recaptcha', 'dynamicaviation')).'</p>';
-			}
 		}		
 		elseif(Dynamic_Aviation_Validators::valid_aircraft_search())
 		{
@@ -501,7 +429,7 @@ class Dynamic_Aviation_Public {
 				$query->set('post_type', 'page');
 				$query->set( 'posts_per_page', 1 );
 			}
-			elseif(isset($query->query_vars['instant_quote']) || isset($query->query_vars['request_submitted']))
+			elseif(isset($query->query_vars['instant_quote']))
 			{
 				if($query->is_main_query())
 				{
@@ -586,13 +514,8 @@ class Dynamic_Aviation_Public {
 		return $sitemap;
 	}
 
-	public function package_template($template)
+	public function locate_template($template)
 	{
-		if(Dynamic_Aviation_Validators::valid_aircraft_quote())
-		{
-			$new_template = locate_template( array( 'page.php' ) );
-			return $new_template;			
-		}
 		if(get_query_var( 'fly' ) || get_query_var( 'instant_quote' )  || is_singular('aircrafts') || is_singular('destinations'))
 		{
 			$new_template = locate_template( array( 'page.php' ) );

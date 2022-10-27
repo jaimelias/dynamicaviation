@@ -12,8 +12,11 @@ class Dynamic_Aviation {
 		$this->version = '1.0.0';
 		$this->load_dependencies();
 		$this->set_locale();
-		$this->define_admin_hooks();
-		$this->define_public_hooks();
+
+		$utilities = new Dynamic_Aviation_Utilities();
+
+		$this->define_admin_hooks($utilities);
+		$this->define_public_hooks($utilities);
 	}
 
 	private function load_dependencies() {
@@ -36,6 +39,7 @@ class Dynamic_Aviation {
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-aircraft-single.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-quote-table.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-destination-details.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-confirmation.php';
 
 		$this->loader = new Dynamic_Aviation_Loader();
 	}
@@ -47,18 +51,17 @@ class Dynamic_Aviation {
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 	}
 
-	private function define_admin_hooks() {
+	private function define_admin_hooks($utilities) {
 
-		$utilities = new Dynamic_Aviation_Utilities();
+		
 		new Dynamic_Aviation_Admin( $this->get_plugin_name(), $this->get_version(),  $utilities);
 		new Dynamic_Aviation_Settings($utilities);
 		new Dynamic_Aviation_Post_Type();
 		new Dynamic_Aviation_Meta_Box($utilities);	
 	}
 
-	private function define_public_hooks() 
+	private function define_public_hooks($utilities) 
 	{
-		$utilities = new Dynamic_Aviation_Utilities();
 		new Dynamic_Aviation_Public( $this->get_plugin_name(), $this->get_version(), $utilities);
 
 		new Dynamic_Aviation_Search_Form($utilities);
@@ -72,6 +75,8 @@ class Dynamic_Aviation {
 		new Dynamic_Aviation_Aircrafts_Table($utilities);
 
 		new Dynamic_Aviation_Destination_Details($utilities);
+
+		new Dynamic_Aviation_Estimate_Confirmation($this->get_plugin_name(), $this->get_version(), $utilities);
 	}
 
 	public function run() {
