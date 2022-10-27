@@ -30,7 +30,6 @@ class Dynamic_Aviation_Public {
 		add_filter('the_content', array(&$this, 'modify_content'));
 		add_filter('the_title', array(&$this, 'modify_title'));
 		add_filter('the_excerpt', array(&$this, 'modify_excerpt'));
-		add_filter('aircraftpack_enable_open_graph', array(&$this, 'dequeue_canonical'));
 		add_filter('template_include', array(&$this, 'package_template'), 100 );
 		add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);		
 		add_filter('body_class', array(&$this, 'remove_body_class'), 100);
@@ -38,27 +37,6 @@ class Dynamic_Aviation_Public {
 		add_filter('minimal_posted_on', array(&$this, 'minimalizr_hide_posted_on'), 100);
 		add_filter('minimal_archive_excerpt', array(&$this, 'minimalizr_modify_archive_excerpt'), 100);
 		add_filter('minimal_archive_title', array(&$this, 'minimalizr_modify_archive_title'), 100);
-		add_filter('pll_translation_url', array(&$this, 'pll_translation_url'), 100, 2);
-	}
-
-
-	public function pll_translation_url($url, $slug)
-	{
-		global $polylang;
-		$query_var = get_query_var('fly');
-		
-		if(isset($polylang) && $query_var)
-		{
-			$default_language = pll_default_language();
-
-
-			$url = ($slug === $default_language) 
-				? esc_url(home_url('/fly/' . $query_var))
-				: esc_url(home_url('/' . $slug . '/fly/' . $query_var));
-
-		}
-
-		return $url;
 	}
 
 	public function init()
@@ -116,14 +94,6 @@ class Dynamic_Aviation_Public {
 		}
 	}	
 	
-	public function dequeue_canonical()
-	{
-		if(get_query_var('fly'))
-		{	
-			remove_action( 'wp_head', 'rel_canonical' );
-			return false;
-		}
-	}
 	public function ld_json($arr)
 	{
 		if(get_query_var('fly'))
@@ -444,7 +414,7 @@ class Dynamic_Aviation_Public {
 			
 			if(!empty($airport_array))
 			{
-				$output = '';
+				$output = "\r\n";
 				$addressArray = array();
 				$airport = $airport_array['airport'];
 				$iata  = $airport_array['iata'];
@@ -491,19 +461,21 @@ class Dynamic_Aviation_Public {
 				{
 					if($v['slug'] == pll_default_language())
 					{
-						$hreflang = $v['slug'].'" href="'.$v['url'].'fly/'.$this->utilities->sanitize_pathname($airport);
-						$output .= '<link rel="alternate" hreflang="'.esc_attr($hreflang).'/" />';	
+						$output .= '<link rel="alternate" hreflang="'.esc_attr($v['slug']).'" href="'.home_url('fly/'.$this->utilities->sanitize_pathname($airport)).'"/>';	
 					}
 					else
 					{
-						$hreflang = $v['slug'].'" href="'.home_url('/').$v['slug'].'/fly/'.$this->utilities->sanitize_pathname($airport);
-						$output .= '<link rel="alternate" hreflang="'.esc_attr($hreflang).'/" />';				
+						$output .= '<link rel="alternate" hreflang="'.esc_attr($v['slug']).'" href="'.home_url($v['slug'].'/fly/'.$this->utilities->sanitize_pathname($airport)).'" />';				
 					}
+
+					$output .= "\r\n";
 				}
 				
 				$output .= '<meta name="description" content="'.esc_attr(sprintf(__('Private charter flights to %s. Jets, planes and helicopter rental services in %s.', 'dynamicaviation'), $address, $airport)).'" />';
+				$output .= "\r\n";
 				$output .= '<link rel="canonical" href="'.esc_url(home_lang().'fly/'.$this->utilities->sanitize_pathname($airport_array['airport'])).'" />';
-			
+				$output .= "\r\n";
+
 				echo $output;			
 			}
 		}
@@ -524,14 +496,7 @@ class Dynamic_Aviation_Public {
 		if(!is_admin())
 		{
 			if(isset($query->query_vars['fly']) && $query->is_main_query())
-			{
-				global $polylang;
-				
-				if($polylang)
-				{
-					remove_filter('wp_head', array($polylang->links, 'wp_head'));
-				}
-				
+			{				
 				//add main query to bypass not found error
 				$query->set('post_type', 'page');
 				$query->set( 'posts_per_page', 1 );
