@@ -6,14 +6,27 @@ class Dynamic_Aviation_Utilities {
 
 	public function __construct()
 	{
-		$this->wp_cache_expires_seconds = 60; 
+		$this->wp_cache_expires_seconds = 60;
+		add_action('init', array(&$this, 'init'), 1);
+		add_action( 'init', array(&$this, 'cacheimg'), 999 );
+	}
+
+	public function init()
+	{
+		$this->algolia_token = get_option('algolia_token');
+		$this->algolia_index = get_option('algolia_index');
+		$this->algolia_id = get_option('algolia_id');
 	}
 
 	public function airport_img_url($json)
 	{
-		$airport = $json['airport'];
-		$url = home_url('cacheimg/'.$this->sanitize_pathname($airport).'.png');		
-		return $url;
+		if(is_array($json))
+		{
+			if(array_key_exists('airport', $json))
+			{
+				return home_url('cacheimg/'.$this->sanitize_pathname($json['airport']).'.png');
+			}
+		}
 	}
 
 	public function transport_title_plural($this_id = null)
@@ -54,44 +67,6 @@ class Dynamic_Aviation_Utilities {
 		}
 	}
 
-	public function get_languages()
-	{
-		global $polylang;
-		$language_list = array();
-
-		if(isset($polylang))
-		{
-			$languages = PLL()->model->get_languages_list();
-
-			for($x = 0; $x < count($languages); $x++)
-			{
-				foreach($languages[$x] as $key => $value)
-				{
-					if($key == 'slug')
-					{
-						array_push($language_list, $value);
-					}
-				}	
-			}
-		}
-
-		if(count($language_list) === 0)
-		{
-			$locale_str = get_locale();
-
-			if(strlen($locale_str) === 5)
-			{
-				array_push($language_list, substr($locale_str, 0, -3));
-			}
-			else if(strlen($locale_str) === 2)
-			{
-				array_push($language_list, $locale_str);
-			}
-		}
-
-		return $language_list;
-	}
-
 	public function json_src_url()
 	{
 		return 'const jsonsrc = () => { return "'.esc_url(plugin_dir_url( __DIR__ )).'/public/";}';
@@ -100,39 +75,18 @@ class Dynamic_Aviation_Utilities {
 	public function algoliasearch_after()
 	{
 		$output = '';
-		$algolia_token = get_option('algolia_token');
-		$algolia_index = get_option('algolia_index');
-		$algolia_id = get_option('algolia_id');
 
-		if($algolia_token && $algolia_index && $algolia_id)
+		if($this->algolia_token && $this->algolia_index && $this->algolia_id)
 		{
-			$output .= 'const getAlgoliaToken = "'.esc_html($algolia_token).'";';	
-			$output .= 'const getAlgoliaIndex = "'.esc_html($algolia_index).'";';
-			$output .= 'const getAlgoliaId = "'.esc_html($algolia_id).'";';
+			$output .= 'const getAlgoliaToken = "'.esc_html($this->algolia_token).'";';	
+			$output .= 'const getAlgoliaIndex = "'.esc_html($this->algolia_index).'";';
+			$output .= 'const getAlgoliaId = "'.esc_html($this->algolia_id).'";';
 			$output .= 'const algoliaClient = algoliasearch(getAlgoliaId, getAlgoliaToken);';
 			$output .= 'const algoliaIndex = algoliaClient.initIndex(getAlgoliaIndex);';
 		}
 
 		return $output;
 	}
-
-	public function distance($lat1, $lon1, $lat2, $lon2, $unit) {
-
-		$theta = $lon1 - $lon2;
-		$dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
-		$dist = acos($dist);
-		$dist = rad2deg($dist);
-		$miles = $dist * 60 * 1.1515;
-		$unit = strtoupper($unit);
-  
-		if ($unit == "K") {
-		  return ($miles * 1.609344);
-		} elseif ($unit == "N") {
-			return ($miles * 0.8684);
-		  } else {
-			  return $miles;
-			}
-	  }
   
 	  public function convertNumberToTime($dec)
 	  {
@@ -223,16 +177,11 @@ class Dynamic_Aviation_Utilities {
 		}
 		else
 		{
-
-			$algolia_token = get_option('algolia_token');
-			$algolia_index = get_option('algolia_index');
-			$algolia_id = get_option('algolia_id');
-
-			$url = 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param;
+			$url = 'https://'.$this->algolia_id.'-dsn.algolia.net/1/indexes/'.$this->algolia_index.'/'.$query_param;
 			
 			$headers = array(
-				'X-Algolia-API-Key' => $algolia_token, 
-				'X-Algolia-Application-Id' =>$algolia_id,
+				'X-Algolia-API-Key' => $this->algolia_token, 
+				'X-Algolia-Application-Id' =>$this->algolia_id,
 				'Content-Type' => 'application/json'
 			);
 
@@ -320,14 +269,11 @@ class Dynamic_Aviation_Utilities {
 		else
 		{
 			$query_param = 'browse?cursor=';
-			$algolia_token = get_option('algolia_token');
-			$algolia_index = get_option('algolia_index');
-			$algolia_id = get_option('algolia_id');
-			$url = 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param;
+			$url = 'https://'.$this->algolia_id.'-dsn.algolia.net/1/indexes/'.$this->algolia_index.'/'.$query_param;
 
 			$headers = array(
-				'X-Algolia-API-Key' => $algolia_token, 
-				'X-Algolia-Application-Id' => $algolia_id,
+				'X-Algolia-API-Key' => $this->algolia_token, 
+				'X-Algolia-Application-Id' => $this->algolia_id,
 				'Content-Type' => 'application/json'
 			);
 			
@@ -345,6 +291,41 @@ class Dynamic_Aviation_Utilities {
 		}		
 
 		return $output;
+	}
+
+	public function cacheimg()
+	{
+		$path = pathinfo($_SERVER['REQUEST_URI']);
+		$dirname = $path['dirname'];
+		$basename = $path['basename'];
+		$dirname_arr = array_values(array_filter(explode('/', $dirname)));
+		$filename = $path['filename'];
+
+		if(is_array($dirname_arr))
+		{
+			if(count($dirname_arr) > 0)
+			{
+				if(in_array('cacheimg', $dirname_arr) && str_ends_with($basename, '.png'))
+				{
+					header('Content-Type: image/png');
+
+					$url = $this->airport_url_string($this->airport_data($filename));
+
+					$headers = array(
+						'Content-Type' => 'image/png'
+					);
+					
+					$resp = wp_remote_get($url, array(
+						'headers' => $headers
+					));
+					
+					if($resp['response']['code'] === 200)
+					{
+						exit($resp['body']);
+					}
+				}
+			}
+		}
 	}
 
 }

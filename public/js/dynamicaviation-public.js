@@ -436,6 +436,11 @@ const aircraft_country_dropdown = (pluginurl, htmllang) => {
 }	
 
 const aircraftCountryOptions = data => {
+
+	data = data
+		.sort((a, b) => a[1].localeCompare(b[1]))
+		.filter(i => i[0] && i[1]);
+
 	jQuery('.countrylist').each(function() {
 		for (let x = 0; x < data.length; x++) 
 		{

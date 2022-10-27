@@ -117,7 +117,6 @@ function aviation_field($name, $this_id = null)
 {
 	if($this_id == null)
 	{		
-		global $polylang;		
 		global $post;
 		
 		if(isset($post))

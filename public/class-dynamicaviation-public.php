@@ -531,7 +531,7 @@ class Dynamic_Aviation_Public {
 				global $polylang;
 				if(isset($polylang))
 				{
-					$languages = $this->utilities->get_languages();
+					$languages = get_languages();
 					$language_list = array();
 					
 					for($x = 0; $x < count($languages); $x++)
