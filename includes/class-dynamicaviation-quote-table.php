@@ -69,9 +69,9 @@ class Dynamic_Aviation_Aircrafts_Table {
             'post_type' => 'aircrafts',
             'posts_per_page' => 200,
             'meta_query' => array($this->capacity_args()),
-            'meta_key' => 'aircraft_commercial',
-            'orderby' => 'meta_value',
-            'order' => 'ASC'
+			'meta_key' => 'aircraft_price_per_hour',
+			'orderby' => 'meta_value_num',
+			'order' => 'ASC'
         );
     }
 
