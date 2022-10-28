@@ -113,7 +113,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 
     public function modify_title($title)
     {
-		if($this->validate_form_submit())
+		if(in_the_loop() && $this->validate_form_submit())
 		{
 			$title = esc_html(__('Request Submitted', "dynamicaviation"));
 		}
