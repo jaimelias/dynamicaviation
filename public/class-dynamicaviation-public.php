@@ -35,6 +35,7 @@ class Dynamic_Aviation_Public {
 	{
 		$this->site_name = get_bloginfo('name');
 		$this->current_language = current_language();
+		$this->get_languages = get_languages();
 	}
 
 	public function estimate_notes()
@@ -60,7 +61,7 @@ class Dynamic_Aviation_Public {
 				] = $airport_array;
 				
 				
-				$lang = current_language();
+				$lang = $this->current_language;
 				$prices = array();
 				
 				if($lang)
@@ -459,7 +460,7 @@ class Dynamic_Aviation_Public {
 
 				if(isset($polylang))
 				{
-					$languages = get_languages();
+					$languages = $this->get_languages;
 					$language_list = array();
 					
 					for($x = 0; $x < count($languages); $x++)
@@ -477,13 +478,14 @@ class Dynamic_Aviation_Public {
 				
 				for($x = 0; $x < count($all_airports); $x++)
 				{
+					$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$x]['airport']);
 					$url = '<url>';
-					$url .= '<loc>'.esc_url(home_url().'/fly/'.$this->utilities->sanitize_pathname($all_airports[$x]['airport'])).'/</loc>';
+					$url .= '<loc>'.esc_url(home_url('fly/' .$airport_pathname)).'/</loc>';
 					
 					if($image_pathname)
 					{
 						$url .= '<image:image>';
-						$url .= '<image:loc>'.esc_url(home_url().'/'.$image_pathname.'/'.$this->utilities->sanitize_pathname($all_airports[$x]['airport'])).'.png</image:loc>';
+						$url .= '<image:loc>'.esc_url(home_url($image_pathname . '/' . $airport_pathname)).'.png</image:loc>';
 						$url .= '</image:image>';
 					}
 
@@ -497,13 +499,14 @@ class Dynamic_Aviation_Public {
 				{
 					for($y = 0; $y < count($all_airports); $y++)
 					{
+						$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$y]['airport']);
 						$pll_url = '<url>';
-						$pll_url .= '<loc>'.esc_url(home_url().'/'.$language_list[0].'/fly/'.$this->utilities->sanitize_pathname($all_airports[$y]['airport'])).'/</loc>';
+						$pll_url .= '<loc>'.esc_url(home_url($language_list[0] . '/fly/' . $airport_pathname)).'/</loc>';
 						
 						if($image_pathname)
 						{
 							$pll_url .= '<image:image>';
-							$pll_url .= '<image:loc>'.esc_url(home_url().'/'.$image_pathname.'/'.$this->utilities->sanitize_pathname($all_airports[$y]['airport'])).'.png</image:loc>';
+							$pll_url .= '<image:loc>'.esc_url(home_url($image_pathname . '/' . $airport_pathname)).'.png</image:loc>';
 							$pll_url .= '</image:image>';
 						}
 
@@ -522,6 +525,7 @@ class Dynamic_Aviation_Public {
 				$sitemap .= '</urlset>';
 			}
 		}
+
 		return $sitemap;
 	}
 
