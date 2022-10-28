@@ -18,6 +18,9 @@ class Dynamic_Aviation_Aircrafts_Table {
 
     public function set_params()
     {
+
+        $intval_params = array('aircraft_pax', 'aircraft_flight');
+
         $this->param_names = array(
             'aircraft_pax', 
             'aircraft_flight', 
@@ -39,7 +42,14 @@ class Dynamic_Aviation_Aircrafts_Table {
 
             if(isset($_REQUEST[$k]))
             {
-                $this->get->$k = sanitize_text_field($_REQUEST[$k]);
+                $v = sanitize_text_field($_REQUEST[$k]);
+
+                if(in_array($k, $intval_params))
+                {
+                    $v = intval($v);
+                }
+
+                $this->get->$k = $v;
             }
         }
     }
