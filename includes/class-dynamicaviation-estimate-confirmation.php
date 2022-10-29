@@ -9,6 +9,7 @@ class Dynamic_Aviation_Estimate_Confirmation
         $this->utilities = $utilities;
         $this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
 		$this->valid_recaptcha = false;
+		$this->pathname = 'request_submitted';
 
 		//sets OOP vars
         add_action('init', array(&$this, 'init'), 1);
@@ -39,12 +40,12 @@ class Dynamic_Aviation_Estimate_Confirmation
 		$this->get_languages = get_languages();
 		$this->site_name = get_bloginfo('name');
 		$this->current_language = current_language();
-		$this->valid_recaptcha = (Dynamic_Aviation_Validators::validate_recaptcha()) ? true : false;
+		$this->valid_recaptcha = $this->validate_recaptcha();
     }	
 
 	public function add_rewrite_rule()
 	{
-		add_rewrite_rule('^request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[1]','top');
+		add_rewrite_rule('^'.$this->pathname.'/([^/]*)/?', 'index.php?'.$this->pathname.'=$matches[1]','top');
 		$languages = $this->get_languages;
 		$arr = array();
 
@@ -59,24 +60,24 @@ class Dynamic_Aviation_Estimate_Confirmation
 		if(count($arr) > 0)
 		{
 			$arr = implode('|', $arr);
-			add_rewrite_rule('('.$arr.')/request_submitted/([^/]*)/?', 'index.php?request_submitted=$matches[2]','top');
+			add_rewrite_rule('('.$arr.')/'.$this->pathname.'/([^/]*)/?', 'index.php?'.$this->pathname.'=$matches[2]','top');
 		}		
 	}
 
 	public function add_rewrite_tag()
 	{
-		add_rewrite_tag('%request_submitted%', '([^&]+)');
+		add_rewrite_tag('%'.$this->pathname.'%', '([^&]+)');
 	}
 
 	public function registering_custom_query_var($query_vars)
 	{
-		$query_vars[] = 'request_submitted';
+		$query_vars[] = $this->pathname;
 		return $query_vars;
 	}
 
     public function main_wp_query($query)
     {
-        if($query->is_main_query() && isset($query->query_vars['request_submitted']))
+        if($query->is_main_query() && isset($query->query_vars[$this->pathname]))
         {
             $query->set('post_type', 'page');
             $query->set( 'posts_per_page', 1 );            
@@ -85,7 +86,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 
     public function locate_template($template)
     {
-		if(get_query_var('request_submitted'))
+		if(get_query_var($this->pathname))
 		{
 			$template = locate_template( array( 'page.php' ) );	
 		}
@@ -133,7 +134,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 
 	public function form_submit()
 	{
-		$which_var = $this->plugin_name . 'form_submit';
+		$which_var = $this->plugin_name.'_'.$this->pathname . '_form_submit';
 		global $$which_var;
 
 		if(!isset($$which_var))
@@ -180,7 +181,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 	public function validate_form_submit()
 	{
 		$output = false;
-		$which_var = $this->plugin_name . 'validate_form_submit';
+		$which_var = $this->plugin_name . '_' . $this->pathname . 'validate_form_submit';
 		global $$which_var;
 		
 		if(isset($$which_var))
@@ -189,13 +190,68 @@ class Dynamic_Aviation_Estimate_Confirmation
 		}
 		else
 		{
-			if(get_query_var('request_submitted') && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']) && isset($_POST['first_name']) && isset($_POST['lastname']) && isset($_POST['email']) && isset($_POST['phone']) && isset($_POST['country']) && isset($_POST['g-recaptcha-response']) && isset($_POST['aircraft_origin'])  && isset($_POST['aircraft_destination'])  && isset($_POST['aircraft_departure_date'])  && isset($_POST['aircraft_departure_hour']) && isset($_POST['departure_itinerary']) && isset($_POST['aircraft_return_date']) && isset($_POST['aircraft_return_hour']) && isset($_POST['return_itinerary']))
+			if(get_query_var($this->pathname) && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']) && isset($_POST['first_name']) && isset($_POST['lastname']) && isset($_POST['email']) && isset($_POST['phone']) && isset($_POST['country']) && isset($_POST['g-recaptcha-response']) && isset($_POST['aircraft_origin'])  && isset($_POST['aircraft_destination'])  && isset($_POST['aircraft_departure_date'])  && isset($_POST['aircraft_departure_hour']) && isset($_POST['departure_itinerary']) && isset($_POST['aircraft_return_date']) && isset($_POST['aircraft_return_hour']) && isset($_POST['return_itinerary']))
 			{
 				$output = true;
 				$GLOBALS[$which_var] = $output;
 			}	
 		}
 
+		return $output;
+	}
+
+	public function validate_recaptcha()
+	{
+		$output = false;
+		$which_var = 'aviation_validate_recaptcha';
+		global $$which_var;
+
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
+		}
+		else
+		{
+			if((isset($_POST['g-recaptcha-response'])))
+			{
+				$secret_key = get_option('captcha_secret_key');
+
+				if($secret_key)
+				{
+					$url = 'https://www.google.com/recaptcha/api/siteverify';			
+
+					$ip = (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) 
+						? $_SERVER['HTTP_CF_CONNECTING_IP'] : 
+						$_SERVER['REMOTE_ADDR'];
+
+					$params = array(
+						'secret' => $secret_key,
+						'remoteip' => $ip,
+						'response' => sanitize_text_field($_POST['g-recaptcha-response']),
+					);
+					
+					$resp = wp_remote_post($url, array(
+						'body' => $params
+					));
+
+					if($resp['response']['code'] === 200)
+					{
+						$output = true;
+					}
+					else
+					{
+						$output = false;
+					}
+				}
+			}
+			else
+			{
+				$output = false;
+			}
+
+			$GLOBALS[$which_var] = $output;
+		}
+		
 		return $output;
 	}
 

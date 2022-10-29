@@ -218,13 +218,6 @@ class Dynamic_Aviation_Public {
 			{
 				$title =  __('Destination Not Found', 'dynamicaviation') . ' | ' . $this->site_name;
 			}			
-		}	
-		elseif(Dynamic_Aviation_Validators::valid_aircraft_search())
-		{
-			$s1 = sanitize_text_field($_GET['aircraft_origin']);
-			$s2 = sanitize_text_field($_GET['aircraft_destination']);
-
-			$title = sprintf( __('Find an Aircraft %s - %s', 'dynamicaviation'), $s1,  $s2) .' | '.$this->site_name;	
 		}
 		elseif(is_post_type_archive('aircrafts'))
 		{
@@ -250,11 +243,7 @@ class Dynamic_Aviation_Public {
 				$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
 				$title = '<span class="linkcolor">'.esc_html($aircraft_type).'</span> '.$title;
 				return $title;				
-			}
-			elseif(in_the_loop() && Dynamic_Aviation_Validators::valid_aircraft_search())
-			{
-				$title = esc_html(__("Find an Aircraft", "dynamicaviation"));
-			}		
+			}	
 			elseif(in_the_loop() && get_query_var( 'fly' ))
 			{
 				$airport_array = $this->utilities->airport_data();
@@ -303,17 +292,6 @@ class Dynamic_Aviation_Public {
 			
 			return $output;
 		}		
-		elseif(Dynamic_Aviation_Validators::valid_aircraft_search())
-		{
-			if(Dynamic_Aviation_Validators::validate_hash())
-			{
-				return apply_filters('dy_aviation_aircrafts_table', '');				
-			}
-			else
-			{
-				return '<p class="minimal_alert">'.esc_html(__('Invalid Request', 'dynamicaviation')).'</p>';
-			}
-		}
 		elseif(in_the_loop() && is_singular('aircrafts'))
 		{
 			return apply_filters('dy_aviation_aircraft_template', $content);			
@@ -429,14 +407,6 @@ class Dynamic_Aviation_Public {
 				$query->set('post_type', 'page');
 				$query->set( 'posts_per_page', 1 );
 			}
-			elseif(isset($query->query_vars['instant_quote']))
-			{
-				if($query->is_main_query())
-				{
-					$query->set('post_type', 'page');
-					$query->set( 'posts_per_page', 1 );
-				}
-			}
 			elseif(is_post_type_archive('aircrafts') && $query->is_main_query())
 			{
 				$query->set( 'meta_key', 'aircraft_price_per_hour' );
@@ -444,7 +414,6 @@ class Dynamic_Aviation_Public {
 				$query->set( 'order', 'ASC');
 			}
 		}
-
 	}
 
 	
@@ -531,7 +500,7 @@ class Dynamic_Aviation_Public {
 
 	public function locate_template($template)
 	{
-		if(get_query_var( 'fly' ) || get_query_var( 'instant_quote' )  || is_singular('aircrafts') || is_singular('destinations'))
+		if(get_query_var( 'fly' )  || is_singular('aircrafts') || is_singular('destinations'))
 		{
 			$new_template = locate_template( array( 'page.php' ) );
 			return $new_template;			
@@ -554,14 +523,14 @@ class Dynamic_Aviation_Public {
 
 		$dep = array('jquery', 'landing-cookies');
 
-		wp_enqueue_script( 'landing-cookies', plugin_dir_url( __FILE__ ).'js/cookies.js', array('jquery'), $this->version, true );		
+		wp_enqueue_script( 'landing-cookies', plugin_dir_url( __FILE__ ).'js/cookies.js', array('jquery'), $this->version, true );	
+		wp_add_inline_script('landing-cookies', $this->utilities->json_src_url(), 'after');	
 		
 		if(((is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'aviation_search_form')) || is_singular('aircrafts') || get_query_var('fly')) && !isset($_GET['fl_builder']))
 		{
 			array_push($dep, 'algolia', 'mapbox', 'markercluster', 'sha512', 'picker-date-js', 'picker-time-js');
 			
 			wp_enqueue_script('algolia', plugin_dir_url( __FILE__ ).'js/algoliasearch.min.js', array( 'jquery' ), '3.32.0', true );
-			wp_add_inline_script('algolia', $this->utilities->json_src_url(), 'before');
 			wp_add_inline_script('algolia', $this->utilities->algoliasearch_after(), 'after');
 			wp_enqueue_script('algolia_autocomplete', plugin_dir_url( __FILE__ ).'js/autocomplete.jquery.min.js', array( 'jquery' ), '0.36.0', true );
 			
@@ -574,34 +543,6 @@ class Dynamic_Aviation_Public {
 			wp_enqueue_script('sha512', plugin_dir_url( __FILE__ ) . 'js/sha512.js', array(), 'async_defer', true );
 			self::datepickerJS();			
 			wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, time(), true );
-		}
-		
-		if(Dynamic_Aviation_Validators::valid_aircraft_search())
-		{
-			$recap = false;
-			
-			if(!function_exists('is_booking_page'))
-			{
-				$recap = true;
-			}
-			else
-			{
-				if(!is_booking_page())
-				{
-					$recap = true;
-				}
-			}
-
-			if($recap === true)
-			{
-				//recaptcha
-				wp_enqueue_script('invisible-recaptcha', 'https://www.google.com/recaptcha/api.js', '', 'async_defer_dynamicaviation', true );	
-
-				$dep[] = 'invisible-recaptcha';
-			}
-			
-			wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, time(), true );
-			wp_add_inline_script($this->plugin_name, $this->utilities->json_src_url(), 'before');
 		}
 	}
 	

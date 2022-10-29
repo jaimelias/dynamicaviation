@@ -39,6 +39,7 @@ class Dynamic_Aviation {
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-aircraft-single.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-quote-table.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-destination-details.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-page.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-confirmation.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-image.php';
 
@@ -77,6 +78,8 @@ class Dynamic_Aviation {
 		new Dynamic_Aviation_Destination_Details($utilities);
 
 		new Dynamic_Aviation_Estimate_Confirmation($this->get_plugin_name(), $this->get_version(), $utilities);
+		
+		new Dynamic_Aviation_Estimate_Page($this->get_plugin_name(), $this->get_version(), $utilities);
 
 		new Dynamic_Aviation_Image($this->get_plugin_name(), $this->get_version(), $utilities);
 	}
