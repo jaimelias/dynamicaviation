@@ -48,9 +48,9 @@ class Dynamic_Aviation_Admin {
 	
 	public function add_rewrite_rule()
 	{
-		add_rewrite_rule('^fly/([^/]*)/?', 'index.php?fly=$matches[1]','top');
+		add_rewrite_rule('^fly/([a-z0-9-]+)[/]?$', 'index.php?fly=$matches[1]','top');
 		
-		add_rewrite_rule('^instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[1]','top');
+		add_rewrite_rule('^instant_quote/([a-z0-9-]+)[/]?$', 'index.php?instant_quote=$matches[1]','top');
 
 		$languages = $this->get_languages;
 		$arr = array();
@@ -66,8 +66,8 @@ class Dynamic_Aviation_Admin {
 		if(count($arr) > 0)
 		{
 			$arr = implode('|', $arr);
-			add_rewrite_rule('('.$arr.')/fly/([^/]*)/?', 'index.php?fly=$matches[2]','top');
-			add_rewrite_rule('('.$arr.')/instant_quote/([^/]*)/?', 'index.php?instant_quote=$matches[2]','top');
+			add_rewrite_rule('('.$arr.')/fly/([a-z0-9-]+)[/]?$', 'index.php?fly=$matches[2]','top');
+			add_rewrite_rule('('.$arr.')/instant_quote/([a-z0-9-]+)[/]?$', 'index.php?instant_quote=$matches[2]','top');
 		}		
 	}
 

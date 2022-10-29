@@ -11,7 +11,6 @@ class Dynamic_Aviation_Image {
 		add_action('init', array(&$this, 'add_rewrite_rule'));
 		add_action('init', array(&$this, 'add_rewrite_tag'), 10, 0);
         add_filter('query_vars', array(&$this, 'registering_custom_query_var'));
-		add_action( 'wp_headers', array(&$this, 'wp_headers') );
         add_action( 'init', array(&$this, 'render_image'), 1000 );
         add_filter('dy_aviation_image_pathname', array(&$this, 'set_pathname'));
 	}
@@ -23,7 +22,7 @@ class Dynamic_Aviation_Image {
 
     public function add_rewrite_rule()
     {
-        add_rewrite_rule('^'.$this->pathname.'/([^/]*)/?.png', 'index.php?'.$this->pathname.'=$matches[1]','top');
+        add_rewrite_rule('^'.$this->pathname.'/([a-z0-9-]+)[.png]?$', 'index.php?'.$this->pathname.'=$matches[1]','top');
     }
 
     public function add_rewrite_tag()
@@ -73,17 +72,6 @@ class Dynamic_Aviation_Image {
 		return $output;       
     }
 
-	public function wp_headers($headers)
-	{
-
-		if($this->get_image_pathname())
-		{
-            $headers['Content-Type'] = 'image/png';
-		}
-
-		return $headers;
-	}
-
 	public function render_image()
 	{
         $filename = $this->get_image_pathname();
@@ -102,6 +90,8 @@ class Dynamic_Aviation_Image {
             
             if($resp['response']['code'] === 200)
             {
+                header ('Content-Type: image/png'); 
+
                 exit($resp['body']);
             }
         }
