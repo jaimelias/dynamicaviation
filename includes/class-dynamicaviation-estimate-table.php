@@ -1,7 +1,7 @@
 <?php
 
 
-class Dynamic_Aviation_Aircrafts_Table {
+class Dynamic_Aviation_Estimate_Table {
 
     public function __construct($utilities) {
         $this->utilities = $utilities;

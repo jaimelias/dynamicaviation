@@ -36,9 +36,9 @@ class Dynamic_Aviation {
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-shortcodes.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-search-form.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-price-table.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-aircraft-single.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-quote-table.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-destination-details.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-aircrafts.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-table.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-destinations.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-page.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-confirmation.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-image.php';
@@ -71,11 +71,11 @@ class Dynamic_Aviation {
 
 		new Dynamic_Aviation_Shortcodes($utilities);		
 		
-		new Dynamic_Aviation_Aircraft_Single($utilities);
+		new Dynamic_Aviation_Aircrafts($this->get_plugin_name(), $this->get_version(), $utilities);
 
-		new Dynamic_Aviation_Aircrafts_Table($utilities);
+		new Dynamic_Aviation_Estimate_Table($utilities);
 
-		new Dynamic_Aviation_Destination_Details($utilities);
+		new Dynamic_Aviation_Destinations($this->get_plugin_name(), $this->get_version(), $utilities);
 
 		new Dynamic_Aviation_Estimate_Confirmation($this->get_plugin_name(), $this->get_version(), $utilities);
 		

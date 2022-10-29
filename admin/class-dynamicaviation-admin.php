@@ -41,8 +41,8 @@ class Dynamic_Aviation_Admin {
 			wp_enqueue_script('algolia', '//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js', array( 'jquery' ), $this->version, true);			
 			wp_enqueue_script('algolia_autocomplete', '//cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js', array( 'jquery' ), $this->version, true );			
 			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-admin.js', array( 'jquery', 'algolia', 'algolia_autocomplete', 'handsontableJS'), time(), true );
-			wp_add_inline_script('dynamicaviation', $this->utilities->json_src_url(), 'before');
-			wp_add_inline_script('dynamicaviation', $this->utilities->algoliasearch_after(), 'before');
+			wp_add_inline_script($this->plugin_name, $this->utilities->json_src_url(), 'before');
+			wp_add_inline_script($this->plugin_name, $this->utilities->algoliasearch_after(), 'before');
 		}
 	}
 	

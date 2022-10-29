@@ -13,6 +13,10 @@ class Dynamic_Aviation_Shortcodes {
     {
 		add_shortcode( 'aviation_search_form', array(&$this, 'search_form'));
 		add_shortcode( 'aviation_table', array(&$this, 'table'));
+
+        //load core scripts
+        add_action( 'parse_query', array( &$this, 'load_algolia_scripts' ), 100);
+        add_action( 'parse_query', array( &$this, 'load_mapbox_scripts' ), 100);		
     }
 
 	public function table($attr, $content = '')
@@ -56,6 +60,35 @@ class Dynamic_Aviation_Shortcodes {
 			return apply_filters('dy_aviation_search_form', '');
 		}	
 	}
+
+    public function load_algolia_scripts()
+    {
+        global $dy_aviation_load_algolia;
+		global $post;
+
+		if(!isset($dy_aviation_load_algolia) && isset($post))
+        {
+			if(is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'aviation_search_form'))
+			{
+				$GLOBALS['dy_aviation_load_algolia'] = true;
+			}
+        }
+    }
+
+    public function load_mapbox_scripts()
+    {
+        global $dy_aviation_load_mapbox;
+		global $post;
+
+		if(!isset($dy_aviation_load_mapbox) && isset($post))
+        {
+			if(is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'aviation_search_form'))
+			{
+				$GLOBALS['dy_aviation_load_mapbox'] = true;
+			}
+        }
+    }
+
 }
 
 

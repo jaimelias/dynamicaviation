@@ -8,7 +8,6 @@ class Dynamic_Aviation_Estimate_Confirmation
 		$this->plugin_name = $plugin_name;
         $this->utilities = $utilities;
         $this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
-		$this->valid_recaptcha = false;
 		$this->pathname = 'request_submitted';
 
 		//sets OOP vars
