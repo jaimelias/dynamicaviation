@@ -31,7 +31,7 @@ $itinerary_text .= ' || ' . __('Passengers', 'dynamicaviation') . ': ' . $passen
 
 
 $label_notes = __('Notes', 'dynamicpackages');
-$notes = nl2br(apply_filters('dy_aviation_estimate_notes', ''));
+$notes = nl2br($notes);
 $footer = $company_address;
 $whatsapp_url = esc_url('https://wa.me/' . get_option('dy_whatsapp') . '?text=' . urlencode($itinerary_text));
 $whatsapp = (get_option('dy_whatsapp')) ? '<a style="border: 16px solid #25d366; text-align: center; background-color: #25d366; color: #fff; font-size: 18px; line-height: 18px; display: block; width: 100%; box-sizing: border-box; text-decoration: none; font-weight: 900;" href="'.esc_url($whatsapp_url).'">'.__('Whatsapp Advisory', 'dynamicpackages').'</a>' : null;

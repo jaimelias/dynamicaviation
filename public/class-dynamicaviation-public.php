@@ -12,9 +12,10 @@ class Dynamic_Aviation_Public {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->utilities =  $utilities;
+		$this->plugin_dir_url = plugin_dir_url( __FILE__ );
 		add_action('init', array(&$this, 'init'));
 		add_filter('minimal_sitemap', array(&$this, 'sitemap'), 10);
-		add_filter('dy_aviation_estimate_notes', array(&$this, 'estimate_notes'));
+		
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
 		add_action('wp_head', array(&$this, 'meta_tags'));
@@ -33,13 +34,6 @@ class Dynamic_Aviation_Public {
 		$this->get_languages = get_languages();
 	}
 
-	public function estimate_notes()
-	{
-		return get_option('dy_aviation_estimate_note_'.$this->current_language);
-	}	
-	
-
-
 	public function modify_wp_title($title)
 	{
 		if(get_query_var( 'fly' ))
@@ -50,7 +44,6 @@ class Dynamic_Aviation_Public {
 			{
 				if(count($airport_array) > 0)
 				{
-
 					$country = '';
 
 					if(array_key_exists('country_names', $airport_array))
@@ -348,17 +341,17 @@ class Dynamic_Aviation_Public {
 
 		$dep = array('jquery', 'landing-cookies');
 
-		wp_enqueue_script( 'landing-cookies', plugin_dir_url( __FILE__ ).'js/cookies.js', array('jquery'), $this->version, true );	
+		wp_enqueue_script( 'landing-cookies', $this->plugin_dir_url.'js/cookies.js', array('jquery'), $this->version, true );	
 		wp_add_inline_script('landing-cookies', $this->utilities->json_src_url(), 'after');	
 		
 		if(isset($dy_aviation_load_algolia) && !isset($_GET['fl_builder']))
 		{
 			array_push($dep, 'algolia', 'sha512', 'picker-date-js', 'picker-time-js');
 
-			wp_enqueue_script('sha512', plugin_dir_url( __FILE__ ) . 'js/sha512.js', array(), 'async_defer', true );
-			wp_enqueue_script('algolia', plugin_dir_url( __FILE__ ).'js/algoliasearch.min.js', array( 'jquery' ), '3.32.0', true );
+			wp_enqueue_script('sha512', $this->plugin_dir_url . 'js/sha512.js', array(), 'async_defer', true );
+			wp_enqueue_script('algolia', $this->plugin_dir_url.'js/algoliasearch.min.js', array( 'jquery' ), '3.32.0', true );
 			wp_add_inline_script('algolia', $this->utilities->algoliasearch_after(), 'after');
-			wp_enqueue_script('algolia_autocomplete', plugin_dir_url( __FILE__ ).'js/autocomplete.jquery.min.js', array( 'jquery' ), '0.36.0', true );
+			wp_enqueue_script('algolia_autocomplete', $this->plugin_dir_url.'js/autocomplete.jquery.min.js', array( 'jquery' ), '0.36.0', true );
 
 			if(isset($dy_aviation_load_mapbox))
 			{
@@ -373,7 +366,7 @@ class Dynamic_Aviation_Public {
 			}
 
 			self::datepickerJS();			
-			wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dynamicaviation-public.js', $dep, time(), true );
+			wp_enqueue_script($this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-public.js', $dep, time(), true );
 		}
 
 	}
@@ -383,7 +376,7 @@ class Dynamic_Aviation_Public {
 	{
 		global $post;
 
-		wp_enqueue_style('minimalLayout', plugin_dir_url( __FILE__ ) . 'css/minimal-layout.css', array(), '', 'all' );
+		wp_enqueue_style('minimalLayout', $this->plugin_dir_url . 'css/minimal-layout.css', array(), '', 'all' );
 
 		if(is_singular('aircrafts') || get_query_var('fly') || (is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'aviation_search_form') || has_shortcode( $post->post_content, 'jc_calculator'))))
 		{
@@ -397,7 +390,7 @@ class Dynamic_Aviation_Public {
 		
 		if(is_a( $post, 'WP_Post' ) && (has_shortcode( $post->post_content, 'aviation_search_form') || has_shortcode( $post->post_content, 'jc_calculator')) || is_singular('aircrafts') || is_singular('aircrafts') || get_query_var('fly'))
 		{
-			wp_enqueue_style( 'picker-css', plugin_dir_url( __FILE__ ) . 'css/picker/default.css', array(), 'dynamicaviation', 'all' );
+			wp_enqueue_style( 'picker-css', $this->plugin_dir_url . 'css/picker/default.css', array(), 'dynamicaviation', 'all' );
 			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.date'));
 			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.time'));				
 		}		
@@ -418,79 +411,19 @@ class Dynamic_Aviation_Public {
 	public function datepickerJS()
 	{
 		//pikadate
-		wp_enqueue_script( 'picker-js', plugin_dir_url( __FILE__ ) . 'js/picker/picker.js', array('jquery'), '3.6.2', true);
-		wp_enqueue_script( 'picker-date-js', plugin_dir_url( __FILE__ ) . 'js/picker/picker.date.js', array('jquery', 'picker-js'), '3.6.2', true);
-		wp_enqueue_script( 'picker-time-js', plugin_dir_url( __FILE__ ) . 'js/picker/picker.time.js',array('jquery', 'picker-js'), '3.6.2', true);	
-		wp_enqueue_script( 'picker-legacy', plugin_dir_url( __FILE__ ) . 'js/picker/legacy.js', array('jquery', 'picker-js'), '3.6.2', true);
+		wp_enqueue_script( 'picker-js', $this->plugin_dir_url . 'js/picker/picker.js', array('jquery'), '3.6.2', true);
+		wp_enqueue_script( 'picker-date-js', $this->plugin_dir_url . 'js/picker/picker.date.js', array('jquery', 'picker-js'), '3.6.2', true);
+		wp_enqueue_script( 'picker-time-js', $this->plugin_dir_url . 'js/picker/picker.time.js',array('jquery', 'picker-js'), '3.6.2', true);	
+		wp_enqueue_script( 'picker-legacy', $this->plugin_dir_url . 'js/picker/legacy.js', array('jquery', 'picker-js'), '3.6.2', true);
 
 		$picker_translation = 'js/picker/translations/'.get_locale().'.js';
 				
 		if(file_exists(dirname( __FILE__ ).'/'.$picker_translation))
 		{
-			wp_enqueue_script( 'picker-time-translation', plugin_dir_url( __FILE__ ).$picker_translation, array('jquery', 'picker-js'), '3.6.2', true);
+			wp_enqueue_script( 'picker-time-translation', $this->plugin_dir_url.$picker_translation, array('jquery', 'picker-js'), '3.6.2', true);
 		}		
 	}
-	
-	public static function webhook($data)
-	{
-		
-		if(get_option('aircraft_webhook'))
-		{
-			$webhook = get_option('aircraft_webhook');
-			
-			if(!filter_var($webhook, FILTER_VALIDATE_URL) === false)
-			{
-				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_URL, $webhook);
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: ' . strlen($data)));
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($ch,CURLOPT_TIMEOUT, 20);
-				$result = curl_exec($ch);
-				$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-				curl_close($ch);
-				
-				if (intval($httpCode) === 200)
-				{
-					//do nothing
-				}
-				else
-				{
-					$admin_email = get_option( 'admin_email' );
-					$time = current_time('timestamp', $gmt = 0 );
-					$time = date_i18n(get_option('date_format'), $time);
-					write_log('Dynamic_Aviation Webhook Error - '.$time.': '.$result);
-					wp_mail( $admin_email, 'Dynamic_Aviation Webhook Error - '.$time, $result);	
-				}
-			}
-		}
-	}
 
-	public static function algolia_one($string)
-	{
-		$new_query_var = $string;
-		$query_param = '?query='.$new_query_var.'&hitsPerPage=1';
-		$algolia_token = get_option('algolia_token');
-		$algolia_index = get_option('algolia_index');
-		$algolia_id = get_option('algolia_id');
-		
-		$curl = curl_init();
-		$headers = array();
-		$headers[] = 'X-Algolia-API-Key: '.$algolia_token;
-		$headers[] = 'X-Algolia-Application-Id: '.$algolia_id;
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);	
-
-		curl_setopt_array($curl, array(
-		CURLOPT_RETURNTRANSFER => 1,
-		CURLOPT_REFERER => esc_url(home_url()),
-		CURLOPT_URL => 'https://'.$algolia_id.'-dsn.algolia.net/1/indexes/'.$algolia_index.'/'.$query_param,
-		));
-		$resp = curl_exec($curl);
-		$resp = json_decode($resp, true);
-		$resp = $resp['hits'];
-		return $resp;
-	}
 
 	public function get_inline_js($file)
 	{

@@ -32,6 +32,10 @@ class Dynamic_Aviation_Estimate_Confirmation
 
 		//process the submit of the quote form
 		add_action( 'parse_query', array( &$this, 'form_submit' ), 100);
+
+
+		//notes
+		add_filter('dy_aviation_estimate_notes', array(&$this, 'estimate_notes'));
     }
 
     public function init()
@@ -144,6 +148,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 				{
 					$data = $_POST;
 					$data['lang'] = $this->current_language;
+					$notes = apply_filters('dy_aviation_estimate_notes', '');
 					
 					if(!isset($_POST['aircraft_id']))
 					{
@@ -166,21 +171,58 @@ class Dynamic_Aviation_Estimate_Confirmation
 						'message' => $email_template
 					);
 
-
 					sg_mail($args);
 
 					$GLOBALS[$which_var] = true;
-					//self::webhook(json_encode($data));
 				}			
 			}
 		}
 	}
 
+	public function required_params()
+	{
+		return array(
+			'aircraft_origin_l',
+			'aircraft_destination_l',
+			'first_name',
+			'lastname',
+			'email',
+			'phone',
+			'country',
+			'g-recaptcha-response',
+			'aircraft_origin',
+			'aircraft_destination',
+			'aircraft_departure_date',
+			'aircraft_departure_hour',
+			'departure_itinerary',
+			'aircraft_return_date',
+			'aircraft_return_hour',
+			'return_itinerary',
+		);
+	}
+
+
+	public function validate_required_params()
+	{
+		$output = true;
+
+		$params = $this->required_params();
+
+		for($x = 0; $x < count($params); $x++)
+		{
+			if(!isset($_POST[$params[$x]]))
+			{
+				$output = false;
+			}	
+		}
+
+		return $output;
+	}
 
 	public function validate_form_submit()
 	{
 		$output = false;
-		$which_var = $this->plugin_name . '_' . $this->pathname . 'validate_form_submit';
+		$which_var = $this->plugin_name . '_' . $this->pathname . '_validate_form_submit';
 		global $$which_var;
 		
 		if(isset($$which_var))
@@ -189,7 +231,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 		}
 		else
 		{
-			if(get_query_var($this->pathname) && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']) && isset($_POST['first_name']) && isset($_POST['lastname']) && isset($_POST['email']) && isset($_POST['phone']) && isset($_POST['country']) && isset($_POST['g-recaptcha-response']) && isset($_POST['aircraft_origin'])  && isset($_POST['aircraft_destination'])  && isset($_POST['aircraft_departure_date'])  && isset($_POST['aircraft_departure_hour']) && isset($_POST['departure_itinerary']) && isset($_POST['aircraft_return_date']) && isset($_POST['aircraft_return_hour']) && isset($_POST['return_itinerary']))
+			if(get_query_var($this->pathname) && $this->validate_required_params())
 			{
 				$output = true;
 				$GLOBALS[$which_var] = $output;
@@ -252,6 +294,11 @@ class Dynamic_Aviation_Estimate_Confirmation
 		}
 		
 		return $output;
+	}
+
+	public function estimate_notes()
+	{
+		return get_option('dy_aviation_estimate_note_'.$this->current_language);
 	}
 
 }
