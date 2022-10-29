@@ -346,15 +346,6 @@ class Dynamic_Aviation_Public {
 		global $dy_aviation_load_algolia;
 		global $dy_aviation_load_mapbox;
 
-		if(isset($dy_aviation_load_algolia))
-		{
-			//write_log('dy_aviation_load_algolia');
-		}
-		if(isset($dy_aviation_load_mapbox))
-		{
-			write_log('dy_aviation_load_mapbox');
-		}
-
 		$dep = array('jquery', 'landing-cookies');
 
 		wp_enqueue_script( 'landing-cookies', plugin_dir_url( __FILE__ ).'js/cookies.js', array('jquery'), $this->version, true );	
