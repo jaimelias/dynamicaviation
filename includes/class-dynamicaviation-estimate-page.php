@@ -139,12 +139,12 @@ class Dynamic_Aviation_Estimate_Page
 	{
 		if($this->validate_form_search())
 		{
-			$script = $this->plugin_name.'_'.$this->pathname;
-			$recaptcha = 'core-recaptcha-v3';
+
+			$recaptcha = 'recaptcha-v3';
 
 			wp_enqueue_script($recaptcha, 'https://www.google.com/recaptcha/api.js', '', 'async_defer', true );
 
-			wp_enqueue_script($script, $this->plugin_dir_url . 'public/js/estimate-page.js', array($recaptcha), time(), true );
+			wp_enqueue_script($this->plugin_name.'_'.$this->pathname, $this->plugin_dir_url . 'public/js/estimate-page.js', array($recaptcha), time(), true );
 		}
 	}
 
