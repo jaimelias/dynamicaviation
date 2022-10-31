@@ -167,7 +167,7 @@ if(!function_exists('get_languages'))
 					{
 						if($key == 'slug')
 						{
-							$output[] = $value;
+							array_push($output, $value);
 						}
 					}	
 				}
@@ -179,11 +179,11 @@ if(!function_exists('get_languages'))
 
 				if(strlen($locale_str) === 5)
 				{
-					$output[] = substr($locale_str, 0, -3);
+					array_push($output, substr($locale_str, 0, -3));
 				}
 				else if(strlen($locale_str) === 2)
 				{
-					$output[] = $locale_str;
+					array_push($output, $locale_str);
 				}
 			}
 

@@ -8,9 +8,18 @@ class Dynamic_Aviation_Destinations {
         $this->utilities = $utilities;
 		$this->plugin_name = $plugin_name;
         $this->pathname = 'fly';
-        add_action('init', array(&$this, 'init'));
+		$this->post_type = 'destinations';
 
-    
+		//init
+        add_action('init', array(&$this, 'init'));
+        add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'), 1);
+
+		//admin query vars
+		add_action('init', array(&$this, 'add_rewrite_rule'));
+		add_action('init', array(&$this, 'add_rewrite_tag'), 10, 0);
+		add_filter('query_vars', array(&$this, 'registering_custom_query_var'));
+
+
         //filters custom wordpress outputs
         add_action('pre_get_posts', array(&$this, 'main_wp_query'), 100);
 		add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);		
@@ -18,14 +27,12 @@ class Dynamic_Aviation_Destinations {
         add_filter('the_title', array(&$this, 'modify_title'));
         add_filter('the_content', array(&$this, 'modify_content'));
 
-
         //meta tags
         add_action('wp_head', array(&$this, 'meta_tags'));
 
         //minimalizr theme
         add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);
         add_filter('template_include', array(&$this, 'locate_template'), 100 );
-
 
         //enqueue logic in public.php
         add_action( 'parse_query', array( &$this, 'load_algolia_scripts' ), 100);
@@ -35,13 +42,63 @@ class Dynamic_Aviation_Destinations {
     public function init()
     {
         $this->site_name = get_bloginfo('name');
-        $this->current_language = current_language();
+		$this->get_languages = get_languages();
+        $this->current_language = current_language();		
         $this->home_lang = home_lang();
     }
 
+	public function admin_enqueue_scripts()
+	{
+		global $typenow;
+
+		if($typenow === $this->post_type)
+		{
+			$GLOBALS['dy_aviation_load_admin_scripts'] = true;
+		}
+	}
+
+	public function add_rewrite_rule()
+	{
+		add_rewrite_rule('^fly/([a-z0-9-]+)[/]?$', 'index.php?fly=$matches[1]','top');
+		
+		add_rewrite_rule('^instant_quote/([a-z0-9-]+)[/]?$', 'index.php?instant_quote=$matches[1]','top');
+
+		$languages = $this->get_languages;
+		$arr = array();
+
+		for($x = 0; $x < count($languages); $x++)
+		{
+			if($languages[$x] != pll_default_language())
+			{
+				$arr[] = $languages[$x];
+			}
+		}
+
+		if(count($arr) > 0)
+		{
+			$arr = implode('|', $arr);
+			add_rewrite_rule('('.$arr.')/fly/([a-z0-9-]+)[/]?$', 'index.php?fly=$matches[2]','top');
+			add_rewrite_rule('('.$arr.')/instant_quote/([a-z0-9-]+)[/]?$', 'index.php?instant_quote=$matches[2]','top');
+		}		
+	}
+
+	public function add_rewrite_tag()
+	{
+		add_rewrite_tag('%fly%', '([^&]+)');
+		add_rewrite_tag('%instant_quote%', '([^&]+)');
+	}
+
+	public function registering_custom_query_var($query_vars)
+	{
+		$query_vars[] = 'fly';
+		$query_vars[] = 'instant_quote';
+		return $query_vars;
+	}
+
+
 	public function main_wp_query($query)
 	{
-		if(isset($query->query_vars['fly']) && $query->is_main_query())
+		if(isset($query->query_vars[$this->pathname]) && $query->is_main_query())
 		{				
 			$query->set('post_type', 'page');
 			$query->set( 'posts_per_page', 1 );
@@ -50,7 +107,7 @@ class Dynamic_Aviation_Destinations {
 
 	public function modify_wp_title($title)
 	{
-		if(get_query_var('fly'))
+		if(get_query_var($this->pathname))
 		{
 			$airport_array = $this->utilities->airport_data();
 			
@@ -98,7 +155,7 @@ class Dynamic_Aviation_Destinations {
 
 	public function modify_title($title)
 	{
-			if(in_the_loop() && get_query_var( 'fly' ))
+			if(in_the_loop() && get_query_var($this->pathname))
 			{
 				$airport_array = $this->utilities->airport_data();
 				
@@ -134,7 +191,7 @@ class Dynamic_Aviation_Destinations {
 	}
     
 	public function modify_content($content)
-	{	if(in_the_loop() && get_query_var( 'fly' ))
+	{	if(in_the_loop() && get_query_var($this->pathname))
 		{
 			$airport_array = $this->utilities->airport_data();
 			$output = '';
@@ -286,7 +343,7 @@ class Dynamic_Aviation_Destinations {
 
 
 	public function meta_tags()
-	{	if(get_query_var( 'fly' ))
+	{	if(get_query_var($this->pathname))
 		{
 			$airport_array = $this->utilities->airport_data();
 			
@@ -490,7 +547,7 @@ class Dynamic_Aviation_Destinations {
 
 	public function locate_template($template)
 	{
-		if(get_query_var( 'fly' ))
+		if(get_query_var($this->pathname))
 		{
 			$new_template = locate_template( array( 'page.php' ) );
 			return $new_template;			

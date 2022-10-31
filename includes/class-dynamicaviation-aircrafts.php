@@ -9,8 +9,11 @@ class Dynamic_Aviation_Aircrafts {
         $this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );        
         $this->utilities = $utilities;
         $this->pathname = 'aircrafts';
+        $this->post_type = $this->pathname;
 
+        //init
         add_action('init', array(&$this, 'init'));
+        add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'), 1);
 
 		//filters custom wordpress outputs
         add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);
@@ -41,6 +44,16 @@ class Dynamic_Aviation_Aircrafts {
 		$this->current_language = current_language();
 		$this->get_languages = get_languages();
     }
+
+	public function admin_enqueue_scripts()
+	{
+		global $typenow;
+
+		if($typenow === $this->post_type)
+		{
+			$GLOBALS['dy_aviation_load_admin_scripts'] = true;
+		}
+	}    
 
     public function meta_tags()
     {
