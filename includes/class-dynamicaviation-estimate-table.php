@@ -13,6 +13,7 @@ class Dynamic_Aviation_Estimate_Table {
     {
         $this->current_language = current_language();
         $this->is_mobile = wp_is_mobile();
+        $this->home_lang = home_lang();
         add_filter('dy_aviation_aircrafts_table', array(&$this, 'template'));
     }
 
@@ -180,9 +181,8 @@ class Dynamic_Aviation_Estimate_Table {
     public function iterate_rows($post, $table_price, $is_commercial)
     {
         $table = '';
-        $aircraft_url = home_lang().$post->post_type.'/'.$post->post_name;
+        $aircraft_url = $this->home_lang.$post->post_type.'/'.$post->post_name;
 
-        
         $thumbnail = get_the_post_thumbnail($post->ID, array( 100, 100), array('class' => 'img-responsive', 'alt' => esc_attr($post->post_title)));
         $large_attr = (!$this->is_mobile) ? ' class="large" ' : ''; 
         $align_left_attr = (!$this->is_mobile) ? ' class="text-left" ' : '';
@@ -291,7 +291,7 @@ class Dynamic_Aviation_Estimate_Table {
 
             <div id="aircraft_booking_container" class="<?php echo ($hide_contact_form) ? 'hidden' : ''; ?> animate-fade">
 
-                <form method="post" id="aircraft_booking_request" action="<?php echo esc_url(home_lang().'request_submitted');?>/">
+                <form method="post" id="aircraft_booking_request" action="<?php echo esc_url($this->home_lang.'request_submitted');?>/">
 
                     <div class="modal-header clearfix">
                         <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php echo (esc_html__('Request a Quote', 'dynamicaviation')); ?></h3>

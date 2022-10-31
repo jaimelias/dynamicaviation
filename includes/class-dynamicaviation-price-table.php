@@ -7,12 +7,13 @@ class Dynamic_Aviation_Price_Table {
     public function __construct($utilities)
     {
 		$this->utilities = $utilities;
-        $this->init();
+		add_filter('init', array(&$this, 'init'));
+        add_filter('dy_aviation_price_table', array(&$this, 'table'), 1, 1);
     }
 
     public function init()
     {
-        add_filter('dy_aviation_price_table', array(&$this, 'table'), 1, 1);
+        $this->home_lang = home_lang();
     }
 
 	public function table($iata = '')
@@ -57,7 +58,7 @@ class Dynamic_Aviation_Price_Table {
 				global $post;
 				$base_iata = aviation_field('aircraft_base_iata');
 				$table_price = json_decode(html_entity_decode(aviation_field('aircraft_rates')), true);
-				$aircraft_url = home_lang().esc_html($post->post_type).'/'.esc_html($post->post_name);
+				$aircraft_url = $this->home_lang.$post->post_type.'/'.esc_html($post->post_name);
 				
 				if(!array_key_exists('aircraft_rates_table', $table_price))
 				{
@@ -177,7 +178,7 @@ class Dynamic_Aviation_Price_Table {
 						}
 						else
 						{
-							$destination_url = home_lang() . 'fly/' . $this->utilities->sanitize_pathname($destination_slug);
+							$destination_url = $this->home_lang . 'fly/' . $this->utilities->sanitize_pathname($destination_slug);
 							$destination_link = '<a href="'.esc_url($destination_url).'" title="'.esc_attr(sprintf(__('Flights to %s', 'dynamicaviation'), $destination_airport, $destination_city)).'">'.esc_html($destination_airport).'</a>';
 							$row .= '<td><strong>'.$destination_link.'</strong><br/><small class="text-muted">('.esc_html($destination_iata).')</small>, <span>'.esc_html($destination_city.', '.$destination_country_code).'</span></td>';
 						}

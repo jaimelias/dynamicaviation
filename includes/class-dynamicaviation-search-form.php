@@ -6,13 +6,14 @@ class Dynamic_Aviation_Search_Form {
     
     public function __construct()
     {
-        $this->init();
+        add_action('init', array(&$this, 'init'));
+        add_filter('dy_aviation_full_search_form', array(&$this, 'full_search_form'));
+        add_filter('dy_aviation_search_form', array(&$this, 'search_form'));        
     }
 
     public function init()
     {
-        add_filter('dy_aviation_full_search_form', array(&$this, 'full_search_form'));
-        add_filter('dy_aviation_search_form', array(&$this, 'search_form'));
+        $this->home_lang = home_lang();
     }
 
 	public function full_search_form()
@@ -40,7 +41,7 @@ class Dynamic_Aviation_Search_Form {
     {
 		ob_start(); 
         ?>
-            <form class="aircraft_calculator" method="get" action="<?php echo esc_url(home_lang().'/instant_quote/'); ?>">
+            <form class="aircraft_calculator" method="get" action="<?php echo esc_url($this->home_lang.'/instant_quote/'); ?>">
 
             <div class="bottom-20"><label><i class="linkcolor fas fa-map-marker"></i> <?php echo (esc_html__('Origin', 'dynamicaviation')); ?></label>
             <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo (esc_html__('country / city / airport', 'dynamicaviation')); ?>" /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l"></div>
