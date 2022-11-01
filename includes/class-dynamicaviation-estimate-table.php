@@ -237,11 +237,6 @@ class Dynamic_Aviation_Estimate_Table {
         $diff = array_diff($request_routes, array($base, $base));
         $count_diff = count($diff);
 
-        if($count_diff === 0)
-        {
-            return $default;
-        }
-
         if($count_diff === 1)
         {
             $itinerary = array(
@@ -251,12 +246,7 @@ class Dynamic_Aviation_Estimate_Table {
             //option #1
             $chart = $this->utilities->get_rates_from_itinerary($itinerary, $table_price);
         }
-
-        //this part of the code works perfetly but fails in the price-table.php figing only origin + destionation not including base
-        //option #2 gives incorrect prices on price-table.php
-
-
-        /*  elseif($count_diff === 2)
+        elseif($count_diff === 2)
         {
             $itinerary = array(
                 array($base, $origin),
@@ -281,7 +271,7 @@ class Dynamic_Aviation_Estimate_Table {
         else
         {
             return $default;
-        }*/
+        }
 
         $count_routes = count($itinerary);
         $found_request_in_index = 0;

@@ -61,6 +61,7 @@ class Dynamic_Aviation_Price_Table {
 				$base_iata = aviation_field('aircraft_base_iata');
 				$table_price = json_decode(html_entity_decode(aviation_field('aircraft_rates')), true);
 				$aircraft_url = $this->home_lang.$post->post_type.'/'.$post->post_name;
+				$base = aviation_field( 'aircraft_base_iata', $post->ID);
 				
 				if(!array_key_exists('aircraft_rates_table', $table_price))
 				{
@@ -78,7 +79,8 @@ class Dynamic_Aviation_Price_Table {
 				for($x = 0; $x < count($table_price); $x++)
 				{
 					$row = '';
-
+					$price = 0;
+					$fees = 0;
 					$origin_iata = $table_price[$x][0];
 					$destination_iata = $table_price[$x][1];
 					$destination_slug = '';
@@ -102,6 +104,49 @@ class Dynamic_Aviation_Price_Table {
 
 					if($show_all && $origin_iata !== $destination_iata && !empty($origin_iata) && !empty($destination_iata))
 					{
+
+						$itinerary = array();
+						$chart = array();
+						
+						$request_routes = array($origin_iata, $destination_iata);
+						sort($request_routes);
+				
+						$diff = array_diff($request_routes, array($base, $base));
+						$count_diff = count($diff);
+				
+						if($count_diff === 1)
+						{
+							$itinerary = array(
+								array($origin_iata, $destination_iata)
+							);
+				
+							//option #1
+							$chart = $this->utilities->get_rates_from_itinerary($itinerary, $table_price);
+							write_log('option #1');
+						}
+						elseif($count_diff === 2)
+						{
+							$itinerary = array(
+								array($base, $origin_iata),
+								array($origin_iata, $destination_iata),
+								array($destination_iata, $base)
+							);
+				
+							//option #2
+							$chart = $this->utilities->get_rates_from_itinerary($itinerary, $table_price);
+
+							write_log('option #2');
+						}
+
+						//sum fees and prices
+						for($c = 0; $c < count($chart); $c++)
+						{
+							$price += floatval($chart[$c][3]);
+							$fees += floatval($chart[$c][4]);
+						}
+
+
+
 						$route_name = (!$is_destination_page) 
 							? $origin_iata 
 							: $origin_iata.'_'.$destination_iata;
@@ -155,7 +200,7 @@ class Dynamic_Aviation_Price_Table {
 							);
 						}
 
-						$fees = $table_price[$x][4];
+						
 						$seats = $table_price[$x][6];
 						$weight_pounds = $table_price[$x][7];
 						$weight_kg = intval(floatval($weight_pounds)*0.453592);
@@ -189,7 +234,7 @@ class Dynamic_Aviation_Price_Table {
 							$row .= '<td><i class="fas fa-clock" ></i> '.esc_html($this->utilities->convertNumberToTime($table_price[$x][2])).'</td>';
 						}
 
-						$row .= '<td><strong>'.esc_html('$'.number_format($table_price[$x][3], 2, '.', ',')).'</strong><br/><span class="text-muted">';
+						$row .= '<td><strong>'.esc_html('$'.number_format($price, 2, '.', ',')).'</strong><br/><span class="text-muted">';
 
 						$row .= __('Charter Flight', 'dynamicaviation');
 
