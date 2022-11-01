@@ -239,11 +239,7 @@ class Dynamic_Aviation_Estimate_Table {
             }
         }
 
-        if(count($filtered_table) > $count_routes)
-        {
-            $filtered_table = array_slice($filtered_table, 0, $count_routes);
-        }
-
+        $filtered_table = array_unique($filtered_table, SORT_REGULAR);
 
         for($f = 0; $f < count($filtered_table); $f++)
         {
