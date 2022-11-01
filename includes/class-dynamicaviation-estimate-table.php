@@ -248,9 +248,18 @@ class Dynamic_Aviation_Estimate_Table {
             for($f = 0; $f < count($filtered_table); $f++)
             {
                 $table_routes = array($filtered_table[$f][0], $filtered_table[$f][1]);
+                sort($table_routes);
+
+
                 $this_routes = array($routes[$r][0], $routes[$r][1]);
+                sort($this_routes);
+
+                $request_routes = array($origin, $destination);
+                sort($request_routes);
 
                 $diff_routes_table = array_diff($table_routes, $this_routes);
+                $diff_routes_request = array_diff($request_routes, $this_routes);
+
 
                 if(count($diff_routes_table) === 0)
                 {
@@ -263,11 +272,14 @@ class Dynamic_Aviation_Estimate_Table {
                     $output['fees'] += ($this->get->aircraft_flight === 1)  ? 
                         (2 * floatval($filtered_table[$f][4]))
                         : floatval($filtered_table[$f][4]);
+                }
 
-                        $output['duration'] = floatval($filtered_table[$f][2]);
-                        $output['stops'] = $filtered_table[$f][5];
-                        $output['seats'] = $filtered_table[$f][6];
-                        $output['weight_pounds'] = $filtered_table[$f][7];
+                if(count($diff_routes_request) === 0)
+                {
+                    $output['duration'] = floatval($filtered_table[$f][2]);
+                    $output['stops'] = $filtered_table[$f][5];
+                    $output['seats'] = $filtered_table[$f][6];
+                    $output['weight_pounds'] = $filtered_table[$f][7];
                 }
             }
         }
