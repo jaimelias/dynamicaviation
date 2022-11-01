@@ -272,7 +272,6 @@ class Dynamic_Aviation_Price_Table {
 					$table .= '<th>'.esc_html(__('Destination', 'dynamicaviation')).'</th>';
 				}
 
-				
 				if(!$is_aircraft_page)
 				{
 					$table .= '<th>'.esc_html(__('Passengers', 'dynamicaviation')).'</th>';

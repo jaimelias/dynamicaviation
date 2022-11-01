@@ -253,6 +253,8 @@ class Dynamic_Aviation_Estimate_Table {
         }
 
         //this part of the code works perfetly but fails in the price-table.php figing only origin + destionation not including base
+        //option #2 gives incorrect prices on price-table.php
+
 
         /*  elseif($count_diff === 2)
         {
