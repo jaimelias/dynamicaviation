@@ -250,7 +250,7 @@ class Dynamic_Aviation_Utilities {
 		return $output;
 	}
 
-    public function get_rates_from_routes($routes, $table_price)
+    public function get_rates_from_itinerary($routes, $table_price)
     {
         $output = array();
         $rows = array();

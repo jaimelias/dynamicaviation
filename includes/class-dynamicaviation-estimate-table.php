@@ -158,6 +158,67 @@ class Dynamic_Aviation_Estimate_Table {
 		    return $content;
     } 
 
+    public function get_rates($itinerary, $table_price)
+    {
+        $output = array();
+        $rows = array();
+        $count_routes = count($itinerary);
+
+        for($r = 0; $r < $count_routes; $r++)
+        {
+            $o = $itinerary[$r][0];
+            $d = $itinerary[$r][1];
+
+            $row = array_filter($table_price, function($i) use($o, $d){
+
+                //table
+                $a1 = array($i[0], $i[1]);
+                sort($a1);
+
+                //route
+                $a2 = array($o, $d);
+                sort($a2);
+
+
+                if(count(array_diff($a1, $a2)) === 0)
+                {
+                    return true;
+                }
+            });
+
+            if($row > 0)
+            {
+                array_push($rows, ...$row);
+            }
+        }
+
+
+        if(count($rows) === $count_routes)
+        {
+            $output = $rows;
+
+            if($count_routes === 3)
+            {
+                $output = array_map(function($v, $i){
+
+                    //divides the rate in to 2
+                    if($i === 0 || $i === 2)
+                    {
+                        $v[3] = floatval($v[3]) / 2;
+                    }
+
+                    return $v;
+                }, $output, array_keys($output));
+            }
+
+            return $output;
+        }
+        else
+        {
+            return array();
+        }
+    }
+
 
     public function get_routes($aicraft_id, $origin, $destination, $table_price)
     {
@@ -167,7 +228,7 @@ class Dynamic_Aviation_Estimate_Table {
         );
 
         $output = $default;
-        $routes = array();
+        $itinerary = array();
         $chart = array();
         $base = aviation_field( 'aircraft_base_iata', $aicraft_id);
         $request_routes = array($origin, $destination);
@@ -183,12 +244,12 @@ class Dynamic_Aviation_Estimate_Table {
 
         if($count_diff === 1)
         {
-            $routes = array(
+            $itinerary = array(
                 array($origin, $destination)
             );
 
             //option #1
-            $chart = $this->utilities->get_rates_from_routes($routes, $table_price);
+            $chart = $this->utilities->get_rates_from_itinerary($itinerary, $table_price);
         }
 
         //this part of the code works perfetly but fails in the price-table.php figing only origin + destionation not including base
@@ -197,24 +258,24 @@ class Dynamic_Aviation_Estimate_Table {
 
         /*  elseif($count_diff === 2)
         {
-            $routes = array(
+            $itinerary = array(
                 array($base, $origin),
                 array($origin, $destination),
                 array($destination, $base)
             );
 
             //option #2
-            $chart = $this->get_rates_from_routes($routes, $table_price);
+            $chart = $this->utilities->get_rates_from_itinerary($itinerary, $table_price);
 
             if(count($chart) === 0)
             {
-                $routes = array(
+                $itinerary = array(
                     array($base, $origin),
                     array($destination, $base)
                 );
 
                 //option #3
-                $chart = $this->get_rates_from_routes($routes, $table_price);
+                $chart = $this->utilities->get_rates_from_itinerary($itinerary, $table_price);
             }
         }
         else
@@ -222,7 +283,7 @@ class Dynamic_Aviation_Estimate_Table {
             return $default;
         }*/
 
-        $count_routes = count($routes);
+        $count_routes = count($itinerary);
         $found_request_in_index = 0;
 
         for($f = 0; $f < count($chart); $f++)
@@ -270,28 +331,28 @@ class Dynamic_Aviation_Estimate_Table {
 
         $origin = $this->get->aircraft_origin;
         $destination = $this->get->aircraft_destination;
-        $routes = $this->get_routes($post->ID, $origin, $destination, $table_price);
+        $itinerary = $this->get_routes($post->ID, $origin, $destination, $table_price);
 
-        if(!$routes)
+        if(!$itinerary)
         {
             return '';
         }
 
-        if(!isset($routes['price']) ||  !isset($routes['duration']))
+        if(!isset($itinerary['price']) ||  !isset($itinerary['duration']))
         {
             return '';
         }
 
-        if($routes['price'] === 0 || $routes['duration'] === 0)
+        if($itinerary['price'] === 0 || $itinerary['duration'] === 0)
         {
             return '';
         }
 
-        $price = $routes['price'];
-        $fees = $routes['fees'];
-        $duration = $routes['duration'];
-        $seats = $routes['seats'];
-        $weight_pounds = $routes['weight_pounds'];
+        $price = $itinerary['price'];
+        $fees = $itinerary['fees'];
+        $duration = $itinerary['duration'];
+        $seats = $itinerary['seats'];
+        $weight_pounds = $itinerary['weight_pounds'];
         $aircraft_price = $price + ($fees * $this->get->aircraft_pax);
         $weight_kg = intval($weight_pounds * 0.453592);
         $weight_allowed = esc_html($weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation'));
