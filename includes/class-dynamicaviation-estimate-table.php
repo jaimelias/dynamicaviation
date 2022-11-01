@@ -168,96 +168,113 @@ class Dynamic_Aviation_Estimate_Table {
         );
 
         $output = $default;
+        $filtered_table = array();
         $routes = array();
         $base = aviation_field( 'aircraft_base_iata', $aicraft_id);
         $diff = array_diff(array($origin, $destination), array($base, $base));
         $count_diff = count($diff);
 
-        if($count_diff > 0)
+        if($count_diff === 0)
         {
-            if($count_diff === 1)
-            {
-                 //do not modify of will generate >0 result in array_diff
-
-                $routes = array(
-                    array($origin, $destination)
-                );
-            }
-            elseif($count_diff === 2)
-            {
-                 //do not modify of will generate >0 result in array_diff
-
-                $routes = array(
-                    array(
-                        'origin' => $base, 
-                        'destination' => $origin),
-                    array(
-                        'origin' => $origin, 
-                        'destination' => $destination)
-                );
-            }
-
-            $count_routes = count($routes);
-
-            if($count_routes > 0 && count($table_price) > 0)
-            {
-                for($t = 0; $t < count($table_price); $t++)
-                {
-                    if(!$table_price[$t][0] || !$table_price[$t][1] || floatval($table_price[$t][3]) === 0 || $this->get->aircraft_pax > intval($table_price[$t][6]))
-                    {
-                        continue;
-                    }
-
-                    //do not modify of will generate >0 result in array_diff
-
-                    $row = array(
-                        'origin' => $table_price[$t][0],
-                        'destination' => $table_price[$t][1]
-                    );
-
-                    for($r = 0; $r < $count_routes; $r++)
-                    {   
-                        $diff_routes_table = array_diff($row, $routes[$r]);
-                        $diff_routes_request = array_diff(array($origin, $destination), $routes[$r]);
-
-                        if(count($diff_routes_table) === 0)
-                        {
-                            $this_route = $routes[$r];
-
-                            $output['price'] += ($this->get->aircraft_flight === 1) 
-                                ? (2 * floatval($table_price[$t][3]))
-                                : floatval($table_price[$t][3]);
-
-                            $output['fees'] += ($this->get->aircraft_flight === 1)  ? 
-                                (2 * floatval($table_price[$t][4]))
-                                : floatval($table_price[$t][4]);
-
-
-                            if(count($diff_routes_request) === 0)
-                            {
-                                $output['duration'] = floatval($table_price[$t][2]);
-                                $output['stops'] = $table_price[$t][5];
-                                $output['seats'] = $table_price[$t][6];
-                                $output['weight_pounds'] = $table_price[$t][7];
-                            }
-                    
-                            array_push($output['itinerary'], $this_route);
-                        }
-                    }
-                }               
-            }
-
-            if($count_routes !== count($output['itinerary']))
-            {
-                $output = $default;
-            }            
-
+            return $default;
         }
 
+        if($count_diff === 1)
+        {
+                //do not modify of will generate >0 result in array_diff
 
+            $routes = array(
+                array($origin, $destination)
+            );
+        }
+        elseif($count_diff === 2)
+        {
+            //do not modify of will generate >0 result in array_diff
+            $routes = array(
+                array($base, $origin),
+                array($origin, $destination),
+                array($destination, $base)
+            );
+        }
+        else
+        {
+            return $default;
+        }
 
+        $count_routes = count($routes);
+
+        if($count_routes > 0 && count($table_price) > 0)
+        {
+            for($t = 0; $t < count($table_price); $t++)
+            {
+                if(!$table_price[$t][0] || !$table_price[$t][1] || floatval($table_price[$t][3]) === 0 || $this->get->aircraft_pax > intval($table_price[$t][6]))
+                {
+                    continue;
+                }
+
+                $table_routes = array($table_price[$t][0], $table_price[$t][1]);
+                sort($table_routes);
+
+                $request_routes = array($origin, $destination);
+                sort($request_routes);
+
+                $diff_request_table = array_diff($request_routes, $table_routes);
+       
+
+                if(count($diff_request_table) > 1)
+                {
+                    //do nothing
+                }
+                else
+                {
+                    $filtered_table[] = $table_price[$t];
+                }
+            }               
+        }
+        else
+        {
+            return $default;
+        }
+
+        if(count($filtered_table) === 0)
+        {
+            return $default;
+        }
+
+      
+
+        for($r = 0; $r < $count_routes; $r++)
+        {
+            for($f = 0; $f < count($filtered_table); $f++)
+            {
+                $table_routes = array($filtered_table[$f][0], $filtered_table[$f][1]);
+                $this_routes = array($routes[$r][0], $routes[$r][1]);
+
+                $diff_routes_table = array_diff($table_routes, $this_routes);
+
+                if(count($diff_routes_table) === 0)
+                {
+                    array_push($output['itinerary'], $this_routes);
+
+                    $output['price'] += ($this->get->aircraft_flight === 1) 
+                    ? (2 * floatval($filtered_table[$f][3]))
+                    : floatval($filtered_table[$f][3]);
+
+                    $output['fees'] += ($this->get->aircraft_flight === 1)  ? 
+                        (2 * floatval($filtered_table[$f][4]))
+                        : floatval($filtered_table[$f][4]);
+
+                        $output['duration'] = floatval($filtered_table[$f][2]);
+                        $output['stops'] = $filtered_table[$f][5];
+                        $output['seats'] = $filtered_table[$f][6];
+                        $output['weight_pounds'] = $filtered_table[$f][7];
+                }
+            }
+        }
 
         return $output;
+
+        
     }
 
     public function iterate_rows($post, $table_price)
@@ -271,6 +288,11 @@ class Dynamic_Aviation_Estimate_Table {
         $origin = $this->get->aircraft_origin;
         $destination = $this->get->aircraft_destination;
         $routes = $this->get_routes($post->ID, $origin, $destination, $table_price);
+
+        if(!$routes)
+        {
+            return '';
+        }
 
         if(count($routes['itinerary']) === 0)
         {
