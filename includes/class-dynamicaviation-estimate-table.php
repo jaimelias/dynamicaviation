@@ -158,60 +158,18 @@ class Dynamic_Aviation_Estimate_Table {
 		    return $content;
     } 
 
-    public function get_routes($aicraft_id, $origin, $destination, $table_price)
+    public function get_rates($routes, $table_price)
     {
-        $default = array(
-            'itinerary' => array(),
-            'price' => 0,
-            'fees' => 0,
-            'duration' => 0,
-            'stops' => 0,
-            'seats' => 0,
-            'weight_pounds' => 0
-        );
-
-        $output = $default;
-        $routes = array();
-        $base = aviation_field( 'aircraft_base_iata', $aicraft_id);
-        $diff = array_diff(array($origin, $destination), array($base, $base));
-        $count_diff = count($diff);
-
-        if($count_diff === 0)
-        {
-            return $default;
-        }
-
-        if($count_diff === 1)
-        {
-                //do not modify of will generate >0 result in array_diff
-
-            $routes = array(
-                array($origin, $destination)
-            );
-        }
-        elseif($count_diff === 2)
-        {
-            //do not modify of will generate >0 result in array_diff
-            $routes = array(
-                array($base, $origin),
-                array($destination, $base)
-            );
-        }
-        else
-        {
-            return $default;
-        }
-
+        $output = array();
+        $rows = array();
         $count_routes = count($routes);
-      
-        $filtered_table = array();
 
         for($r = 0; $r < $count_routes; $r++)
         {
             $o = $routes[$r][0];
             $d = $routes[$r][1];
 
-            $row = array_filter($table_price, function($i) use($o, $d, $destination, $base){
+            $row = array_filter($table_price, function($i) use($o, $d){
 
                 //table
                 $a1 = array($i[0], $i[1]);
@@ -221,12 +179,8 @@ class Dynamic_Aviation_Estimate_Table {
                 $a2 = array($o, $d);
                 sort($a2);
 
-                //custom
-                $a3 = array($destination, $base);
-                sort($a3);
 
-
-                if(count(array_diff($a1, $a2)) === 0 || count(array_diff($a1, $a3)) === 0)
+                if(count(array_diff($a1, $a2)) === 0)
                 {
                     return true;
                 }
@@ -234,60 +188,131 @@ class Dynamic_Aviation_Estimate_Table {
 
             if($row > 0)
             {
-
-                array_push($filtered_table, ...$row);
+                array_push($rows, ...$row);
             }
         }
 
-        $filtered_table = array_unique($filtered_table, SORT_REGULAR);
 
-        for($f = 0; $f < count($filtered_table); $f++)
+        if(count($rows) === $count_routes)
         {
-            $table_routes = array($filtered_table[$f][0], $filtered_table[$f][1]);
-            sort($table_routes);
+            $output = $rows;
 
-            $request_routes = array($origin, $destination);
-            sort($request_routes);
-
-            $diff_routes_table = array_diff($table_routes, $request_routes);
-
-            array_push($output['itinerary'], $table_routes);
-
-            $output['price'] += ($this->get->aircraft_flight === 1) 
-            ? (2 * floatval($filtered_table[$f][3]))
-            : floatval($filtered_table[$f][3]);
-
-            $output['fees'] += ($this->get->aircraft_flight === 1)  ? 
-                (2 * floatval($filtered_table[$f][4]))
-                : floatval($filtered_table[$f][4]);
-
-                
-            $output['duration'] += floatval($filtered_table[$f][2]);
-
-            if(!$output['stops'])
+            if($count_routes === 3)
             {
-                $output['stops'] = $filtered_table[$f][5];
-            }
-            
-            if(!$output['seats'])
-            {
-                $output['seats'] = $filtered_table[$f][6];
-            }
-            
-            if(!$output['weight_pounds'])
-            {
-                $output['weight_pounds'] = $filtered_table[$f][7];
-            }
-        }
+                $output = array_map(function($v, $i){
 
-        if(count($output['itinerary']) === $count_routes)
-        {
+                    //divides the rate in to 2
+                    if($i === 0 || $i === 2)
+                    {
+                        $v[3] = floatval($v[3]) / 2;
+                    }
+
+                    return $v;
+                }, $output, array_keys($output));
+            }
+
             return $output;
+        }
+        else
+        {
+            return array();
+        }
+    }
+
+
+    public function get_routes($aicraft_id, $origin, $destination, $table_price)
+    {
+        $default = array(
+            'price' => 0,
+            'fees' => 0
+        );
+
+        $output = $default;
+        $routes = array();
+        $base = aviation_field( 'aircraft_base_iata', $aicraft_id);
+        $request_routes = array($origin, $destination);
+        sort($request_routes);
+
+        $diff = array_diff($request_routes, array($base, $base));
+        $count_diff = count($diff);
+
+        if($count_diff === 0)
+        {
+            return $default;
+        }
+
+        if($count_diff === 1)
+        {
+            $routes = array(
+                array($origin, $destination)
+            );
+
+            //option #1
+            $chart = $this->get_rates($routes, $table_price);
+        }
+        elseif($count_diff === 2)
+        {
+            $routes = array(
+                array($base, $origin),
+                array($origin, $destination),
+                array($destination, $base)
+            );
+
+            //option #2
+            $chart = $this->get_rates($routes, $table_price);
+
+            if(count($chart) === 0)
+            {
+                $routes = array(
+                    array($base, $origin),
+                    array($destination, $base)
+                );
+
+                //option #3
+                $chart = $this->get_rates($routes, $table_price);
+            }
         }
         else
         {
             return $default;
         }
+
+        $count_routes = count($routes);
+        $found_request_in_index = 0;
+
+        for($f = 0; $f < count($chart); $f++)
+        {
+            $chart_routes = array($chart[$f][0], $chart[$f][1]);
+            sort($chart_routes);
+            $diff_chart_request = array_diff($request_routes, $chart_routes);
+
+            $output['price'] += ($this->get->aircraft_flight === 1) 
+            ? (2 * floatval($chart[$f][3]))
+            : floatval($chart[$f][3]);
+
+            $output['fees'] += ($this->get->aircraft_flight === 1)  ? 
+                (2 * floatval($chart[$f][4]))
+                : floatval($chart[$f][4]);
+
+            
+            if(count($diff_chart_request) === 0)
+            {
+                $found_request_in_index = $f;
+            }
+        }
+
+        for($i = 0; $i < count($chart); $i++)
+        {
+            if($i === $found_request_in_index)
+            {
+                $output['duration'] = floatval($chart[$i][2]);
+                $output['stops'] = $chart[$i][5];
+                $output['seats'] = $chart[$i][6];
+                $output['weight_pounds'] = $chart[$i][7];
+            }
+        }
+
+        return $output;
     }
 
     public function iterate_rows($post, $table_price)
@@ -303,11 +328,6 @@ class Dynamic_Aviation_Estimate_Table {
         $routes = $this->get_routes($post->ID, $origin, $destination, $table_price);
 
         if(!$routes)
-        {
-            return '';
-        }
-
-        if(count($routes['itinerary']) === 0)
         {
             return '';
         }
