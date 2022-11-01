@@ -287,8 +287,8 @@ class Dynamic_Aviation_Estimate_Table {
             $diff_chart_request = array_diff($request_routes, $chart_routes);
 
             $output['price'] += ($this->get->aircraft_flight === 1) 
-            ? (2 * floatval($chart[$f][3]))
-            : floatval($chart[$f][3]);
+                ? (2 * floatval($chart[$f][3]))
+                : floatval($chart[$f][3]);
 
             $output['fees'] += ($this->get->aircraft_flight === 1)  ? 
                 (2 * floatval($chart[$f][4]))
@@ -332,7 +332,12 @@ class Dynamic_Aviation_Estimate_Table {
             return '';
         }
 
-        if($routes['price'] === 0 && $routes['duration'] === 0)
+        if(!isset($routes['price']) ||  !isset($routes['duration']))
+        {
+            return '';
+        }
+
+        if($routes['price'] === 0 || $routes['duration'] === 0)
         {
             return '';
         }
