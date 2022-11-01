@@ -177,10 +177,14 @@ class Dynamic_Aviation_Price_Table {
 							$row .= '<td><strong>'.$destination_link.'</strong><br/><small class="text-muted">('.esc_html($destination_iata).')</small>, <span>'.esc_html($destination_city.', '.$destination_country_code).'</span></td>';
 						}
 						
+
+						if(!$is_aircraft_page)
+						{
+							$row .= '<td><strong><i class="fas fa-male" ></i> '.esc_html($seats).' </strong><br/><small>'.esc_html($weight_allowed).'</small></td>';
+						}
 						
 						if(!$this->is_mobile)
 						{
-							$row .= '<td><strong><i class="fas fa-male" ></i> '.esc_html($seats).' </strong><br/><small>'.esc_html($weight_allowed).'</small></td>';
 
 							$row .= '<td><i class="fas fa-clock" ></i> '.esc_html($this->utilities->convertNumberToTime($table_price[$x][2])).'</td>';
 						}
@@ -269,10 +273,14 @@ class Dynamic_Aviation_Price_Table {
 				}
 
 				
+				if(!$is_aircraft_page)
+				{
+					$table .= '<th>'.esc_html(__('Passengers', 'dynamicaviation')).'</th>';
+				}
 
 				if(!$this->is_mobile)
 				{
-					$table .= '<th>'.esc_html(__('Passengers', 'dynamicaviation')).'</th>';
+					
 					$table .= '<th>'.esc_html(__('Duration', 'dynamicaviation')).'</th>';
 				}
 				
