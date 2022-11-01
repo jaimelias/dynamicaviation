@@ -76,15 +76,8 @@ class Dynamic_Aviation_Meta_Box
 		$this->echo_nonce();
 		
 		$aircraft_type = aviation_field('aircraft_type');
-		$aircraft_commercial = aviation_field( 'aircraft_commercial' );
 		
 		?>
-		<p><label for="aircraft_commercial"><?php _e( 'Type of Transport', 'dynamicaviation' ); ?></label><br>
-			<select name="aircraft_commercial" id="aircraft_commercial">
-				<option value="0" <?php echo ($aircraft_commercial == 0 ) ? 'selected' : '' ?>><?php _e( 'Charter Flight', 'dynamicaviation' ); ?></option>
-				<option value="1" <?php echo ($aircraft_commercial == 1 ) ? 'selected' : '' ?>><?php _e( 'Commercial Flight', 'dynamicaviation' ); ?></option>
-			</select>
-		</p>	
 
 
 		<?php $this->base_field(); ?>
@@ -164,10 +157,7 @@ class Dynamic_Aviation_Meta_Box
 	public function save( $post_id ) {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
 		if ( ! isset( $_POST['aviation_nonce'] ) || ! wp_verify_nonce( $_POST['aviation_nonce'], '_aviation_nonce' ) ) return;
-		if ( ! current_user_can( 'edit_post', $post_id ) ) return;
-		
-		if ( isset( $_POST['aircraft_commercial'] ) )
-			update_post_meta( $post_id, 'aircraft_commercial', esc_attr( $_POST['aircraft_commercial'] ) );		
+		if ( ! current_user_can( 'edit_post', $post_id ) ) return;	
 		
 		if ( isset( $_POST['aircraft_rates'] ) )
 			update_post_meta( $post_id, 'aircraft_rates', esc_attr( $_POST['aircraft_rates'] ) );

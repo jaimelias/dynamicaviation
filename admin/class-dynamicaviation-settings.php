@@ -13,7 +13,6 @@ class Dynamic_Aviation_Settings
 		add_action('admin_init', array(&$this, 'settings_init'));
 	}
 
-
 	public function add_settings_page()
 	{
 		add_submenu_page('edit.php?post_type=aircrafts', 'Dynamic Aviation - Settings', 'Settings', 'manage_options', 'dynamicaviation', array(&$this, 'settings_page'));

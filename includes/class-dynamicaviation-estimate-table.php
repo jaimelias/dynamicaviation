@@ -78,27 +78,8 @@ class Dynamic_Aviation_Estimate_Table {
         return $output;
     }
 
-    public function capacity_args()
-    {
-        return array(
-            'key' => 'aircraft_passengers',
-            'value' => $this->get->aircraft_pax,
-            'type' => 'numeric',
-            'compare' => '>='
-        );       
-    }
 
-    public function query_args()
-    {
-        return array(
-            'post_type' => 'aircrafts',
-            'posts_per_page' => 200,
-            'meta_query' => array($this->capacity_args()),
-			'meta_key' => 'aircraft_price_per_hour',
-			'orderby' => 'meta_value_num',
-			'order' => 'ASC'
-        );
-    }
+
 
     public function not_found()
     {
@@ -175,10 +156,99 @@ class Dynamic_Aviation_Estimate_Table {
             endif;
 
 		    return $content;
+    } 
+
+    public function get_routes($aicraft_id, $origin, $destination, $table_price)
+    {
+        $output = array(
+            'itinerary' => array(),
+            'price' => 0,
+            'fees' => 0
+        );
+        $routes = array();
+        $base = aviation_field( 'aircraft_base_iata', $aicraft_id);
+        $diff = array_diff(array($origin, $destination), array($base, $base));
+        $count_diff = count($diff);
+
+        if($count_diff > 0)
+        {
+            if($count_diff === 1)
+            {
+                 //do not modify of will generate >0 result in array_diff
+
+                $routes = array(
+                    array($origin, $destination)
+                );
+            }
+            elseif($count_diff === 2)
+            {
+                 //do not modify of will generate >0 result in array_diff
+
+                $routes = array(
+                    array(
+                        'origin' => $base, 
+                        'destination' => $origin),
+                    array(
+                        'origin' => $origin, 
+                        'destination' => $destination)
+                );
+            }
+
+            if(count($routes) > 0 && count($table_price) > 0)
+            {
+                for($t = 0; $t < count($table_price); $t++)
+                {
+                    if(!$table_price[$t][0] || !$table_price[$t][1] || floatval($table_price[$t][3]) === 0 || $this->get->aircraft_pax > intval($table_price[$t][6]))
+                    {
+                        continue;
+                    }
+
+                    //do not modify of will generate >0 result in array_diff
+
+                    $row = array(
+                        'origin' => $table_price[$t][0],
+                        'destination' => $table_price[$t][1]
+                    );
+
+                    for($r = 0; $r < count($routes); $r++)
+                    {   
+                        $diff_routes_table = array_diff($row, $routes[$r]);
+                        $diff_routes_request = array_diff(array($origin, $destination), $routes[$r]);
+
+                        if(count($diff_routes_table) === 0)
+                        {
+                            $this_route = $routes[$r];
+
+                            $output['price'] += ($this->get->aircraft_flight === 1) 
+                                ? (2 * floatval($table_price[$t][3]))
+                                : floatval($table_price[$t][3]);
+
+                            $output['fees'] += ($this->get->aircraft_flight === 1)  ? 
+                                (2 * floatval($table_price[$t][4]))
+                                : floatval($table_price[$t][4]);
+
+
+                            if(count($diff_routes_request) === 0)
+                            {
+                                $output['duration'] = floatval($table_price[$t][2]);
+                                $output['stops'] = $table_price[$t][5];
+                                $output['seats'] = $table_price[$t][6];
+                                $output['payload'] = $table_price[$t][7];
+                            }
+                    
+                            array_push($output['itinerary'], $this_route);
+                        }
+                    }
+                }               
+            }
+
+        }
+
+
+        return $output;
     }
 
-
-    public function iterate_rows($post, $table_price, $is_commercial)
+    public function iterate_rows($post, $table_price)
     {
         $table = '';
         $aircraft_url = $this->home_lang.$post->post_type.'/'.$post->post_name;
@@ -187,11 +257,32 @@ class Dynamic_Aviation_Estimate_Table {
         $large_attr = (!$this->is_mobile) ? ' class="large" ' : ''; 
         $align_left_attr = (!$this->is_mobile) ? ' class="text-left" ' : '';
 
+        $origin = $this->get->aircraft_origin;
+        $destination = $this->get->aircraft_destination;
+        $routes = $this->get_routes($post->ID, $origin, $destination, $table_price);
+
+        if($routes['price'] === 0 && $routes['duration'] === 0)
+        {
+            return '';
+        }
+
+        $price = $routes['price'];
+        $fees = $routes['fees'];
+        $duration = $routes['duration'];
+        $stops = $routes['seats'];
+        $payload = $routes['payload'];
+        $total = $price + $fees;
+
+
+        write_log('estimate-table > iterate_rows');
+        write_log(json_encode($routes));
+
+
 		for($x = 0; $x < count($table_price); $x++)
 		{
             $rates = $table_price[$x];
 
-            $diff = array_diff(array($this->get->aircraft_origin, $this->get->aircraft_destination), array($rates[0], $rates[1]));
+            $diff = array_diff(array($origin, $destination), array($rates[0], $rates[1]));
 
 			if(count($diff) === 0)
 			{
@@ -202,12 +293,6 @@ class Dynamic_Aviation_Estimate_Table {
 				$weight_pounds = intval($rates[7]);
 				$weight_kg = intval($weight_pounds * 0.453592);
 				$weight_allowed = esc_html($weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation'));
-				
-				
-				if($is_commercial)
-				{
-					$price = $price * $this->get->aircraft_pax;
-				}
 
 				if($this->get->aircraft_flight === 1)
 				{
@@ -220,7 +305,7 @@ class Dynamic_Aviation_Estimate_Table {
                 $flight_array = array(
                     'aircraft_price' => $aircraft_price,
                     'aircraft_name' => $post->post_title,
-                    'aircraft_id' => intval($post->ID),
+                    'aircraft_id' => $post->ID,
                     'aircraft_seats' => $seats,
                     'aircraft_weight' => $weight_allowed,
                     'aircraft_url' => esc_url($aircraft_url)
@@ -228,35 +313,20 @@ class Dynamic_Aviation_Estimate_Table {
 				
 				$aircraft_col = ($this->is_mobile) ? '<a href="'.esc_url($aircraft_url).'">'.$thumbnail.'</a><br/>' : '';            
 				
-				if($is_commercial)
-				{
+                $aircraft_col .= '<a class="strong" href="'.esc_url($aircraft_url).'">'.esc_html($post->post_title).'</a><br/><small>'.esc_html($this->utilities->aircraft_type(aviation_field( 'aircraft_type', $post->ID))).'</small> <strong><i class="fas fa-male" aria-hidden="true"></i> '.esc_html($seats).'</strong><br/><small>'.esc_html('Max').' ('.$weight_allowed.')</small>';
 
-                    $aircraft_col .= '<strong>'.esc_html(__('Commercial Flight', 'dynamicaviation')).'</strong>';
-
-					$price_col = '<small class="text-muted">USD</small><br/><strong class="large">'.esc_html('$'.number_format($price, 0, '.', ',')).'</strong><br /><span class="small text-muted">'.esc_html('$'.number_format(($price / $this->get->aircraft_pax), 0, '.', ',')).' '.esc_html(__('Per Person', 'dynamicaviation')).'</span>';
-					
-					if(floatval($fees) > 0)
-					{
-						$price_col .= '<br/><span class="text-muted">'.__('Fees per pers.', 'dynamicaviation').' $'.number_format($fees, 0, '.', ',').'</span>';
-					}
-				}
-				else
-				{
-					$aircraft_col .= '<a class="strong" href="'.esc_url($aircraft_url).'">'.esc_html($post->post_title).'</a><br/><small>'.esc_html($this->utilities->aircraft_type(aviation_field( 'aircraft_type' ))).'</small> <strong><i class="fas fa-male" aria-hidden="true"></i> '.esc_html($seats).'</strong><br/><small>'.esc_html('Max').' ('.$weight_allowed.')</small>';
-
-					$price_col = '<small class="text-muted">USD</small><br/><strong '.$large_attr.'><span class="text-muted">$</span>'.esc_html(number_format($price, 2, '.', ',')).'</strong>';
-					
-					if(floatval($fees) > 0)
-					{
-						$price_col .= '<br/><span class="text-muted">'.__('Fees per pers.', 'dynamicaviation').' $'.esc_html(number_format($fees, 2, '.', ',')).'</span>';
-					}
-                    
-                    if($this->is_mobile)
-                    {
-                        //duration in mobile
-                        $price_col .= '<hr style="margin-top: 10px; margin-bottom: 10px;"/><small class="text-muted"><i class="text-muted fas fa-clock" aria-hidden="true"></i></small><br/><strong '.$large_attr.'>'.esc_html($this->utilities->convertNumberToTime($duration)).'</strong>';
-                    }                    
-				}			
+                $price_col = '<small class="text-muted">USD</small><br/><strong '.$large_attr.'><span class="text-muted">$</span>'.esc_html(number_format($price, 2, '.', ',')).'</strong>';
+                
+                if(floatval($fees) > 0)
+                {
+                    $price_col .= '<br/><span class="text-muted">'.__('Fees per pers.', 'dynamicaviation').' $'.esc_html(number_format($fees, 2, '.', ',')).'</span>';
+                }
+                
+                if($this->is_mobile)
+                {
+                    //duration in mobile
+                    $price_col .= '<hr style="margin-top: 10px; margin-bottom: 10px;"/><small class="text-muted"><i class="text-muted fas fa-clock" aria-hidden="true"></i></small><br/><strong '.$large_attr.'>'.esc_html($this->utilities->convertNumberToTime($duration)).'</strong>';
+                }			
 				
 				$row = '<tr>';
 				
@@ -361,7 +431,24 @@ class Dynamic_Aviation_Estimate_Table {
     {
         $output = '';
         $rows = '';
-        $wp_query = new WP_Query($this->query_args());
+
+        $capacity_args = array(
+            'key' => 'aircraft_passengers',
+            'value' => $this->get->aircraft_pax,
+            'type' => 'numeric',
+            'compare' => '>='
+        );
+
+        $query_args = array(
+            'post_type' => 'aircrafts',
+            'posts_per_page' => 200,
+            'meta_query' => array($capacity_args),
+			'meta_key' => 'aircraft_price_per_hour',
+			'orderby' => 'meta_value_num',
+			'order' => 'ASC'
+        );
+
+        $wp_query = new WP_Query($query_args);
         
         if ($wp_query->have_posts())
         {
@@ -379,7 +466,7 @@ class Dynamic_Aviation_Estimate_Table {
                 $wp_query->the_post();
                 global $post;
                
-                $table_price = json_decode(html_entity_decode(aviation_field('aircraft_rates')), true);
+                $table_price = json_decode(html_entity_decode(aviation_field('aircraft_rates', $post->ID)), true);
 
                 if(array_key_exists('aircraft_rates_table', $table_price))
                 {
@@ -389,8 +476,7 @@ class Dynamic_Aviation_Estimate_Table {
                     {
                         if(count($aircraft_rates_table) > 0)
                         {
-                            $is_commercial = (intval(aviation_field( 'aircraft_commercial')) === 1) ? true : false;
-                            $rows .= $this->iterate_rows($post, $aircraft_rates_table, $is_commercial);
+                            $rows .= $this->iterate_rows($post, $aircraft_rates_table);
                         }
                     }
 
@@ -403,7 +489,6 @@ class Dynamic_Aviation_Estimate_Table {
             {
                 $output .= $this->table_container($rows);
                 $output .= $this->request_form(true);
-                $output .= $this->connected_packages();
             }
             else
             {
@@ -416,6 +501,8 @@ class Dynamic_Aviation_Estimate_Table {
             $output = $this->not_found();
             $output .= $this->request_form(false);
         }
+
+        $output .= $this->connected_packages();
 
         return $output;
     }
@@ -451,11 +538,13 @@ class Dynamic_Aviation_Estimate_Table {
             while ( $wp_query->have_posts() )
             {
                 $wp_query->the_post();
-                $base_iata = aviation_field('aircraft_base_iata');
+                global $post;
+
+                $base_iata = aviation_field('aircraft_base_iata', $post->ID);
 
                 if($base_iata)
                 {
-                    $connected_ids = $this->utilities->items_per_line_to_array(aviation_field('aircraft_connected_packages'));
+                    $connected_ids = $this->utilities->items_per_line_to_array(aviation_field('aircraft_connected_packages', $post->ID));
 
                     for($x = 0; $x < count($connected_ids); $x++ )
                     {

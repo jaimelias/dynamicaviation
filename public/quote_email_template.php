@@ -1,5 +1,7 @@
 <?php
 
+$transport_title = __('Charter Flight', 'dynamicaviation');
+$this_id = sanitize_text_field($_POST['aircraft_id']);
 $aircraft_price = sanitize_text_field($_POST['aircraft_price']);
 $aircraft_name = sanitize_text_field($_POST['aircraft_name']);
 $aircraft_seats = sanitize_text_field($_POST['aircraft_seats']);
@@ -7,9 +9,7 @@ $aircraft_weight = sanitize_text_field($_POST['aircraft_weight']);
 $aircraft_url = sanitize_text_field($_POST['aircraft_url']);
 $passengers = sanitize_text_field($_POST['aircraft_pax']);
 $aircraft_settings = $aircraft_name . ' ('.$aircraft_seats.' '.__('seats or', 'dynamicaviation').' '.$aircraft_weight.')';
-$aircraft_link = ($is_commercial) 
-	? $aircraft_name
-	:'<a href="'.esc_url($aircraft_url).'">'.esc_html($aircraft_settings).'</a>';
+$aircraft_link = '<a href="'.esc_url($aircraft_url).'">'.esc_html($aircraft_settings).'</a>';
 
 $today = date_i18n(get_option('date_format'), strtotime(null));
 $label_doc = __('Estimate', 'dynamicpackages');

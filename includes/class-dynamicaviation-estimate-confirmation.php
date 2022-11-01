@@ -36,6 +36,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 
 		//notes
 		add_filter('dy_aviation_estimate_notes', array(&$this, 'estimate_notes'));
+		add_filter('dy_aviation_estimate_subject', array(&$this, 'subject'));
     }
 
     public function init()
@@ -135,6 +136,20 @@ class Dynamic_Aviation_Estimate_Confirmation
         return $title;
     }
 
+	public function subject($output)
+	{
+		if(!isset($_POST['aircraft_id']))
+		{
+			$output = sprintf(__('%s, Your request has been sent to our specialists at %s!', 'dynamicaviation'), sanitize_text_field($_POST['first_name']), $this->site_name);
+		}
+		else
+		{
+			$output = sprintf(__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), sanitize_text_field($_POST['first_name']), $this->site_name, sanitize_text_field($_POST['aircraft_price']));
+		}
+
+		return $output;
+	}
+
 	public function form_submit()
 	{
 		$which_var = $this->plugin_name.'_'.$this->pathname . '_form_submit';
@@ -149,18 +164,14 @@ class Dynamic_Aviation_Estimate_Confirmation
 					$data = $_POST;
 					$data['lang'] = $this->current_language;
 					$notes = apply_filters('dy_aviation_estimate_notes', '');
+					$subject = apply_filters('dy_aviation_estimate_subject', '');
 					
 					if(!isset($_POST['aircraft_id']))
 					{
-						$subject = sprintf(__('%s, Your request has been sent to our specialists at %s!', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'));
 						require_once( $this->plugin_dir_path . 'public/general_email_template.php');
 					}
 					else
 					{
-						$this_id = sanitize_text_field($_POST['aircraft_id']);
-						$subject = sprintf(__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), sanitize_text_field($data['first_name']), get_bloginfo('name'), sanitize_text_field($data['aircraft_price']));
-						$is_commercial = (aviation_field('aircraft_commercial', $this_id) == 1) ? true : false;
-						$transport_title = $this->utilities->transport_title_singular($this_id);
 						require_once($this->plugin_dir_path . 'public/quote_email_template.php');
 					}
 					

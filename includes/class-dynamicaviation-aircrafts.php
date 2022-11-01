@@ -69,12 +69,12 @@ class Dynamic_Aviation_Aircrafts {
 	{
 		if(is_singular($this->pathname))
 		{
+            $title = get_the_title();
 			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
-			$transport_title = $this->utilities->transport_title_singular();
 			$city = aviation_field('aircraft_base_city');
 			$airport = aviation_field('aircraft_base_name');
 			$price_per_hour = '$'.aviation_field('aircraft_price_per_hour');
-			return sprintf(__('%s for rent in %s. %s Service %s %s in %s, %s from %s per hour.', 'dynamicaviation'), $aircraft_type, $city, $transport_title, $aircraft_type, get_the_title(), $airport, $city, $price_per_hour);
+			return sprintf(__('%s for rent in %s. Charter Flight Service %s %s in %s, %s from %s per hour.', 'dynamicaviation'), $title, $city, $aircraft_type, $title, $airport, $city, $price_per_hour);
 		}
 
 		return $excerpt;
@@ -134,9 +134,8 @@ class Dynamic_Aviation_Aircrafts {
 		elseif(is_singular($this->pathname))
 		{			
 			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
-			$is_commercial = (aviation_field( 'aircraft_commercial') == 1) ? true : false;
 			$city = aviation_field('aircraft_base_city');
-			$label = $this->utilities->transport_title_plural();
+			$label = __('Charter Flights', 'dynamicaviation');
 			$title = sprintf(__('%s %s %s in %s', 'dynamicaviation'), $label, $aircraft_type, get_the_title(), $city) .' | '.$this->site_name;
 		}
 
