@@ -229,6 +229,7 @@ class Dynamic_Aviation_Estimate_Table {
 
         $output = $default;
         $routes = array();
+        $chart = array();
         $base = aviation_field( 'aircraft_base_iata', $aicraft_id);
         $request_routes = array($origin, $destination);
         sort($request_routes);
@@ -250,7 +251,10 @@ class Dynamic_Aviation_Estimate_Table {
             //option #1
             $chart = $this->get_rates($routes, $table_price);
         }
-        elseif($count_diff === 2)
+
+        //this part of the code works perfetly but fails in the price-table.php figing only origin + destionation not including base
+
+        /*  elseif($count_diff === 2)
         {
             $routes = array(
                 array($base, $origin),
@@ -275,7 +279,7 @@ class Dynamic_Aviation_Estimate_Table {
         else
         {
             return $default;
-        }
+        }*/
 
         $count_routes = count($routes);
         $found_request_in_index = 0;
