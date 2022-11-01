@@ -122,7 +122,6 @@ class Dynamic_Aviation_Price_Table {
 				
 							//option #1
 							$chart = $this->utilities->get_rates_from_itinerary($itinerary, $table_price);
-							write_log('option #1');
 						}
 						elseif($count_diff === 2)
 						{
@@ -134,8 +133,6 @@ class Dynamic_Aviation_Price_Table {
 				
 							//option #2
 							$chart = $this->utilities->get_rates_from_itinerary($itinerary, $table_price);
-
-							write_log('option #2');
 						}
 
 						//sum fees and prices
