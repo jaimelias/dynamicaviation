@@ -158,67 +158,6 @@ class Dynamic_Aviation_Estimate_Table {
 		    return $content;
     } 
 
-    public function get_rates($routes, $table_price)
-    {
-        $output = array();
-        $rows = array();
-        $count_routes = count($routes);
-
-        for($r = 0; $r < $count_routes; $r++)
-        {
-            $o = $routes[$r][0];
-            $d = $routes[$r][1];
-
-            $row = array_filter($table_price, function($i) use($o, $d){
-
-                //table
-                $a1 = array($i[0], $i[1]);
-                sort($a1);
-
-                //route
-                $a2 = array($o, $d);
-                sort($a2);
-
-
-                if(count(array_diff($a1, $a2)) === 0)
-                {
-                    return true;
-                }
-            });
-
-            if($row > 0)
-            {
-                array_push($rows, ...$row);
-            }
-        }
-
-
-        if(count($rows) === $count_routes)
-        {
-            $output = $rows;
-
-            if($count_routes === 3)
-            {
-                $output = array_map(function($v, $i){
-
-                    //divides the rate in to 2
-                    if($i === 0 || $i === 2)
-                    {
-                        $v[3] = floatval($v[3]) / 2;
-                    }
-
-                    return $v;
-                }, $output, array_keys($output));
-            }
-
-            return $output;
-        }
-        else
-        {
-            return array();
-        }
-    }
-
 
     public function get_routes($aicraft_id, $origin, $destination, $table_price)
     {
@@ -249,7 +188,7 @@ class Dynamic_Aviation_Estimate_Table {
             );
 
             //option #1
-            $chart = $this->get_rates($routes, $table_price);
+            $chart = $this->utilities->get_rates_from_routes($routes, $table_price);
         }
 
         //this part of the code works perfetly but fails in the price-table.php figing only origin + destionation not including base
@@ -265,7 +204,7 @@ class Dynamic_Aviation_Estimate_Table {
             );
 
             //option #2
-            $chart = $this->get_rates($routes, $table_price);
+            $chart = $this->get_rates_from_routes($routes, $table_price);
 
             if(count($chart) === 0)
             {
@@ -275,7 +214,7 @@ class Dynamic_Aviation_Estimate_Table {
                 );
 
                 //option #3
-                $chart = $this->get_rates($routes, $table_price);
+                $chart = $this->get_rates_from_routes($routes, $table_price);
             }
         }
         else

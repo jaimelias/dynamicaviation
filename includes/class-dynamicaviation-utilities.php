@@ -250,6 +250,67 @@ class Dynamic_Aviation_Utilities {
 		return $output;
 	}
 
+    public function get_rates_from_routes($routes, $table_price)
+    {
+        $output = array();
+        $rows = array();
+        $count_routes = count($routes);
+
+        for($r = 0; $r < $count_routes; $r++)
+        {
+            $o = $routes[$r][0];
+            $d = $routes[$r][1];
+
+            $row = array_filter($table_price, function($i) use($o, $d){
+
+                //table
+                $a1 = array($i[0], $i[1]);
+                sort($a1);
+
+                //route
+                $a2 = array($o, $d);
+                sort($a2);
+
+
+                if(count(array_diff($a1, $a2)) === 0)
+                {
+                    return true;
+                }
+            });
+
+            if($row > 0)
+            {
+                array_push($rows, ...$row);
+            }
+        }
+
+
+        if(count($rows) === $count_routes)
+        {
+            $output = $rows;
+
+            if($count_routes === 3)
+            {
+                $output = array_map(function($v, $i){
+
+                    //divides the rate in to 2
+                    if($i === 0 || $i === 2)
+                    {
+                        $v[3] = floatval($v[3]) / 2;
+                    }
+
+                    return $v;
+                }, $output, array_keys($output));
+            }
+
+            return $output;
+        }
+        else
+        {
+            return array();
+        }
+    }
+
 }
 
 
