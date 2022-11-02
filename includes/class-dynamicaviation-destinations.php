@@ -37,6 +37,9 @@ class Dynamic_Aviation_Destinations {
         //enqueue logic in public.php
         add_action( 'parse_query', array( &$this, 'load_algolia_scripts' ), 100);
         add_action( 'parse_query', array( &$this, 'load_mapbox_scripts' ), 100);
+
+		//polylang
+		add_filter('pll_translation_url', array(&$this, 'pll_translation_url'), 100, 2);
     }
 
     public function init()
@@ -390,22 +393,7 @@ class Dynamic_Aviation_Destinations {
 				$addressArray[] = $country_lang;
 				
 				$address = implode(', ', $addressArray);
-				$translations = pll_the_languages(array('raw'=>1));
-				
-				foreach ($translations as $k => $v)
-				{
-					if($v['slug'] == pll_default_language())
-					{
-						$output .= '<link rel="alternate" hreflang="'.esc_attr($v['slug']).'" href="'.home_url('fly/'.$this->utilities->sanitize_pathname($airport)).'"/>';	
-					}
-					else
-					{
-						$output .= '<link rel="alternate" hreflang="'.esc_attr($v['slug']).'" href="'.home_url($v['slug'].'/fly/'.$this->utilities->sanitize_pathname($airport)).'" />';				
-					}
-
-					$output .= "\r\n";
-				}
-				
+								
 				$output .= '<meta name="description" content="'.esc_attr(sprintf(__('Private charter flights to %s. Jets, planes and helicopter rental services in %s.', 'dynamicaviation'), $address, $airport)).'" />';
 				$output .= "\r\n";
 				$output .= '<link rel="canonical" href="'.esc_url($this->home_lang.'fly/'.$this->utilities->sanitize_pathname($airport_array['airport'])).'" />';
@@ -580,6 +568,26 @@ class Dynamic_Aviation_Destinations {
             }
         }
     }
+
+	public function pll_translation_url($url, $slug)
+	{
+		global $polylang;
+
+		if(isset($polylang) && get_query_var($this->pathname))
+		{
+			if($slug === pll_default_language())
+			{
+				$url = home_url('fly/' . get_query_var($this->pathname));
+			}
+			else
+			{
+				
+				$url = home_url($slug . '/fly/' . get_query_var($this->pathname));
+			}
+		}
+
+		return $url;
+	}
 
 }
 
