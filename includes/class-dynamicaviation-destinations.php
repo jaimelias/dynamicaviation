@@ -305,24 +305,24 @@ class Dynamic_Aviation_Destinations {
                     <table class="airport_description pure-table pure-table-striped bottom-20">
                         <?php if($iata != null && $icao != null): ?>
                             <?php if($iata != null): ?>
-                            <tr><td>IATA</td><td><?php esc_html_e($iata); ?></td></tr>
+                            <tr><td>IATA</td><td><?php echo esc_html($iata); ?></td></tr>
                             <?php endif;?>
                             <?php if($icao != null): ?>
-                            <tr><td>ICAO</td><td><?php esc_html_e($icao); ?></td></tr>
+                            <tr><td>ICAO</td><td><?php echo esc_html($icao); ?></td></tr>
                             <?php endif; ?>
                         <?php endif; ?>	
                         <tbody>
-                            <tr><td><?php echo (esc_html__('City', 'dynamicaviation')); ?></td><td><?php esc_html_e($city); ?></td></tr>
-                            <tr><td><?php echo (esc_html__('Country', 'dynamicaviation')); ?></td><td><?php esc_html_e($country_lang); ?></td></tr>	
-                            <tr><td><?php echo (esc_html__('Longitude', 'dynamicaviation')); ?></td> <td><?php esc_html_e(round($_geoloc['lng'], 4)); ?></td></tr>
-                            <tr><td><?php echo (esc_html__('Latitude', 'dynamicaviation')); ?></td> <td><?php esc_html_e(round($_geoloc['lat'], 4)); ?></td></tr>	
-                            <tr><td><?php echo (esc_html__('Timezone', 'dynamicaviation')); ?></td> <td><?php esc_html_e($utc).' (UTC)'; ?></td></tr>
+                            <tr><td><?php echo (esc_html__('City', 'dynamicaviation')); ?></td><td><?php echo esc_html($city); ?></td></tr>
+                            <tr><td><?php echo (esc_html__('Country', 'dynamicaviation')); ?></td><td><?php echo esc_html($country_lang); ?></td></tr>	
+                            <tr><td><?php echo (esc_html__('Longitude', 'dynamicaviation')); ?></td> <td><?php echo esc_html(round($_geoloc['lng'], 4)); ?></td></tr>
+                            <tr><td><?php echo (esc_html__('Latitude', 'dynamicaviation')); ?></td> <td><?php echo esc_html(round($_geoloc['lat'], 4)); ?></td></tr>	
+                            <tr><td><?php echo (esc_html__('Timezone', 'dynamicaviation')); ?></td> <td><?php echo esc_html($utc).' (UTC)'; ?></td></tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3">
                     <div class="entry-content">
-                        <img class="bottom-20" width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php esc_html_e($airport).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
+                        <img class="bottom-20" width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php echo esc_html(sprintf(__('Charter Flights to %s', 'dynamicaviation'), $airport)).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
                         <?php echo $this->get_destination_content($iata); ?>
                     </div>
                 </div>
@@ -330,7 +330,7 @@ class Dynamic_Aviation_Destinations {
 
             <hr/>
 
-            <h4><span class="linkcolor"><?php echo (esc_html__('Quote Charter Flight to', 'dynamicaviation'));?></span> <?php esc_html_e($airport); ?><span class="linkcolor">, <?php esc_html_e($city);?></span></h4>
+            <h4><span class="linkcolor"><?php echo (esc_html__('Quote Charter Flight to', 'dynamicaviation'));?></span> <?php echo esc_html($airport); ?><span class="linkcolor">, <?php echo esc_html($city);?></span></h4>
             <div id="quote-sidebar">
                 <?php echo apply_filters('dy_aviation_search_form', ''); ?>
             </div>

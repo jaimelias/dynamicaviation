@@ -150,12 +150,12 @@ class Dynamic_Aviation_Estimate_Confirmation
 		return $output;
 	}
 
-	public function form_submit()
+	public function form_submit($query)
 	{
 		$which_var = $this->plugin_name.'_'.$this->pathname . '_form_submit';
 		global $$which_var;
 
-		if(!isset($$which_var))
+		if(!isset($$which_var) && isset($query->query_vars[$this->pathname]))
 		{
 			if($this->valid_recaptcha)
 			{
