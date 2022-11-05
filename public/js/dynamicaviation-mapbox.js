@@ -1,7 +1,3 @@
-const obj = i => {
-	return { y: i[0], x: i[1] }; 
-}
-
 const convertToSlug = str => {
 	str = str.toLowerCase();
 	str = str.replace(/á/gi,'a');
@@ -9,12 +5,12 @@ const convertToSlug = str => {
 	str = str.replace(/í/gi,'i');
 	str = str.replace(/ó/gi,'o');
 	str = str.replace(/ú/gi,'u');
-	str = str.replace(/ñ/gi,'n');		
+	str = str.replace(/ñ/gi,'n');
 	str = str.replace(/ +/g,'-');
 	str = str.replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '');
 	str = str.replace(/\-\-/gi,'-');		
 	return str;
-}
+};
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -26,20 +22,16 @@ const RenderMap =  () => {
 		return;
 	}
 
-
-	const setLat = mapbox_vars().mapbox_base_lat;
-	const setLon = mapbox_vars().mapbox_base_lon;
-	const setZoom = mapbox_vars().mapbox_map_zoom;
-	const mapboxToken = mapbox_vars().mapbox_token;
-	const mapboxId = mapbox_vars().mapbox_map_id;
+	const args = mapbox_vars();
+	const {mapbox_base_lat, mapbox_base_lon, mapbox_map_zoom, mapbox_token, mapbox_map_id} = args;
 	
-	L.mapbox.accessToken = mapboxToken;
+	L.mapbox.accessToken = mapbox_token;
 	
-	const map = L.mapbox.map('aviation_map', mapboxId, {
+	const map = L.mapbox.map('aviation_map', mapbox_map_id, {
 		zoomControl: false,
 		minZoom: 4,
 		maxZoom: 16
-	}).setView([setLat, setLon], setZoom);
+	}).setView([mapbox_base_lat, mapbox_base_lon], mapbox_map_zoom);
 	map.touchZoom.disable();
 	map.doubleClickZoom.disable();
 	map.scrollWheelZoom.disable();
@@ -51,79 +43,85 @@ const RenderMap =  () => {
 	
 	jQuery(() => {
 	
-		'use strict';
 		
 		if(!isMobile && jQuery('.aviation_search_form_container').length)
 		{
-			load_mapbox(algoliaIndex, true);
+
+			loadMapBox({algoliaIndex, viaIP: true, center: map.getCenter()});
 			
 			map.on('moveend zoomend', function() {
-				load_mapbox(algoliaIndex, false);
+				loadMapBox({algoliaIndex, viaIP: false, center: map.getCenter()});
 			});
 			
 			jQuery('.aviation_search_form_container').each(function(){
 				
 				const thisForm = jQuery(this);
-				
-				jQuery(thisForm).find('.aircraft_list').blur(function(){			
-					
-					if(jQuery(this).hasClass('aircraft_selected') && jQuery(thisForm).find('.aircraft_selected').length == 1)
-					{
-						const getLatLng = [jQuery(this).attr('data-lat'), jQuery(this).attr('data-lon')];
-						map.fitBounds([getLatLng, getLatLng]);
-						map.setZoom(13);
-					}
-					else if(jQuery(thisForm).find('.aircraft_selected').length == 2)
-					{
-						const cardinals = [];
-						
-						jQuery(thisForm).find('.aircraft_selected').each(function(){
-							const row = [];
-							row.push(jQuery(this).attr('data-lat'));
-							row.push(jQuery(this).attr('data-lon'));
-							cardinals.push(obj(row));
-						});
-						
-						map.eachLayer(layer => {
-							if(layer.hasOwnProperty('_path'))
+
+				jQuery(thisForm).find('.aircraft_list').each(function(){
+
+					jQuery(this).blur(function(){
+
+						const allSelectedFields = jQuery(thisForm).find('.aircraft_selected');
+						const countAllSelectedFields = jQuery(thisForm).find('.aircraft_selected').length;
+
+						if(jQuery(allSelectedFields).length)
+						{
+							if(countAllSelectedFields == 1)
 							{
-								map.removeLayer(layer);
+								map.fitBounds([[jQuery(this).attr('data-lat'), jQuery(this).attr('data-lon')]]);
+								map.setZoom(13);
 							}
-						});	
-	
-						const generator = new arc.GreatCircle(cardinals[0], cardinals[1]);
-						const line = generator.Arc(100, { offset: 10 });
-						const arcLine = L.polyline(line.geometries[0].coords.map(c => {
-							return c.reverse();
-						}), {
-							color: '#ff6d33',
-							weight: 5
-						})
-						.addTo(map);
+							else if(countAllSelectedFields == 2)
+							{
+								const cardinals = [];
+								
+								jQuery(thisForm).find('.aircraft_selected').each(function()
+								{
+									cardinals.push({y: jQuery(this).attr('data-lat'), x: jQuery(this).attr('data-lon')});
+								});
+								
+								map.eachLayer(layer => {
+									if(layer.hasOwnProperty('_path'))
+									{
+										map.removeLayer(layer);
+									}
+								});	
+			
+								const generator = new arc.GreatCircle(cardinals[0], cardinals[1]);
+								const line = generator.Arc(100, { offset: 10 });
+								const arcLine = L.polyline(line.geometries[0].coords.map(c => {
+									return c.reverse();
+								}), {
+									color: '#ff6d33',
+									weight: 5
+								})
+								.addTo(map);
+								
+								map.fitBounds(arcLine.getBounds(), {padding: [20,20]});
+							}
+						}				
+					});	
+				});
 						
-						map.fitBounds(arcLine.getBounds(), {padding: [20,20]});
-					}				
-				});			
 			});	
 		}
 	});
 	
 	
-	const load_mapbox = (index, viaIP) => {
+	const loadMapBox = ({algoliaIndex, viaIP, center}) => {
 	
-		let latlon = [map.getCenter().lat, map.getCenter().lng];
-		latlon = latlon.join(',');
+		const {lat, lng} = center;
 	
 		if (viaIP === true) {
-			index.search({
+			algoliaIndex.search({
 				hitsPerPage: 1000,
 				aroundLatLngViaIP: true,
 				minimumAroundRadius: 20000,
 			}, buildMap);
 		} else {
-			index.search({
+			algoliaIndex.search({
 				hitsPerPage: 1000,
-				aroundLatLng: String(latlon),
+				aroundLatLng: `${lat},${lng}`,
 				minimumAroundRadius: 20000,
 			}, buildMap);
 		}
@@ -164,7 +162,7 @@ const RenderMap =  () => {
 				
 				if(iata)
 				{
-					title += `${iata}`;
+					title += ` (${iata})`;
 				}
 	
 				const marker = L.marker(new L.LatLng(lat, lng), {
@@ -176,9 +174,9 @@ const RenderMap =  () => {
 					title
 				});
 
-				const homeUrl =  mapbox_vars().home_url;
+				const {home_url} =  mapbox_vars();
 				const slug = convertToSlug(airport);
-				const url = `${homeUrl}fly/${slug}`;
+				const url = `${home_url}fly/${slug}`;
 
 				marker.bindPopup(`<div class="text-center"><a target="_top" class="large" href="${url}">` + title + '</a></div>');
 	
