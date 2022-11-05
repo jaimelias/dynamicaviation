@@ -119,25 +119,26 @@ const RenderMap =  () => {
 				hitsPerPage: 1000,
 				aroundLatLngViaIP: true,
 				minimumAroundRadius: 20000,
-			}, seachByIp);
+			}, buildMap);
 		} else {
 			index.search({
 				hitsPerPage: 1000,
 				aroundLatLng: String(latlon),
 				minimumAroundRadius: 20000,
-			}, seachByIp);
+			}, buildMap);
 		}
 	}
 	
-	const seachByIp = (err, content) => {
+	const buildMap = (err, content) => {
 	
 		return new Promise((resolve, reject) => {
 			
 			if (err) {
 				reject(err);
 			}
-	
-			const json_array = [];
+			
+			const htmlLang = (String(jQuery('html').attr('lang')).slice(0, 2)).toLowerCase() || 'en';
+
 			overlays.clearLayers();
 			const markers = new L.MarkerClusterGroup();
 	
@@ -146,31 +147,24 @@ const RenderMap =  () => {
 			});
 	
 			for (let i = 0; i < content.hits.length; i++) {
-				const json_obj = {};
-				const lng = parseFloat(content.hits[i]._geoloc['lng']);
-				const lat = parseFloat(content.hits[i]._geoloc['lat']);
-				const city = content.hits[i]['city'];
-				const airport = content.hits[i]['airport'];
-				const iata = content.hits[i]['iata'];
-	
-				json_obj.type = 'Feature';
-				json_obj.properties = {
-					'marker-symbol': 'airport',
-					'marker-color': '#9ACD32',
-					'marker-size': 'large'
-				};
-				json_obj.geometry = {
-					type: 'Point',
-					coordinates: []
-				};
-				json_obj.geometry.coordinates.push(lng, lat);
-				json_array.push(json_obj);
-	
-				let title = city + ' - ' + airport;
 				
-				if(iata != null)
+				const hits = content.hits[i];
+				const {_geoloc, city, airport, iata, airport_names} = hits;
+				const {lng, lat} = _geoloc;
+
+				let title = (city !== airport) ?  `${city} - ${airport}` : airport;
+
+				if(airport_names)
 				{
-					title += ' (' + iata + ')';
+					if(airport_names.hasOwnProperty(htmlLang))
+					{
+						title = airport_names[htmlLang];
+					}
+				}
+				
+				if(iata)
+				{
+					title += `${iata}`;
 				}
 	
 				const marker = L.marker(new L.LatLng(lat, lng), {
@@ -179,9 +173,14 @@ const RenderMap =  () => {
 						'marker-color': '#dd3333',
 						'marker-size': 'large'
 					}),
-					title: title
+					title
 				});
-			   marker.bindPopup('<div class="text-center"><a target="_top" class="large" href="'+mapbox_vars().home_url+'fly/' + convertToSlug(content.hits[i]["airport"]) + '/">' + title + '</a></div>');
+
+				const homeUrl =  mapbox_vars().home_url;
+				const slug = convertToSlug(airport);
+				const url = `${homeUrl}fly/${slug}`;
+
+				marker.bindPopup(`<div class="text-center"><a target="_top" class="large" href="${url}">` + title + '</a></div>');
 	
 				markers.addLayer(marker);
 			}

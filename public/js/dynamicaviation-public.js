@@ -180,7 +180,7 @@ const algolia_execute = () => {
 
 jQuery('.aircraft_calculator').each(function(){
 
-	const htmllang = (String(jQuery('html').attr('lang')).slice(0, 2)).toLowerCase() || 'en';
+	const htmlLang = (String(jQuery('html').attr('lang')).slice(0, 2)).toLowerCase() || 'en';
 	const thisForm = jQuery(this);
 
 	jQuery(this).find('.aircraft_list').each(function(){
@@ -197,11 +197,9 @@ jQuery('.aircraft_calculator').each(function(){
 			templates: {
 				suggestion: suggestion => {
 
-					
-
 					const localize = ['airport', 'city'];
 
-					let {country_names, country_code, _highlightResult, iata, icao} = suggestion;
+					let {country_names, country_code, _highlightResult, iata} = suggestion;
 
 					localize.forEach(k => {
 
@@ -212,9 +210,9 @@ jQuery('.aircraft_calculator').each(function(){
 
 							if(loc)
 							{
-								if(loc.hasOwnProperty(htmllang))
+								if(loc.hasOwnProperty(htmlLang))
 								{
-									_highlightResult[k] = loc[htmllang];
+									_highlightResult[k] = loc[htmlLang];
 								}
 							}
 						}
@@ -223,7 +221,7 @@ jQuery('.aircraft_calculator').each(function(){
 
 					const {airport, iata: _iata, city} = _highlightResult;
 
-					const country = (country_names.hasOwnProperty(htmllang)) ? country_names[htmllang] : null;
+					const country = (country_names.hasOwnProperty(htmlLang)) ? country_names[htmlLang] : null;
 					let flag_url = String(jsonsrc() + "img/flags/" + country_code + '.svg').toLowerCase();
 					const result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> <strong class="iata"></strong></div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
 					result.find('.sairport > .airport').html(airport.value);
@@ -248,8 +246,8 @@ jQuery('.aircraft_calculator').each(function(){
 			let {iata, icao, airport, airport_names, city, country_code, _geoloc} = suggestion;
 
 			airport = (typeof airport_names !== 'undefined')
-				? (airport_names.hasOwnProperty(htmllang)) 
-				? airport_names[htmllang] 
+				? (airport_names.hasOwnProperty(htmlLang)) 
+				? airport_names[htmlLang] 
 				: airport
 				: airport;
 			

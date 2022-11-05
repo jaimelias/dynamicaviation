@@ -107,8 +107,8 @@ const validate_instant_quote = () =>
 
 
 
-const aircraft_country_dropdown = (pluginurl, htmllang) => {
-	$.getJSON( pluginurl + 'countries/'+htmllang+'.json')
+const aircraft_country_dropdown = (pluginurl, htmlLang) => {
+	$.getJSON( pluginurl + 'countries/'+htmlLang+'.json')
 		.done(data => {
 			aircraftCountryOptions(data);
 		})

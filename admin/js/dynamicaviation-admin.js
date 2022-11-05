@@ -448,12 +448,12 @@ const algolia_execute = () => {
 			templates: {
 				suggestion: suggestion => {
 
-					let htmllang = jQuery('html').attr('lang');
-					htmllang = htmllang.slice(0, 2);
-					htmllang.toLowerCase();
+					let htmlLang = jQuery('html').attr('lang');
+					htmlLang = htmlLang.slice(0, 2);
+					htmlLang.toLowerCase();
 
 					let {_highlightResult, country_names, country_code, iata} = suggestion;
-					const country = (country_names.hasOwnProperty(htmllang)) ? country_names[htmllang] : null;
+					const country = (country_names.hasOwnProperty(htmlLang)) ? country_names[htmlLang] : null;
 					const localize = ['airport', 'city'];
 
 
@@ -466,9 +466,9 @@ const algolia_execute = () => {
 
 							if(loc)
 							{
-								if(loc.hasOwnProperty(htmllang))
+								if(loc.hasOwnProperty(htmlLang))
 								{
-									_highlightResult[k] = loc[htmllang];
+									_highlightResult[k] = loc[htmlLang];
 								}
 							}
 						}
