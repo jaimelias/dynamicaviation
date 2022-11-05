@@ -2,7 +2,6 @@
 
 $transport_title = __('Charter Flight', 'dynamicaviation');
 $this_id = sanitize_text_field($_POST['aircraft_id']);
-$aircraft_price = sanitize_text_field($_POST['aircraft_price']);
 $aircraft_name = sanitize_text_field($_POST['aircraft_name']);
 $aircraft_seats = sanitize_text_field($_POST['aircraft_seats']);
 $aircraft_weight = sanitize_text_field($_POST['aircraft_weight']);
@@ -172,7 +171,7 @@ $email_template = <<<EOT
 							${itinerary_html}
 						</td>
 						<td style="width: 100px; padding: 5px;vertical-align: top; text-align: right; ">
-							${currency_symbol}${aircraft_price}
+							${currency_symbol}${price}
 						</td>
 					</tr>			
 					
@@ -181,7 +180,7 @@ $email_template = <<<EOT
 						<td style="width: 100px; padding: 5px; vertical-align: top; text-align: right; line-height: 2;">
                             <strong style="color: #666666">${label_total}</strong>
                             <br/>
-                            <span>${currency_symbol}${aircraft_price}</span>
+                            <span>${currency_symbol}${price}</span>
 						</td>
 					</tr>
 					

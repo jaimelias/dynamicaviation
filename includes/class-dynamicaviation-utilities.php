@@ -311,6 +311,11 @@ class Dynamic_Aviation_Utilities {
         }
     }
 
+	public function currency_format($amount)
+	{
+		return number_format(floatval($amount), 2, '.', ',');
+	}
+
 }
 
 
