@@ -146,25 +146,27 @@ class Dynamic_Aviation_Utilities {
 				'headers' => $headers
 			));
 
-			if($resp['response']['code'] === 200)
+			if ( is_array( $resp ) && ! is_wp_error( $resp ) )
 			{
-
-				$body = json_decode($resp['body'], true);
-
-				if(array_key_exists('hits', $body))
+				if($resp['response']['code'] === 200)
 				{
-					$hits = $body['hits'];
-					
-					if(is_array($hits))
+					$body = json_decode($resp['body'], true);
+
+					if(array_key_exists('hits', $body))
 					{
-						for($x = 0; $x < count($hits); $x++)
-						{
-							if($query_var === $this->sanitize_pathname($hits[$x]['airport']))
-							{
-								$output = $hits[$x];
-							}
-						}			
+						$hits = $body['hits'];
 						
+						if(is_array($hits))
+						{
+							for($x = 0; $x < count($hits); $x++)
+							{
+								if($query_var === $this->sanitize_pathname($hits[$x]['airport']))
+								{
+									$output = $hits[$x];
+								}
+							}			
+							
+						}
 					}
 				}
 			}
@@ -239,12 +241,16 @@ class Dynamic_Aviation_Utilities {
 			));
 
 
-			if($resp['response']['code'] === 200)
+			if ( is_array( $resp ) && ! is_wp_error( $resp ) )
 			{
-				$body = json_decode($resp['body'], true);
-				$output = $body['hits'];
-				$GLOBALS[$which_var] = $output;
+				if($resp['response']['code'] === 200)
+				{
+					$body = json_decode($resp['body'], true);
+					$output = $body['hits'];
+					$GLOBALS[$which_var] = $output;
+				}
 			}
+
 		}		
 
 		return $output;

@@ -289,14 +289,17 @@ class Dynamic_Aviation_Estimate_Confirmation
 					$resp = wp_remote_post($url, array(
 						'body' => $params
 					));
-
-					if($resp['response']['code'] === 200)
+					
+					if ( is_array( $resp ) && ! is_wp_error( $resp ) )
 					{
-						$output = true;
-					}
-					else
-					{
-						$output = false;
+						if($resp['response']['code'] === 200)
+						{
+							$output = true;
+						}
+						else
+						{
+							$output = false;
+						}
 					}
 				}
 			}

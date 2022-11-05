@@ -87,12 +87,15 @@ class Dynamic_Aviation_Image {
             $resp = wp_remote_get($url, array(
                 'headers' => $headers
             ));
-            
-            if($resp['response']['code'] === 200)
-            {
-                header ('Content-Type: image/png'); 
 
-                exit($resp['body']);
+            if ( is_array( $resp ) && ! is_wp_error( $resp ) )
+            {
+                if($resp['response']['code'] === 200)
+                {
+                    header ('Content-Type: image/png'); 
+
+                    exit($resp['body']);
+                }
             }
         }
 	}
