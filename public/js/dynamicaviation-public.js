@@ -87,16 +87,21 @@ const validate_aircraft_form = () => {
 	jQuery('.aircraft_calculator').each(function(){
 		
 		const thisForm = jQuery(this);
+		const excludeArr = ['aircraft_return_date', 'aircraft_return_hour', 'aircraft_return_date_submit', 'aircraft_return_hour_submit'];
 		
 		jQuery(thisForm).find('#aircraft_submit').click(function(){
 			
 			let invalid_field = 0;
+
 			
 			jQuery(thisForm).find('input').each(function(){
+
+				const value = jQuery(this).val();
+				const name = jQuery(this).attr('name');
 				
-				if(jQuery(this).val() == '')
+				if(value === '')
 				{
-					if(jQuery('#aircraft_flight').val() == 0 && (jQuery(this).attr('name') == 'aircraft_return_date' || jQuery(this).attr('name') == 'aircraft_return_hour' || jQuery(this).attr('name') == 'aircraft_return_date_submit' || jQuery(this).attr('name') == 'aircraft_return_hour_submit'))
+					if(jQuery('#aircraft_flight').val() == 0 && excludeArr.includes(name))
 					{
 						jQuery(this).removeClass('invalid_field');
 					}
@@ -127,7 +132,8 @@ const validate_aircraft_form = () => {
 				}
 			});
 
-			if(invalid_field == 0)
+
+			if(invalid_field === 0)
 			{
 				const hash = sha512(jQuery(thisForm).find('input[name="aircraft_pax"]').val()+jQuery(thisForm).find('input[name="aircraft_departure_date"]').val());
 				const departure = Date.parse(jQuery('input[name="aircraft_departure_date"]').val());
