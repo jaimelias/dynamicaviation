@@ -51,21 +51,14 @@ function deactivate_dynamicaviation() {
 register_activation_hook( __FILE__, 'activate_dynamicaviation' );
 register_deactivation_hook( __FILE__, 'deactivate_dynamicaviation' );
 
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
+
+//dynamic core scripts
+require_once plugin_dir_path( __FILE__ ) . 'dy_core/loader.php';
+
+// admin and public
 require plugin_dir_path( __FILE__ ) . 'includes/class-dynamicaviation.php';
 
-/**
- * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- *
- * @since    1.0.0
- */
+
 function run_dynamicaviation() {
 
 	$plugin = new Dynamic_Aviation();
@@ -73,44 +66,6 @@ function run_dynamicaviation() {
 
 }
 run_dynamicaviation();
-
-
-if ( ! function_exists('write_log')) {
-	
-	
-	if(! function_exists('var_error_log'))
-	{
-		function var_error_log( $object=null ){
-			ob_start();
-			var_dump( $object );
-			$contents = ob_get_contents();
-			ob_end_clean();
-			return $contents;
-		}
-	}
-	
-	function write_log ( $log )  {
-		
-		$output = '';
-		$request_uri = sanitize_text_field($_SERVER['REQUEST_URI']);
-		$user_agent = sanitize_text_field($_SERVER['HTTP_USER_AGENT']);
-		
-		if ( is_array( $log ) || is_object( $log ) ) {
-
-			$output = print_r(var_error_log($log), true);
-			$output .= ' '.$request_uri;  
-			$output .= ' '.$user_agent;  
-			error_log( $output );
-		}
-		else
-		{
-			$output = $log;
-			$output .= ' '.$request_uri;  
-			$output .= ' '.$user_agent;
-			error_log( $log );
-		}
-	}
-}
 
 
 function aviation_field($name, $this_id = null)
@@ -138,101 +93,4 @@ function aviation_field($name, $this_id = null)
 		$GLOBALS[$which_var] = $package_field;
 		return $package_field;
 	}	
-}
-
-
-
-if(!function_exists('get_languages'))
-{
-	function get_languages()
-	{
-		global $polylang;
-		$output = array();
-		$which_var = 'wp_core_get_languages';
-		global $$which_var;
-
-		if(isset($$which_var))
-		{
-			$output = $$which_var;
-		}
-		else
-		{
-			if(isset($polylang))
-			{
-				$languages = PLL()->model->get_languages_list();
-
-				for($x = 0; $x < count($languages); $x++)
-				{
-					foreach($languages[$x] as $key => $value)
-					{
-						if($key == 'slug')
-						{
-							array_push($output, $value);
-						}
-					}	
-				}
-			}
-
-			if(count($output) === 0)
-			{
-				$locale_str = get_locale();
-
-				if(strlen($locale_str) === 5)
-				{
-					array_push($output, substr($locale_str, 0, -3));
-				}
-				else if(strlen($locale_str) === 2)
-				{
-					array_push($output, $locale_str);
-				}
-			}
-
-			$GLOBALS[$which_var] = $output;
-		}
-
-
-		return $output;
-	}	
-}
-
-if(!function_exists('current_language'))
-{
-	function current_language()
-	{
-		global $polylang;
-		$output = '';
-		$which_var = 'wp_core_current_language';
-		global $$which_var;
-
-		if($$which_var)
-		{
-			$output = $$which_var;
-		}
-		else
-		{
-			if(isset($polylang))
-			{
-				$output = pll_current_language();
-			}
-			else
-			{
-				$locale = get_locale();
-				$locale_strlen = strlen($locale);
-
-				if($locale_strlen === 5)
-				{
-					$output = substr($locale, 0, -3);
-				}
-				if($locale_strlen === 2)
-				{
-					$output = $locale;
-				}			
-			}
-
-			$GLOBALS[$which_var] = $output;
-		}
-
-
-		return $output;
-	}
 }
