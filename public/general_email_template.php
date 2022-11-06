@@ -1,8 +1,8 @@
 <?php
 
 $today = date_i18n(get_option('date_format'), strtotime(null));
-$label_doc = __('Estimate', 'dynamicpackages');
-$greeting = sprintf(__('Hello %s,', 'dynamicpackages'), sanitize_text_field($_POST['first_name']));
+$label_doc = __('Estimate', 'dynamicaviation');
+$greeting = sprintf(__('Hello %s,', 'dynamicaviation'), sanitize_text_field($_POST['first_name']));
 $passengers = sanitize_text_field($_POST['aircraft_pax']);
 $currency_symbol = '$';
 $company_name = get_bloginfo('name');
@@ -11,13 +11,13 @@ $company_email = sanitize_email(get_option('dy_email'));
 $company_contact = ($company_phone) ?  $company_phone . ' / ' . $company_email : $company_email;
 $company_address = get_option('dy_address');
 $company_tax_id = get_option('dy_tax_id');
-$label_client = __('Client', 'dynamicpackages');
+$label_client = __('Client', 'dynamicaviation');
 $client_name = sanitize_text_field($_POST['first_name']) . ' ' . sanitize_text_field($_POST['lastname']);
 $client_email = sanitize_email($_POST['email']);
 $client_phone = sanitize_text_field($_POST['phone']);
-$label_item = __('Service', 'dynamicpackages');
-$label_total = __('Total', 'dynamicpackages');
-$label_subtotal = __('Subtotal', 'dynamicpackages');
+$label_item = __('Service', 'dynamicaviation');
+$label_total = __('Total', 'dynamicaviation');
+$label_subtotal = __('Subtotal', 'dynamicaviation');
 $departure_itinerary = sanitize_text_field($_POST['departure_itinerary']);
 $return_itinerary = sanitize_text_field($_POST['return_itinerary']);
 
@@ -30,11 +30,11 @@ $itinerary_text = ($return_itinerary) ? $departure_itinerary . ' || ' . $return_
 $itinerary_text .= ' || ' . __('Passengers', 'dynamicaviation') . ': ' . $passengers;
 
 
-$label_notes = __('Notes', 'dynamicpackages');
+$label_notes = __('Notes', 'dynamicaviation');
 $notes = nl2br($notes);
 $footer = $company_address;
 $whatsapp_url = esc_url('https://wa.me/' . get_option('dy_whatsapp') . '?text=' . urlencode($itinerary_text));
-$whatsapp = (get_option('dy_whatsapp')) ? '<a style="border: 16px solid #25d366; text-align: center; background-color: #25d366; color: #fff; font-size: 18px; line-height: 18px; display: block; width: 100%; box-sizing: border-box; text-decoration: none; font-weight: 900;" href="'.esc_url($whatsapp_url).'">'.__('Whatsapp Advisory', 'dynamicpackages').'</a>' : null;
+$whatsapp = (get_option('dy_whatsapp')) ? '<a style="border: 16px solid #25d366; text-align: center; background-color: #25d366; color: #fff; font-size: 18px; line-height: 18px; display: block; width: 100%; box-sizing: border-box; text-decoration: none; font-weight: 900;" href="'.esc_url($whatsapp_url).'">'.__('Whatsapp Advisory', 'dynamicaviation').'</a>' : null;
 
 $email_template = <<<EOT
 <!DOCTYPE html>

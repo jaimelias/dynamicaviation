@@ -132,19 +132,19 @@ class Dynamic_Aviation_Settings
 			'name' => 'mapbox_map_id',
 			'options' => array(
 				array(
-					'text' => __('Streets', 'dynamicpackages'),
+					'text' => __('Streets', 'dynamicaviation'),
 					'value' => 'mapbox.streets'
 				),
 				array(
-					'text' => __('Light', 'dynamicpackages'),
+					'text' => __('Light', 'dynamicaviation'),
 					'value' => 'mapbox.light'
 				),
 				array(
-					'text' => __('Dark', 'dynamicpackages'),
+					'text' => __('Dark', 'dynamicaviation'),
 					'value' => 'mapbox.dark'
 				),
 				array(
-					'text' => __('Outdoors', 'dynamicpackages'),
+					'text' => __('Outdoors', 'dynamicaviation'),
 					'value' => 'mapbox.outdoors'
 				),
 			)
