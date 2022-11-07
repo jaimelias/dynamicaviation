@@ -456,8 +456,8 @@ class Dynamic_Aviation_Estimate_Table {
                         <?php echo $this->obj_to_inputs(); ?>
                     </div>
                     
-                    <?php if(get_option('captcha_site_key')): ?>
-                            <button data-badge="bottomleft" data-callback="validateAviationEstimateRequest" class="g-recaptcha pure-button pure-button-primary" data-sitekey="<?php echo esc_attr(get_option('captcha_site_key')); ?>" data-action='estimate'><i class="fas fa-plane"></i> <?php echo esc_html(__('Send Request', 'dynamicaviation'));?></button>	
+                    <?php if(get_option('dy_recaptcha_site_key')): ?>
+                            <button data-badge="bottomleft" data-callback="validateAviationEstimateRequest" class="g-recaptcha pure-button pure-button-primary" data-sitekey="<?php echo esc_attr(get_option('dy_recaptcha_site_key')); ?>" data-action='estimate'><i class="fas fa-plane"></i> <?php echo esc_html(__('Send Request', 'dynamicaviation'));?></button>	
                     <?php endif; ?>
 
                 </form>

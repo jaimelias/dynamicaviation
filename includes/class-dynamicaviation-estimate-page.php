@@ -31,11 +31,9 @@ class Dynamic_Aviation_Estimate_Page
 		add_action('init', array(&$this, 'add_rewrite_rule'), 100);
 		add_action('init', array(&$this, 'add_rewrite_tag'), 100);
 
-		//process the submit of the quote form
-		add_action( 'parse_query', array( &$this, 'form_search' ), 100);
-
 		//enqueue scripts
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
+		add_action( 'parse_query', array( &$this, 'load_recaptcha_scripts' ));
     }
 
     public function init()
@@ -139,26 +137,9 @@ class Dynamic_Aviation_Estimate_Page
 	{
 		if($this->validate_form_search())
 		{
-
-			$recaptcha = 'recaptcha-v3';
-
-			wp_enqueue_script($recaptcha, 'https://www.google.com/recaptcha/api.js', '', 'async_defer', true );
-
-			wp_enqueue_script($this->plugin_name.'_'.$this->pathname, $this->plugin_dir_url . 'public/js/estimate-page.js', array($recaptcha), time(), true );
+			wp_enqueue_script($this->plugin_name.'_'.$this->pathname, $this->plugin_dir_url . 'public/js/estimate-page.js', array(), time(), true );
 		}
 	}
-
-	public function form_search()
-	{
-		$which_var = $this->plugin_name . 'form_search';
-		global $$which_var;
-
-		if(!isset($$which_var))
-		{
-			$GLOBALS[$which_var] = true;
-		}
-	}
-
 
 	public static function validate_form_search()
 	{
@@ -185,5 +166,22 @@ class Dynamic_Aviation_Estimate_Page
 		}
 
 		return $output;
+	}
+
+
+	public function load_recaptcha_scripts($query)
+	{
+		global $dy_load_recaptcha_scripts;
+
+		if(!isset($dy_load_recaptcha_scripts))
+		{
+			if(isset($query->query_vars[$this->pathname]))
+			{
+				if($query->query_vars[$this->pathname])
+				{
+					$GLOBALS['dy_load_recaptcha_scripts'] = true;
+				}
+			}
+		}
 	}
 }

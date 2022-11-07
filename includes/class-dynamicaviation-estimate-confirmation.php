@@ -270,7 +270,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 		{
 			if((isset($_POST['g-recaptcha-response'])))
 			{
-				$secret_key = get_option('captcha_secret_key');
+				$secret_key = get_option('dy_recaptcha_secret_key');
 
 				if($secret_key)
 				{
