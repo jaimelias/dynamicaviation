@@ -5,8 +5,8 @@ class Dynamic_Aviation_Utilities {
 
 
 	public function __construct()
-	{
-		$this->wp_cache_expires_seconds = 60;
+	{	
+		$this->plugin_dir_url = plugin_dir_url( __DIR__ );
 		add_action('init', array(&$this, 'init'), 1);
 	}
 
@@ -30,7 +30,7 @@ class Dynamic_Aviation_Utilities {
 
 	public function json_src_url()
 	{
-		return 'const jsonsrc = () => { return "'.esc_url(plugin_dir_url( __DIR__ )).'/public/";}';
+		return 'const jsonsrc = () => { return "'.esc_url($this->plugin_dir_url.'public/').'";}';
 	}
     
 	public function algoliasearch_after()
