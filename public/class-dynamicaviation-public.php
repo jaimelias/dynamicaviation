@@ -171,7 +171,6 @@ class Dynamic_Aviation_Public {
 
 			if(isset($dy_aviation_load_mapbox))
 			{
-
 				array_push($dep, 'mapbox', 'markercluster');
 
 				wp_enqueue_script( 'mapbox', 'https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js', array( 'jquery', 'algolia'), '3.3.1', true );			
