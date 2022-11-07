@@ -39,11 +39,8 @@ class Dynamic_Aviation_Utilities {
 
 		if($this->algolia_token && $this->algolia_index && $this->algolia_id)
 		{
-			$output .= 'const getAlgoliaToken = "'.esc_html($this->algolia_token).'";';	
-			$output .= 'const getAlgoliaIndex = "'.esc_html($this->algolia_index).'";';
-			$output .= 'const getAlgoliaId = "'.esc_html($this->algolia_id).'";';
-			$output .= 'const algoliaClient = algoliasearch(getAlgoliaId, getAlgoliaToken);';
-			$output .= 'const algoliaIndex = algoliaClient.initIndex(getAlgoliaIndex);';
+			$output .= 'const algoliaClient = algoliasearch("'.esc_html($this->algolia_id).'", "'.esc_html($this->algolia_token).'");';
+			$output .= 'const algoliaIndex = algoliaClient.initIndex("'.esc_html($this->algolia_index).'");';
 		}
 
 		return $output;
