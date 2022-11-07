@@ -25,7 +25,7 @@ async function validateAviationEstimateRequest (token) {
 	const urlParams = new URLSearchParams(queryString);
 	const isOneWay = urlParams.has('aircraft_flight') ? parseInt(urlParams.get('aircraft_flight')) === 0 ? true : false : false;
 	const action = jQuery(thisForm).attr('action')+token;
-	const requiredOnRoundTrip = ['aircraft_return_date', 'aircraft_return_hour', 'return_itinerary'];
+	const requiredOnRoundTrip = ['end_date', 'end_hour', 'return_itinerary'];
 
 	jQuery(inputs).each(function(){	
 		

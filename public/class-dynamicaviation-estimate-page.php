@@ -98,7 +98,7 @@ class Dynamic_Aviation_Estimate_Page
     {
 		if($this->validate_form_search())
 		{
-			if(Dynamic_Aviation_Validators::validate_hash())
+			if($this->validate_hash())
 			{
 				return apply_filters('dy_aviation_aircrafts_table', '');				
 			}
@@ -120,6 +120,35 @@ class Dynamic_Aviation_Estimate_Page
         
         return $title;
     }
+
+	public function validate_hash()
+	{
+		$output = false;
+		$which_var = 'aviation_validate_hash';
+		global $$which_var;
+
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
+		}
+		else
+		{
+			$hash = hash('sha512', $_GET['pax_num'].$_GET['start_date']);
+
+			if($hash == get_query_var('instant_quote'))
+			{
+				$output = true;
+			}
+			else
+			{
+				$output = false;
+			}
+
+			$GLOBALS[$which_var] = $output;
+		}
+
+		return $output;
+	}
 
     public function modify_wp_title($title)
     {
@@ -153,7 +182,7 @@ class Dynamic_Aviation_Estimate_Page
 		}
 		else
 		{
-			if(get_query_var('instant_quote') && isset($_GET['aircraft_origin']) && isset($_GET['aircraft_destination']) && isset($_GET['aircraft_pax']) && isset($_GET['aircraft_flight']) && isset($_GET['aircraft_departure_date']) && isset($_GET['aircraft_departure_hour']) && isset($_GET['aircraft_return_date']) && isset($_GET['aircraft_return_hour']) && isset($_GET['aircraft_origin_l']) && isset($_GET['aircraft_destination_l']))
+			if(get_query_var('instant_quote') && isset($_GET['aircraft_origin']) && isset($_GET['aircraft_destination']) && isset($_GET['pax_num']) && isset($_GET['aircraft_flight']) && isset($_GET['start_date']) && isset($_GET['start_hour']) && isset($_GET['end_date']) && isset($_GET['end_hour']) && isset($_GET['aircraft_origin_l']) && isset($_GET['aircraft_destination_l']))
 			{
 				$output = true;
 			}

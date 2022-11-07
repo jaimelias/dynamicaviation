@@ -23,25 +23,28 @@ class Dynamic_Aviation {
 
 		$plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
 
+		//includes
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-loader.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-i18n.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-sendgrid-mailer.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-utilities.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-validators.php';
+
+		//admin
 		require_once $plugin_dir_path . 'admin/class-dynamicaviation-settings.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-post-type.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-meta-box.php';
 		require_once $plugin_dir_path . 'admin/class-dynamicaviation-admin.php';
+
+		//public
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-public.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-shortcodes.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-search-form.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-price-table.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-aircrafts.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-table.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-destinations.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-page.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-estimate-confirmation.php';
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-image.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-shortcodes.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-search-form.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-price-table.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-aircrafts.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-table.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-destinations.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-page.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-confirmation.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-image.php';
 
 		$this->loader = new Dynamic_Aviation_Loader();
 	}

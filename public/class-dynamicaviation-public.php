@@ -13,6 +13,7 @@ class Dynamic_Aviation_Public {
 		$this->version = $version;
 		$this->utilities =  $utilities;
 		$this->plugin_dir_url = plugin_dir_url( __FILE__ );
+		$this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
 		add_action('init', array(&$this, 'init'));
 		add_filter('minimal_sitemap', array(&$this, 'sitemap'), 10);
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
@@ -129,9 +130,25 @@ class Dynamic_Aviation_Public {
 	
 	public function enqueue_styles() {
 
-		$this->css();
-		$this->datepickerCSS();
-		$this->mapboxCSS();
+		global $dy_aviation_load_algolia;
+		global $dy_aviation_load_mapbox;
+
+		if(isset($dy_aviation_load_algolia))
+		{
+			wp_enqueue_style($this->plugin_name, $this->plugin_dir_url . 'css/dynamicaviation-public.css', array(), '', 'all');
+
+			//date time picker
+			wp_enqueue_style( 'picker-css', $this->plugin_dir_url . 'css/picker/default.css', array(), 'dynamicaviation', 'all' );
+			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.date'));
+			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.time'));	
+		}
+
+		if(isset($dy_aviation_load_mapbox))
+		{
+			wp_enqueue_style('mapbox', 'https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css', array(), '3.1.1', 'all' );
+			wp_add_inline_style('mapbox', $this->get_inline_css('MarkerCluster'));
+			wp_add_inline_style('mapbox', $this->get_inline_css('MarkerCluster.Default'));
+		}
 	}
 
 	public function enqueue_scripts() {
@@ -165,61 +182,7 @@ class Dynamic_Aviation_Public {
 				wp_add_inline_script('mapbox', $this->get_inline_js('dynamicaviation-mapbox'), 'after');
 			}
 
-			self::datepickerJS();			
-			wp_enqueue_script($this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-public.js', $dep, time(), true );
-		}
-
-	}
-	
-
-	public function css()
-	{
-		global $dy_aviation_load_algolia;
-		global $dy_aviation_load_mapbox;
-
-		wp_enqueue_style('minimalLayout', $this->plugin_dir_url . 'css/minimal-layout.css', array(), '', 'all' );
-
-		if(isset($dy_aviation_load_algolia) || isset($dy_aviation_load_mapbox))
-		{
-			wp_add_inline_style('minimalLayout', $this->get_inline_css('dynamicaviation-public'));
-		}
-	}
-	
-	public function datepickerCSS()
-	{
-		global $dy_aviation_load_algolia;
-		global $dy_aviation_load_mapbox;
-		
-		if(isset($dy_aviation_load_algolia) || isset($dy_aviation_load_mapbox))
-		{
-			wp_enqueue_style( 'picker-css', $this->plugin_dir_url . 'css/picker/default.css', array(), 'dynamicaviation', 'all' );
-			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.date'));
-			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.time'));				
-		}		
-	}
-	
-	public function mapboxCSS()
-	{
-		global $dy_aviation_load_mapbox;
-		
-		if(isset($dy_aviation_load_mapbox))
-		{
-			wp_enqueue_style('mapbox', 'https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css', array(), '3.1.1', 'all' );
-			wp_add_inline_style('mapbox', $this->get_inline_css('MarkerCluster'));
-			wp_add_inline_style('mapbox', $this->get_inline_css('MarkerCluster.Default'));
-		}		
-	}
-	
-	public function datepickerJS()
-	{
-
-		global $dy_aviation_load_algolia;
-		global $dy_aviation_load_mapbox;
-
-
-		if(isset($dy_aviation_load_algolia) || isset($dy_aviation_load_mapbox))
-		{
-			//pikadate
+			//start picker
 			wp_enqueue_script( 'picker-js', $this->plugin_dir_url . 'js/picker/picker.js', array('jquery'), '3.6.2', true);
 			wp_enqueue_script( 'picker-date-js', $this->plugin_dir_url . 'js/picker/picker.date.js', array('jquery', 'picker-js'), '3.6.2', true);
 			wp_enqueue_script( 'picker-time-js', $this->plugin_dir_url . 'js/picker/picker.time.js',array('jquery', 'picker-js'), '3.6.2', true);	
@@ -227,18 +190,21 @@ class Dynamic_Aviation_Public {
 
 			$picker_translation = 'js/picker/translations/'.get_locale().'.js';
 					
-			if(file_exists(dirname( __FILE__ ).'/'.$picker_translation))
+			if(file_exists($this->plugin_dir_path.'/'.$picker_translation))
 			{
 				wp_enqueue_script( 'picker-time-translation', $this->plugin_dir_url.$picker_translation, array('jquery', 'picker-js'), '3.6.2', true);
-			}	
+			}
+			//end picker
+			
+			wp_enqueue_script($this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-public.js', $dep, time(), true );
 		}
+
 	}
-
-
+	
 	public function get_inline_js($file)
 	{
 		ob_start();
-		require_once(dirname( __FILE__ ) . '/js/'.$file.'.js');
+		require_once($this->plugin_dir_path . 'public/js/'.$file.'.js');
 		$output = ob_get_contents();
 		ob_end_clean();
 		return $output;			
@@ -247,7 +213,7 @@ class Dynamic_Aviation_Public {
 	public function get_inline_css($file)
 	{
 		ob_start();
-		require_once(dirname( __FILE__ ) . '/css/'.$file.'.css');
+		require_once($this->plugin_dir_path . 'public/css/'.$file.'.css');
 		$output = ob_get_contents();
 		ob_end_clean();
 		return $output;			

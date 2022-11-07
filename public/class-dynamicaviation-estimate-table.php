@@ -20,17 +20,17 @@ class Dynamic_Aviation_Estimate_Table {
     public function set_params()
     {
 
-        $intval_params = array('aircraft_pax', 'aircraft_flight');
+        $intval_params = array('pax_num', 'aircraft_flight');
 
         $this->param_names = array(
-            'aircraft_pax', 
+            'pax_num', 
             'aircraft_flight', 
-            'aircraft_departure_date', 
+            'start_date', 
             'aircraft_origin_l', 
             'aircraft_destination_l', 
-            'aircraft_departure_hour',
-            'aircraft_return_date',
-            'aircraft_return_hour',
+            'start_hour',
+            'end_date',
+            'end_hour',
             'aircraft_origin',
             'aircraft_destination',
         );
@@ -89,7 +89,7 @@ class Dynamic_Aviation_Estimate_Table {
 
     public function pax_template()
     {
-        return '<p class="large"><strong>'.esc_html(__('Passengers', 'dynamicaviation')).':</strong> <span class="linkcolor">'.esc_html($this->get->aircraft_pax).'</span></p>';
+        return '<p class="large"><strong>'.esc_html(__('Passengers', 'dynamicaviation')).':</strong> <span class="linkcolor">'.esc_html($this->get->pax_num).'</span></p>';
     }
 
     public function departure_itinerary()
@@ -99,9 +99,9 @@ class Dynamic_Aviation_Estimate_Table {
         $output .= ' &rsaquo;&rsaquo;&rsaquo; ';
         $output .= $this->get->aircraft_destination_l;
         $output .= ' '.__('on', 'dynamicaviation').' ';
-        $output .= date_i18n(get_option( 'date_format' ), strtotime($this->get->aircraft_departure_date));
+        $output .= date_i18n(get_option( 'date_format' ), strtotime($this->get->start_date));
         $output .= ' '.__('at', 'dynamicaviation').' ';
-        $output .= $this->get->aircraft_departure_hour;
+        $output .= $this->get->start_hour;
         return $output;
     }
 
@@ -116,9 +116,9 @@ class Dynamic_Aviation_Estimate_Table {
             $output .= ' &rsaquo;&rsaquo;&rsaquo; ';
             $output .= $this->get->aircraft_origin_l;
             $output .= ' '.__('on', 'dynamicaviation').' ';
-            $output .= date_i18n(get_option('date_format'), strtotime($this->get->aircraft_return_date));
+            $output .= date_i18n(get_option('date_format'), strtotime($this->get->end_date));
             $output .= ' '.__('at', 'dynamicaviation').' ';
-            $output .= $this->get->aircraft_return_hour;
+            $output .= $this->get->end_hour;
         }
 
         return $output;
@@ -343,7 +343,7 @@ class Dynamic_Aviation_Estimate_Table {
         $duration = $itinerary['duration'];
         $seats = $itinerary['seats'];
         $weight_pounds = $itinerary['weight_pounds'];
-        $aircraft_price = $price + ($fees * $this->get->aircraft_pax);
+        $aircraft_price = $price + ($fees * $this->get->pax_num);
         $weight_kg = intval($weight_pounds * 0.453592);
         $weight_allowed = esc_html($weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation'));
 
@@ -477,7 +477,7 @@ class Dynamic_Aviation_Estimate_Table {
 
         $capacity_args = array(
             'key' => 'aircraft_passengers',
-            'value' => $this->get->aircraft_pax,
+            'value' => $this->get->pax_num,
             'type' => 'numeric',
             'compare' => '>='
         );

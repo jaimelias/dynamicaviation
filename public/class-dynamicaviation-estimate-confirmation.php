@@ -172,11 +172,11 @@ class Dynamic_Aviation_Estimate_Confirmation
 					
 					if(!isset($_POST['aircraft_id']))
 					{
-						require_once( $this->plugin_dir_path . 'public/general_email_template.php');
+						require_once( $this->plugin_dir_path . 'public/email_templates/general.php');
 					}
 					else
 					{
-						require_once($this->plugin_dir_path . 'public/quote_email_template.php');
+						require_once($this->plugin_dir_path . 'public/email_templates/quote.php');
 					}
 					
 					
@@ -207,11 +207,11 @@ class Dynamic_Aviation_Estimate_Confirmation
 			'g-recaptcha-response',
 			'aircraft_origin',
 			'aircraft_destination',
-			'aircraft_departure_date',
-			'aircraft_departure_hour',
+			'start_date',
+			'start_hour',
 			'departure_itinerary',
-			'aircraft_return_date',
-			'aircraft_return_hour',
+			'end_date',
+			'end_hour',
 			'return_itinerary',
 		);
 	}

@@ -87,7 +87,7 @@ const validate_aircraft_form = () => {
 	jQuery('.aircraft_calculator').each(function(){
 		
 		const thisForm = jQuery(this);
-		const excludeArr = ['aircraft_return_date', 'aircraft_return_hour', 'aircraft_return_date_submit', 'aircraft_return_hour_submit'];
+		const excludeArr = ['end_date', 'end_hour', 'aircraft_return_date_submit', 'aircraft_return_hour_submit'];
 		
 		jQuery(thisForm).find('#aircraft_submit').click(function(){
 			
@@ -135,8 +135,8 @@ const validate_aircraft_form = () => {
 
 			if(invalid_field === 0)
 			{
-				const hash = sha512(jQuery(thisForm).find('input[name="aircraft_pax"]').val()+jQuery(thisForm).find('input[name="aircraft_departure_date"]').val());
-				const departure = Date.parse(jQuery('input[name="aircraft_departure_date"]').val());
+				const hash = sha512(jQuery(thisForm).find('input[name="pax_num"]').val()+jQuery(thisForm).find('input[name="start_date"]').val());
+				const departure = Date.parse(jQuery('input[name="start_date"]').val());
 				let today = new Date();
 				today.setDate(today.getDate() - 2);
 				today = Date.parse(today);
@@ -148,8 +148,8 @@ const validate_aircraft_form = () => {
 					gtag('event', 'search_flight', {
 						itinerary,
 						days_between,
-						departure: jQuery('#aircraft_departure_date').val(),
-						pax: jQuery('#aircraft_pax').val()
+						departure: jQuery('#start_date').val(),
+						pax: jQuery('#pax_num').val()
 					});
 				}
 				else
@@ -176,8 +176,8 @@ const one_way_round_trip = () => {
 		else
 		{
 			jQuery('.aircraft_return').fadeOut();
-			jQuery('#aircraft_return_date').val('');
-			jQuery('#aircraft_return_hour').val('');
+			jQuery('#end_date').val('');
+			jQuery('#end_hour').val('');
 		}
 	});		
 }
@@ -298,7 +298,7 @@ jQuery('.aircraft_calculator').each(function(){
 			}
 			if(jQuery(thisForm).find('.aircraft_selected').length == 2)
 			{
-				jQuery(thisForm).find('input[name="aircraft_pax"]').focus();
+				jQuery(thisForm).find('input[name="pax_num"]').focus();
 			}
 			else
 			{
