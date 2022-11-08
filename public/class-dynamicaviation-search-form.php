@@ -37,29 +37,29 @@ class Dynamic_Aviation_Search_Form {
         ?>
             <form class="aircraft_calculator" method="get" action="<?php echo esc_url(home_lang().'instant_quote/'); ?>">
 
-            <div class="bottom-20"><label><i class="linkcolor fas fa-map-marker"></i> <?php echo (esc_html__('Origin', 'dynamicaviation')); ?></label>
-            <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo (esc_html__('country / city / airport', 'dynamicaviation')); ?>" /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l"></div>
+            <div class="bottom-20"><label><i class="linkcolor fas fa-map-marker"></i> <?php echo esc_html(__('Origin', 'dynamicaviation')); ?></label>
+            <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l"></div>
 
 
             <div class="bottom-20">
-                <label><i class="linkcolor fas fa-map-marker"></i> <?php echo (esc_html__('Destination', 'dynamicaviation')); ?></label>	
-                <input type="text" id="aircraft_destination" name="aircraft_destination" class="aircraft_list" spellcheck="false" placeholder="<?php echo (esc_html__('country / city / airport', 'dynamicaviation')); ?>" /><input type="hidden" id="aircraft_destination_l" name="aircraft_destination_l">
+                <label><i class="linkcolor fas fa-map-marker"></i> <?php echo esc_html(__('Destination', 'dynamicaviation')); ?></label>	
+                <input type="text" id="aircraft_destination" name="aircraft_destination" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" /><input type="hidden" id="aircraft_destination_l" name="aircraft_destination_l">
             </div>
 
 
             <div class="pure-g gutters">
                 <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                     <div class="bottom-20">
-                        <label><i class="linkcolor fas fa-male"></i> <?php echo (esc_html__('Passengers', 'dynamicaviation')); ?></label>
+                        <label><i class="linkcolor fas fa-male"></i> <?php echo esc_html(__('Passengers', 'dynamicaviation')); ?></label>
                     <input type="number" min="1" name="pax_num" id="pax_num"/>
                     </div>
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                     <div class="bottom-20">
-                        <label><i class="linkcolor fas fa-plane"></i> <?php echo (esc_html__('Flight', 'dynamicaviation')); ?></label>
+                        <label><i class="linkcolor fas fa-plane"></i> <?php echo esc_html(__('Flight', 'dynamicaviation')); ?></label>
                         <select name="aircraft_flight" id="aircraft_flight">
-                            <option value="0"><?php echo (esc_html__('One way', 'dynamicaviation')); ?></option>
-                            <option value="1"><?php echo (esc_html__('Round trip', 'dynamicaviation')); ?></option>
+                            <option value="0"><?php echo esc_html(__('One way', 'dynamicaviation')); ?></option>
+                            <option value="1"><?php echo esc_html(__('Round trip', 'dynamicaviation')); ?></option>
                         </select>
                     </div>
                 </div>
