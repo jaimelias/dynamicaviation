@@ -134,7 +134,7 @@ class Dynamic_Aviation_Public {
 
 		if(isset($dy_aviation_load_algolia))
 		{
-			wp_enqueue_style($this->plugin_name, $this->plugin_dir_url . 'css/dynamicaviation-public.css', array(), time(), 'all');
+			wp_enqueue_style($this->plugin_name, $this->plugin_dir_url . 'css/dynamicaviation-public.css', array(), $this->version, 'all');
 
 			//date time picker
 			wp_enqueue_style( 'picker-css', $this->plugin_dir_url . 'css/picker/default.css', array(), 'dynamicaviation', 'all' );
