@@ -18,12 +18,18 @@ class Dynamic_Aviation_Public {
 		add_filter('minimal_sitemap', array(&$this, 'sitemap'), 10);
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
+		add_action('wp_head', array(&$this, 'plugin_public_args'));
 	}
 
 	public function init()
 	{
 		$this->get_languages = get_languages();
 		$this->home_lang = home_lang();
+	}
+
+	public function plugin_public_args()
+	{
+		echo '<script>'.$this->utilities->plugin_public_args().'</script>';
 	}
 
 	public function mapbox_vars()
@@ -195,7 +201,6 @@ class Dynamic_Aviation_Public {
 			//end picker
 			
 			wp_enqueue_script($this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-public.js', $dep, time(), true );
-			wp_add_inline_script($this->plugin_name, $this->utilities->json_src_url(), 'before');
 		}
 
 	}

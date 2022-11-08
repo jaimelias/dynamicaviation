@@ -28,7 +28,7 @@ class Dynamic_Aviation_Utilities {
 		}
 	}
 
-	public function json_src_url()
+	public function plugin_public_args()
 	{
 		return 'const jsonsrc = () => { return "'.esc_url($this->plugin_dir_url.'public/').'";}';
 	}
