@@ -65,6 +65,11 @@
 	font-weight: normal;
 	margin: 0 !important;
  }
+ .aircraft_calculator input,  .aircraft_calculator select
+ {
+	font-size: .85em;
+	font-weight: 400;
+ }
  .sflag img
  {
 	border: solid 1px #999;
@@ -75,9 +80,9 @@
  .algolia-autocomplete {
 	color: #262626;
   width: 100%;
-  font-size: 85%;
   line-height: 1.5;
 }
+
 .algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
   width: 100%;
 }
@@ -89,6 +94,7 @@
   background-color: #f7f7f7;
   border: 1px solid #3692b0;
   border-top: none;
+  font-size: .85em;
 }
 .algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
   cursor: pointer;

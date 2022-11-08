@@ -74,12 +74,12 @@ class Dynamic_Aviation_Search_Form {
             <div class="pure-g gutters">
                 <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                     <div class="bottom-20">
-                        <label><i class="linkcolor fas fa-calendar-alt"></i> <?php echo (esc_html__('Date of Departure', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="start_date" id="start_date"/>
+                        <label><i class="linkcolor fas fa-calendar-alt"></i> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="start_date" id="start_date" placeholder="<?php echo esc_html(__('YYYY-MM-DD', 'dynamicaviation')); ?>" />
                     </div>
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                     <div class="bottom-20">
-                        <label><i class="linkcolor fas fa-clock"></i> <?php echo (esc_html__('Hour of Departure', 'dynamicaviation')); ?></label><input placeholder="<?php echo (esc_html__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="start_hour" id="start_hour"/>
+                        <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="start_hour" id="start_hour"/>
                     </div>
                 </div>
             </div>
@@ -88,18 +88,18 @@ class Dynamic_Aviation_Search_Form {
                 <div class="pure-g gutters">
                     <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                         <div class="bottom-20">
-                            <label><i class="linkcolor fas fa-calendar-alt"></i> <?php echo (esc_html__('Date of Return', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="end_date" id="end_date"/>
+                            <label><i class="linkcolor fas fa-calendar-alt"></i> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="end_date" id="end_date" placeholder="<?php echo esc_html(__('YYYY-MM-DD', 'dynamicaviation')); ?>" />
                         </div>
                     </div>
                     <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                         <div class="bottom-20">
-                            <label><i class="linkcolor fas fa-clock"></i> <?php echo (esc_html__('Hour of Return', 'dynamicaviation')); ?></label><input placeholder="<?php echo (esc_html__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="end_hour" id="end_hour"/>
+                            <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="end_hour" id="end_hour"/>
                         </div>
                     </div>
                 </div>	
             </div>
 
-            <div class="text-center bottom-20"><button id="aircraft_submit" class="strong uppercase pure-button pure-button-primary" type="button"><i class="fa fa-search" aria-hidden="true"></i> <?php echo (esc_html__('Find Aircrafts', 'dynamicaviation')); ?></button></div>
+            <div class="text-center bottom-20"><button id="aircraft_submit" class="strong uppercase pure-button pure-button-primary" type="button"><i class="fa fa-search" aria-hidden="true"></i> <?php echo esc_html(__('Find Aircrafts', 'dynamicaviation')); ?></button></div>
 
             <div class="text-center"><small class="text-muted">Powered by</small> <img style="vertical-align: middle;" width="57" height="18" alt="algolia" src="<?php echo esc_url(plugin_dir_url(__DIR__) . 'public/img/algolia.svg'); ?>"/></div>
                 
