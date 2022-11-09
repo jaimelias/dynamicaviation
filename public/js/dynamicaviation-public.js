@@ -91,9 +91,8 @@ const validate_aircraft_form = () => {
 		
 		jQuery(thisForm).find('#aircraft_submit').click(function(){
 			
-			let invalid_field = 0;
+			let invalid_field = [];
 
-			
 			jQuery(thisForm).find('input').each(function(){
 
 				const value = jQuery(this).val();
@@ -107,7 +106,7 @@ const validate_aircraft_form = () => {
 					}
 					else
 					{
-						invalid_field++;
+						invalid_field.push(name);
 						jQuery(this).addClass('invalid_field');
 					}
 				}
@@ -117,7 +116,7 @@ const validate_aircraft_form = () => {
 					{
 						if(!jQuery(this).hasClass('aircraft_selected'))
 						{
-							invalid_field++;
+							invalid_field.push(name);
 							jQuery(this).addClass('invalid_field');
 						}
 						else
@@ -133,7 +132,7 @@ const validate_aircraft_form = () => {
 			});
 
 
-			if(invalid_field === 0)
+			if(invalid_field.length === 0)
 			{
 				const hash = sha512(jQuery(thisForm).find('input[name="pax_num"]').val()+jQuery(thisForm).find('input[name="start_date"]').val());
 				const departure = Date.parse(jQuery('input[name="start_date"]').val());
@@ -158,6 +157,10 @@ const validate_aircraft_form = () => {
 				}
 				jQuery(thisForm).attr({'action': jQuery(thisForm).attr('action')+hash});
 				jQuery(thisForm).submit();
+			}
+			else
+			{
+				alert(invalid_field);
 			}
 		});			
 	});
