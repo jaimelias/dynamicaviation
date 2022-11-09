@@ -160,7 +160,7 @@ const validate_aircraft_form = () => {
 			}
 			else
 			{
-				alert(invalid_field);
+				alert(JSON.stringify(invalid_field));
 			}
 		});			
 	});
