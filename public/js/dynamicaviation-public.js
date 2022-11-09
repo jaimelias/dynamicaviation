@@ -93,8 +93,7 @@ const validate_aircraft_form = () => {
 			
 			let invalid_field = [];
 
-			
-			jQuery(thisForm).find('input').each(function(){
+			jQuery(thisForm).find('input').add('select').each(function(){
 
 				const value = jQuery(this).val();
 				const name = jQuery(this).attr('name');
@@ -167,6 +166,7 @@ const validate_aircraft_form = () => {
 			else
 			{
 				console.log({invalid_field});
+				alert(JSON.stringify({invalid_field}));
 			}
 		});			
 	});
