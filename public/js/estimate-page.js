@@ -32,7 +32,7 @@ async function validateAviationEstimateRequest (token) {
 		const thisName = jQuery(this).attr('name');
 		const thisVal = jQuery(this).val();
 
-		if(thisVal == '' && thisName != 'g-recaptcha-response')
+		if(thisVal === '' && thisName !== 'g-recaptcha-response')
 		{
 			if(isOneWay)
 			{

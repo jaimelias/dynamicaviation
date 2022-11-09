@@ -248,6 +248,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 		{
 			if(get_query_var($this->pathname) && $this->validate_required_params())
 			{
+				
 				$output = true;
 				$GLOBALS[$which_var] = $output;
 			}	
