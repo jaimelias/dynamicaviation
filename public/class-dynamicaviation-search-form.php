@@ -38,12 +38,12 @@ class Dynamic_Aviation_Search_Form {
             <form class="aircraft_calculator" method="get" action="<?php echo esc_url(home_lang().'instant_quote/'); ?>">
 
             <div class="bottom-20"><label><i class="linkcolor fas fa-map-marker"></i> <?php echo esc_html(__('Origin', 'dynamicaviation')); ?></label>
-            <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" autocomplete="off" /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l" autocomplete="off" /></div>
+            <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" autocomplete="off" /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l"  /></div>
 
 
             <div class="bottom-20">
                 <label><i class="linkcolor fas fa-map-marker"></i> <?php echo esc_html(__('Destination', 'dynamicaviation')); ?></label>	
-                <input type="text" id="aircraft_destination" name="aircraft_destination" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" autocomplete="off" /><input type="hidden" id="aircraft_destination_l" name="aircraft_destination_l" autocomplete="off" />
+                <input type="text" id="aircraft_destination" name="aircraft_destination" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" autocomplete="off" /><input type="hidden" id="aircraft_destination_l" name="aircraft_destination_l" />
             </div>
 
 
