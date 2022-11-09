@@ -50,7 +50,7 @@ class Dynamic_Aviation_Image {
         {
             $path = pathinfo($_SERVER['REQUEST_URI']);
 
-            if(array_key_exists('dirname', $path))
+            if(array_key_exists('dirname', $path) && array_key_exists('basename', $path) && array_key_exists('filename', $path))
             {
                 $dirname = $path['dirname'];
                 $basename = $path['basename'];
