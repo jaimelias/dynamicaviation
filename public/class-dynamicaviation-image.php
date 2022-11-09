@@ -49,19 +49,23 @@ class Dynamic_Aviation_Image {
         else
         {
             $path = pathinfo($_SERVER['REQUEST_URI']);
-            $dirname = $path['dirname'];
-            $basename = $path['basename'];
-            $dirname_arr = array_values(array_filter(explode('/', $dirname)));
-            $filename = $path['filename'];
 
-            if(is_array($dirname_arr))
+            if(array_key_exists('dirname', $path))
             {
-                if(count($dirname_arr) > 0)
-                {
-                    if(in_array($this->pathname, $dirname_arr) && str_ends_with($basename, '.png'))
-                    {
+                $dirname = $path['dirname'];
+                $basename = $path['basename'];
+                $dirname_arr = array_values(array_filter(explode('/', $dirname)));
+                $filename = $path['filename'];
 
-                        $output = $filename;
+                if(is_array($dirname_arr))
+                {
+                    if(count($dirname_arr) > 0)
+                    {
+                        if(in_array($this->pathname, $dirname_arr) && str_ends_with($basename, '.png'))
+                        {
+
+                            $output = $filename;
+                        }
                     }
                 }
             }
