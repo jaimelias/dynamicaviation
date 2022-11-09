@@ -87,7 +87,7 @@ const validate_aircraft_form = () => {
 	jQuery('.aircraft_calculator').each(function(){
 		
 		const thisForm = jQuery(this);
-		const excludeArr = ['end_date', 'end_hour', 'aircraft_return_date_submit', 'aircraft_return_hour_submit'];
+		const excludeArr = ['end_date', 'end_time'];
 		
 		jQuery(thisForm).find('#aircraft_submit').click(function(){
 			
@@ -103,6 +103,11 @@ const validate_aircraft_form = () => {
 				{
 					if(jQuery('#aircraft_flight').val() == 0 && excludeArr.includes(name))
 					{
+						jQuery(this).removeClass('invalid_field');
+					}
+					else if(name.endsWith('_submit'))
+					{
+						//fix date picke bug that adds end_date_submit and end_hour_submit
 						jQuery(this).removeClass('invalid_field');
 					}
 					else
@@ -159,6 +164,10 @@ const validate_aircraft_form = () => {
 				jQuery(thisForm).attr({'action': jQuery(thisForm).attr('action')+hash});
 				jQuery(thisForm).submit();
 			}
+			else
+			{
+				console.log({invalid_field});
+			}
 		});			
 	});
 }
@@ -177,7 +186,7 @@ const one_way_round_trip = () => {
 		{
 			jQuery('.aircraft_return').fadeOut();
 			jQuery('#end_date').val('');
-			jQuery('#end_hour').val('');
+			jQuery('#end_time').val('');
 		}
 	});		
 }

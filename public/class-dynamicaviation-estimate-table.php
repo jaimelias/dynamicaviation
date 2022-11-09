@@ -28,9 +28,9 @@ class Dynamic_Aviation_Estimate_Table {
             'start_date', 
             'aircraft_origin_l', 
             'aircraft_destination_l', 
-            'start_hour',
+            'start_time',
             'end_date',
-            'end_hour',
+            'end_time',
             'aircraft_origin',
             'aircraft_destination',
         );
@@ -101,7 +101,7 @@ class Dynamic_Aviation_Estimate_Table {
         $output .= ' '.__('on', 'dynamicaviation').' ';
         $output .= date_i18n(get_option( 'date_format' ), strtotime($this->get->start_date));
         $output .= ' '.__('at', 'dynamicaviation').' ';
-        $output .= $this->get->start_hour;
+        $output .= $this->get->start_time;
         return $output;
     }
 
@@ -118,7 +118,7 @@ class Dynamic_Aviation_Estimate_Table {
             $output .= ' '.__('on', 'dynamicaviation').' ';
             $output .= date_i18n(get_option('date_format'), strtotime($this->get->end_date));
             $output .= ' '.__('at', 'dynamicaviation').' ';
-            $output .= $this->get->end_hour;
+            $output .= $this->get->end_time;
         }
 
         return $output;

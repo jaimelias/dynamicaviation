@@ -197,10 +197,10 @@ class Dynamic_Aviation_Estimate_Confirmation
 			'aircraft_origin',
 			'aircraft_destination',
 			'start_date',
-			'start_hour',
+			'start_time',
 			'departure_itinerary',
 			'end_date',
-			'end_hour',
+			'end_time',
 			'return_itinerary',
 		);
 	}

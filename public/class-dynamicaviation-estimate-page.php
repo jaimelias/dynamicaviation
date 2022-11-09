@@ -182,7 +182,7 @@ class Dynamic_Aviation_Estimate_Page
 		}
 		else
 		{
-			if(get_query_var('instant_quote') && isset($_GET['aircraft_origin']) && isset($_GET['aircraft_destination']) && isset($_GET['pax_num']) && isset($_GET['aircraft_flight']) && isset($_GET['start_date']) && isset($_GET['start_hour']) && isset($_GET['end_date']) && isset($_GET['end_hour']) && isset($_GET['aircraft_origin_l']) && isset($_GET['aircraft_destination_l']))
+			if(get_query_var('instant_quote') && isset($_GET['aircraft_origin']) && isset($_GET['aircraft_destination']) && isset($_GET['pax_num']) && isset($_GET['aircraft_flight']) && isset($_GET['start_date']) && isset($_GET['start_time']) && isset($_GET['end_date']) && isset($_GET['end_time']) && isset($_GET['aircraft_origin_l']) && isset($_GET['aircraft_destination_l']))
 			{
 				$output = true;
 			}

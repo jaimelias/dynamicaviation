@@ -73,7 +73,7 @@ class Dynamic_Aviation_Search_Form {
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                     <div class="bottom-20">
-                        <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="start_hour" id="start_hour" autocomplete="off"/>
+                        <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="start_time" id="start_time" autocomplete="off"/>
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@ class Dynamic_Aviation_Search_Form {
                     </div>
                     <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                         <div class="bottom-20">
-                            <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="end_hour" id="end_hour" autocomplete="off"/>
+                            <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="end_time" id="end_time" autocomplete="off"/>
                         </div>
                     </div>
                 </div>	
