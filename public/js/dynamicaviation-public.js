@@ -159,10 +159,6 @@ const validate_aircraft_form = () => {
 				jQuery(thisForm).attr({'action': jQuery(thisForm).attr('action')+hash});
 				jQuery(thisForm).submit();
 			}
-			else
-			{
-				alert(invalid_field.join(', '));
-			}
 		});			
 	});
 }

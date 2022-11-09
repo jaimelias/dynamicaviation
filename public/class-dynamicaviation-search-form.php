@@ -38,12 +38,12 @@ class Dynamic_Aviation_Search_Form {
             <form class="aircraft_calculator" method="get" action="<?php echo esc_url(home_lang().'instant_quote/'); ?>">
 
             <div class="bottom-20"><label><i class="linkcolor fas fa-map-marker"></i> <?php echo esc_html(__('Origin', 'dynamicaviation')); ?></label>
-            <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>"  /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l" /></div>
+            <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" autocomplete="off" /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l" autocomplete="off" /></div>
 
 
             <div class="bottom-20">
                 <label><i class="linkcolor fas fa-map-marker"></i> <?php echo esc_html(__('Destination', 'dynamicaviation')); ?></label>	
-                <input type="text" id="aircraft_destination" name="aircraft_destination" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>"  /><input type="hidden" id="aircraft_destination_l" name="aircraft_destination_l" />
+                <input type="text" id="aircraft_destination" name="aircraft_destination" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" autocomplete="off" /><input type="hidden" id="aircraft_destination_l" name="aircraft_destination_l" autocomplete="off" />
             </div>
 
 
@@ -51,13 +51,13 @@ class Dynamic_Aviation_Search_Form {
                 <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                     <div class="bottom-20">
                         <label><i class="linkcolor fas fa-male"></i> <?php echo esc_html(__('Passengers', 'dynamicaviation')); ?></label>
-                    <input type="number" min="1" name="pax_num" id="pax_num" />
+                    <input type="number" min="1" name="pax_num" id="pax_num" autocomplete="off"/>
                     </div>
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                     <div class="bottom-20">
                         <label><i class="linkcolor fas fa-plane"></i> <?php echo esc_html(__('Flight', 'dynamicaviation')); ?></label>
-                        <select name="aircraft_flight" id="aircraft_flight" >
+                        <select name="aircraft_flight" id="aircraft_flight" autocomplete="off">
                             <option value="0"><?php echo esc_html(__('One way', 'dynamicaviation')); ?></option>
                             <option value="1"><?php echo esc_html(__('Round trip', 'dynamicaviation')); ?></option>
                         </select>
@@ -68,12 +68,12 @@ class Dynamic_Aviation_Search_Form {
             <div class="pure-g gutters">
                 <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                     <div class="bottom-20">
-                        <label><i class="linkcolor fas fa-calendar-alt"></i> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="start_date" id="start_date" placeholder="<?php echo esc_html(__('YYYY-MM-DD', 'dynamicaviation')); ?>" />
+                        <label><i class="linkcolor fas fa-calendar-alt"></i> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="start_date" id="start_date" placeholder="<?php echo esc_html(__('YYYY-MM-DD', 'dynamicaviation')); ?>" autocomplete="off"/>
                     </div>
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                     <div class="bottom-20">
-                        <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="start_hour" id="start_hour" />
+                        <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="start_hour" id="start_hour" autocomplete="off"/>
                     </div>
                 </div>
             </div>
@@ -82,12 +82,12 @@ class Dynamic_Aviation_Search_Form {
                 <div class="pure-g gutters">
                     <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                         <div class="bottom-20">
-                            <label><i class="linkcolor fas fa-calendar-alt"></i> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="end_date" id="end_date" placeholder="<?php echo esc_html(__('YYYY-MM-DD', 'dynamicaviation')); ?>" />
+                            <label><i class="linkcolor fas fa-calendar-alt"></i> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="end_date" id="end_date" placeholder="<?php echo esc_html(__('YYYY-MM-DD', 'dynamicaviation')); ?>" autocomplete="off" />
                         </div>
                     </div>
                     <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
                         <div class="bottom-20">
-                            <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="end_hour" id="end_hour" />
+                            <label><i class="linkcolor fas fa-clock"></i> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="end_hour" id="end_hour" autocomplete="off"/>
                         </div>
                     </div>
                 </div>	
