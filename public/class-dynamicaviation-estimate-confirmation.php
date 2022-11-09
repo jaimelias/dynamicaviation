@@ -44,7 +44,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 		$this->get_languages = get_languages();
 		$this->site_name = get_bloginfo('name');
 		$this->current_language = current_language();
-		$this->valid_recaptcha = $this->validate_recaptcha();
+		$this->valid_recaptcha = validate_recaptcha();
     }	
 
 	public function add_rewrite_rule()
@@ -102,15 +102,7 @@ class Dynamic_Aviation_Estimate_Confirmation
     {
 		if($this->validate_form_submit())
 		{
-			
-			if($this->valid_recaptcha)
-			{				
-				$content = '<p class="minimal_success">'.esc_html(__('Request received. Our sales team will be in touch with you soon.', 'dynamicaviation')).'</p>';
-			}
-			else
-			{
-				$content = '<p class="minimal_alert">'.esc_html(__('Invalid Recaptcha', 'dynamicaviation')).'</p>';
-			}
+			$content = '<p class="minimal_success">'.esc_html(__('Request received. Our sales team will be in touch with you soon.', 'dynamicaviation')).'</p>';
 		}
 
         return $content;
@@ -158,38 +150,35 @@ class Dynamic_Aviation_Estimate_Confirmation
 
 		if(!isset($$which_var) && isset($query->query_vars[$this->pathname]))
 		{
-			if($this->valid_recaptcha)
+			if($this->validate_form_submit())
 			{
-				if($this->validate_form_submit())
+				$data = $_POST;
+				$data['lang'] = $this->current_language;
+				$notes = apply_filters('dy_aviation_estimate_notes', '');
+				$subject = apply_filters('dy_aviation_estimate_subject', '');
+				$price = isset($_POST['aircraft_id']) 
+					? $this->utilities->currency_format(sanitize_text_field($_POST['aircraft_price']))
+					: 0;
+				
+				if(!isset($_POST['aircraft_id']))
 				{
-					$data = $_POST;
-					$data['lang'] = $this->current_language;
-					$notes = apply_filters('dy_aviation_estimate_notes', '');
-					$subject = apply_filters('dy_aviation_estimate_subject', '');
-					$price = isset($_POST['aircraft_id']) 
-						? $this->utilities->currency_format(sanitize_text_field($_POST['aircraft_price']))
-						: 0;
-					
-					if(!isset($_POST['aircraft_id']))
-					{
-						require_once( $this->plugin_dir_path . 'public/email_templates/general.php');
-					}
-					else
-					{
-						require_once($this->plugin_dir_path . 'public/email_templates/quote.php');
-					}
-					
-					
-					$args = array(
-						'subject' => $subject,
-						'to' => sanitize_email($_POST['email']),
-						'message' => $email_template
-					);
+					require_once( $this->plugin_dir_path . 'public/email_templates/general.php');
+				}
+				else
+				{
+					require_once($this->plugin_dir_path . 'public/email_templates/quote.php');
+				}
+				
+				
+				$args = array(
+					'subject' => $subject,
+					'to' => sanitize_email($_POST['email']),
+					'message' => $email_template
+				);
 
-					sg_mail($args);
+				sg_mail($args);
 
-					$GLOBALS[$which_var] = true;
-				}			
+				$GLOBALS[$which_var] = true;
 			}
 		}
 	}
@@ -246,72 +235,13 @@ class Dynamic_Aviation_Estimate_Confirmation
 		}
 		else
 		{
-			if(get_query_var($this->pathname) && $this->validate_required_params())
+			if(get_query_var($this->pathname) && $this->validate_required_params() && $this->valid_recaptcha)
 			{
-				
 				$output = true;
 				$GLOBALS[$which_var] = $output;
 			}	
 		}
 
-		return $output;
-	}
-
-	public function validate_recaptcha()
-	{
-		$output = false;
-		$which_var = 'aviation_validate_recaptcha';
-		global $$which_var;
-
-		if(isset($$which_var))
-		{
-			$output = $$which_var;
-		}
-		else
-		{
-			if((isset($_POST['g-recaptcha-response'])))
-			{
-				$secret_key = get_option('dy_recaptcha_secret_key');
-
-				if($secret_key)
-				{
-					$url = 'https://www.google.com/recaptcha/api/siteverify';			
-
-					$ip = (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) 
-						? $_SERVER['HTTP_CF_CONNECTING_IP'] : 
-						$_SERVER['REMOTE_ADDR'];
-
-					$params = array(
-						'secret' => $secret_key,
-						'remoteip' => $ip,
-						'response' => sanitize_text_field($_POST['g-recaptcha-response']),
-					);
-					
-					$resp = wp_remote_post($url, array(
-						'body' => $params
-					));
-					
-					if ( is_array( $resp ) && ! is_wp_error( $resp ) )
-					{
-						if($resp['response']['code'] === 200)
-						{
-							$output = true;
-						}
-						else
-						{
-							$output = false;
-						}
-					}
-				}
-			}
-			else
-			{
-				$output = false;
-			}
-
-			$GLOBALS[$which_var] = $output;
-		}
-		
 		return $output;
 	}
 
