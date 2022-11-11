@@ -89,8 +89,8 @@ async function validateaircraftsearch (token) {
 		const excludeArr = ['end_date', 'end_time'];
 		let invalid_field = [];
 		const formData = jQuery(thisForm).serializeArray();
-
-		console.log(formData);
+		const action = jQuery(thisForm).attr('data-action');
+		const nonce = jQuery(thisForm).attr('data-nonce');
 
 		formData.forEach(o => {
 			const {name, value} = o;
@@ -137,7 +137,6 @@ async function validateaircraftsearch (token) {
 
 		if(invalid_field.length === 0)
 		{
-			const hash = sha512(jQuery(thisForm).find('input[name="pax_num"]').val()+jQuery(thisForm).find('input[name="start_date"]').val());
 			const departure = Date.parse(jQuery('input[name="start_date"]').val());
 			let today = new Date();
 			today.setDate(today.getDate() - 2);
@@ -158,7 +157,7 @@ async function validateaircraftsearch (token) {
 			{
 				console.log('dynamicaviation: gtag not defined');
 			}
-			jQuery(thisForm).attr({'action': jQuery(thisForm).attr('action')+hash});
+			jQuery(thisForm).attr({'action': `${action}/${nonce}`});
 			jQuery(thisForm).submit();
 		}
 		else
@@ -254,7 +253,6 @@ jQuery('.aircraft_search_form').each(function(){
 			}
 		}]).on('autocomplete:selected', function(event, suggestion) {
 			
-			
 
 			let {iata, icao, airport, airport_names, city, country_code, _geoloc} = suggestion;
 
@@ -267,9 +265,6 @@ jQuery('.aircraft_search_form').each(function(){
 			jQuery(thisForm)
 				.find('#'+jQuery(this_field).attr('id')+'_l')
 				.val(`${airport}${icao || iata.length === 3 ? ' ('+ iata + ')':  ''}, ${city}, ${country_code}`);
-
-			jQuery(thisForm).find('button.fake').addClass('hidden');
-			jQuery(thisForm).find('button.real').removeClass('hidden');
 			
 			jQuery(this_field).attr({
 				'data-iata': iata,

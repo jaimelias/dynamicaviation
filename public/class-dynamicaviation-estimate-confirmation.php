@@ -183,6 +183,15 @@ class Dynamic_Aviation_Estimate_Confirmation
 		}
 	}
 
+	public function non_required_params()
+	{
+		return array(
+			'end_date',
+			'end_time',
+			'end_itinerary'
+		);
+	}
+
 	public function required_params()
 	{
 		return array(
@@ -198,19 +207,23 @@ class Dynamic_Aviation_Estimate_Confirmation
 			'aircraft_destination',
 			'start_date',
 			'start_time',
-			'departure_itinerary',
-			'end_date',
-			'end_time',
-			'return_itinerary',
+			'start_itinerary'
 		);
 	}
-
 
 	public function validate_required_params()
 	{
 		$output = true;
 
 		$params = $this->required_params();
+
+		if(isset($_POST['aircraft_flight']))
+		{
+			if(intval($_POST['aircraft_flight']) === 1)
+			{
+				$output = array_merge($params, $this->non_required_params());
+			}
+		}
 
 		for($x = 0; $x < count($params); $x++)
 		{
@@ -219,6 +232,8 @@ class Dynamic_Aviation_Estimate_Confirmation
 				$output = false;
 			}	
 		}
+
+
 
 		return $output;
 	}

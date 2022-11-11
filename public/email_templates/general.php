@@ -18,15 +18,15 @@ $client_phone = sanitize_text_field($_POST['phone']);
 $label_item = __('Service', 'dynamicaviation');
 $label_total = __('Total', 'dynamicaviation');
 $label_subtotal = __('Subtotal', 'dynamicaviation');
-$departure_itinerary = sanitize_text_field($_POST['departure_itinerary']);
-$return_itinerary = sanitize_text_field($_POST['return_itinerary']);
+$start_itinerary = sanitize_text_field($_POST['start_itinerary']);
+$end_itinerary = sanitize_text_field($_POST['end_itinerary']);
 
 
-$departure_itinerary = ($departure_itinerary) ? __('Departure', 'dynamicaviation') . ': ' . $departure_itinerary : '';
-$return_itinerary = ($return_itinerary) ? __('Return', 'dynamicaviation') . ': ' . $return_itinerary : '';
-$itinerary_html = ($return_itinerary) ? $departure_itinerary.'<br/><br/>'.$return_itinerary : $departure_itinerary;
+$start_itinerary = ($start_itinerary) ? __('Departure', 'dynamicaviation') . ': ' . $start_itinerary : '';
+$end_itinerary = ($end_itinerary) ? __('Return', 'dynamicaviation') . ': ' . $end_itinerary : '';
+$itinerary_html = ($end_itinerary) ? $start_itinerary.'<br/><br/>'.$end_itinerary : $start_itinerary;
 $itinerary_html .= '<br/><br/>' . __('Passengers', 'dynamicaviation') . ': ' . $passengers;
-$itinerary_text = ($return_itinerary) ? $departure_itinerary . ' || ' . $return_itinerary : $departure_itinerary;
+$itinerary_text = ($end_itinerary) ? $start_itinerary . ' || ' . $end_itinerary : $start_itinerary;
 $itinerary_text .= ' || ' . __('Passengers', 'dynamicaviation') . ': ' . $passengers;
 
 

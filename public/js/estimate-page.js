@@ -21,18 +21,16 @@ async function validateAviationEstimateRequest (token) {
 	let invalids = [];
 	const thisForm = jQuery('#aircraft_booking_request');
 	const inputs = jQuery(thisForm).find('input').add('select').add('textarea');
-	const queryString = window.location.search;
-	const urlParams = new URLSearchParams(queryString);
-	const isOneWay = urlParams.has('aircraft_flight') ? parseInt(urlParams.get('aircraft_flight')) === 0 ? true : false : false;
+	const isOneWay = (parseInt(jQuery(thisForm).find('input[name="aircraft_flight"]').val()) === 0) ? true : false;
 	const action = jQuery(thisForm).attr('action')+token;
-	const requiredOnRoundTrip = ['end_date', 'end_time', 'return_itinerary'];
+	const requiredOnRoundTrip = ['end_date', 'end_time', 'end_itinerary'];
 
 	jQuery(inputs).each(function(){	
 		
 		const thisName = jQuery(this).attr('name');
 		const thisVal = jQuery(this).val();
 
-		if(thisVal === '' && thisName !== 'g-recaptcha-response')
+		if(thisVal === '')
 		{
 			if(isOneWay)
 			{

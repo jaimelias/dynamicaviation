@@ -41,9 +41,9 @@ class Dynamic_Aviation_Estimate_Table {
         {
             $k = $this->param_names[$x];
 
-            if(isset($_REQUEST[$k]))
+            if(isset($_POST[$k]))
             {
-                $v = sanitize_text_field($_REQUEST[$k]);
+                $v = sanitize_text_field($_POST[$k]);
 
                 if(in_array($k, $intval_params))
                 {
@@ -59,8 +59,8 @@ class Dynamic_Aviation_Estimate_Table {
     {
         $output = '';
         $obj = $this->get;
-        $obj->departure_itinerary = $this->departure_itinerary();
-        $obj->return_itinerary = $this->return_itinerary();
+        $obj->start_itinerary = $this->start_itinerary();
+        $obj->end_itinerary = $this->end_itinerary();
         $obj->channel = '';
         $obj->device = '';
         $obj->landing_path = '';
@@ -92,7 +92,7 @@ class Dynamic_Aviation_Estimate_Table {
         return '<p class="large"><strong>'.esc_html(__('Passengers', 'dynamicaviation')).':</strong> <span class="linkcolor">'.esc_html($this->get->pax_num).'</span></p>';
     }
 
-    public function departure_itinerary()
+    public function start_itinerary()
     {
         $output = '';
         $output .= $this->get->aircraft_origin_l;
@@ -105,7 +105,7 @@ class Dynamic_Aviation_Estimate_Table {
         return $output;
     }
 
-    public function return_itinerary()
+    public function end_itinerary()
     {
         $output = '';
 
@@ -496,11 +496,11 @@ class Dynamic_Aviation_Estimate_Table {
         if ($wp_query->have_posts())
         {
             $output .= $this->pax_template();
-            $output .= '<p class="large"><strong>'.esc_html(__('Departure', 'dynamicaviation')).':</strong> '.$this->departure_itinerary().'</p>';
+            $output .= '<p class="large"><strong>'.esc_html(__('Departure', 'dynamicaviation')).':</strong> '.$this->start_itinerary().'</p>';
             
             if($this->get->aircraft_flight === 1)
             {
-                $output .= '<p class="large"><strong>'.esc_html(__('Return', 'dynamicaviation')).':</strong> '.$this->return_itinerary().'</p>';
+                $output .= '<p class="large"><strong>'.esc_html(__('Return', 'dynamicaviation')).':</strong> '.$this->end_itinerary().'</p>';
             }
             
 
