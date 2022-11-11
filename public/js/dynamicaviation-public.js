@@ -5,11 +5,10 @@ jQuery(() => {
 	dynamicaviation_cookies();
 	aircraft_datepicker();
 	aircraft_timepicker();
-	validate_aircraft_form();
 });
 
 const aircraft_timepicker = () =>	{
-	jQuery('form.aircraft_calculator').find('input.timepicker').each(function(){
+	jQuery('form.aircraft_search_form').find('input.timepicker').each(function(){
 		jQuery(this).pickatime();
 	});
 }
@@ -21,7 +20,7 @@ const aircraft_datepicker = () =>	{
 		min: true
 	};
 
-	jQuery('form.aircraft_calculator').find('input.datepicker').each(function(){
+	jQuery('form.aircraft_search_form').find('input.datepicker').each(function(){
 		
 		if(jQuery(this).attr('type') == 'text')
 		{
@@ -83,92 +82,91 @@ const dynamicaviation_cookies = () => {
 }		
 
 
-const validate_aircraft_form = () => {
-	jQuery('.aircraft_calculator').each(function(){
+async function validateaircraftsearch (token) {
+	jQuery('.aircraft_search_form').each(function(){
 		
 		const thisForm = jQuery(this);
 		const excludeArr = ['end_date', 'end_time'];
-		
-		jQuery(thisForm).find('#aircraft_submit').click(function(){
-			
-			let invalid_field = [];
+		let invalid_field = [];
+		const formData = jQuery(thisForm).serializeArray();
 
-			jQuery(thisForm).find('input').add('select').each(function(){
+		console.log(formData);
 
-				const value = jQuery(this).val();
-				const name = jQuery(this).attr('name');
-				
-				if(value === '')
-				{
-					if(jQuery('#aircraft_flight').val() == 0 && excludeArr.includes(name))
-					{
-						jQuery(this).removeClass('invalid_field');
-					}
-					else if(name.endsWith('_submit'))
-					{
-						//fix date picke bug that adds end_date_submit and end_hour_submit
-						jQuery(this).removeClass('invalid_field');
-					}
-					else
-					{
-						invalid_field.push(name);
-						jQuery(this).addClass('invalid_field');
-					}
-				}
-				else
-				{
-					if(jQuery(this).hasClass('aircraft_list'))
-					{
-						if(!jQuery(this).hasClass('aircraft_selected'))
-						{
-							invalid_field.push(name);
-							jQuery(this).addClass('invalid_field');
-						}
-						else
-						{
-							jQuery(this).removeClass('invalid_field');
-						}
-					}
-					else
-					{
-						jQuery(this).removeClass('invalid_field');
-					}
-				}
-			});
+		formData.forEach(o => {
+			const {name, value} = o;
+			const thisField = jQuery(`[name="${name}"]`);
 
-
-			if(invalid_field.length === 0)
+			if(value === '')
 			{
-				const hash = sha512(jQuery(thisForm).find('input[name="pax_num"]').val()+jQuery(thisForm).find('input[name="start_date"]').val());
-				const departure = Date.parse(jQuery('input[name="start_date"]').val());
-				let today = new Date();
-				today.setDate(today.getDate() - 2);
-				today = Date.parse(today);
-				const days_between = Math.round((departure-today)/(1000*60*60*24));				
-				const itinerary = jQuery('#aircraft_origin').val()+'/'+jQuery('#aircraft_destination').val();
-				
-				if(typeof gtag !== 'undefined')
-				{	
-					gtag('event', 'search_flight', {
-						itinerary,
-						days_between,
-						departure: jQuery('#start_date').val(),
-						pax: jQuery('#pax_num').val()
-					});
+				if(jQuery('#aircraft_flight').val() == 0 && excludeArr.includes(name))
+				{
+					jQuery(thisField).removeClass('invalid_field');
+				}
+				else if(name.endsWith('_submit'))
+				{
+					//fix date picke bug that adds end_date_submit and end_hour_submit
+					jQuery(thisField).removeClass('invalid_field');
 				}
 				else
 				{
-					console.log('dynamicaviation: gtag not defined');
+					invalid_field.push(name);
+					jQuery(thisField).addClass('invalid_field');
 				}
-				jQuery(thisForm).attr({'action': jQuery(thisForm).attr('action')+hash});
-				jQuery(thisForm).submit();
 			}
 			else
 			{
-				console.log({invalid_field});
-				alert(JSON.stringify({invalid_field}));
+				if(jQuery(thisField).hasClass('aircraft_list'))
+				{
+					if(!jQuery(thisField).hasClass('aircraft_selected'))
+					{
+						invalid_field.push(name);
+						jQuery(thisField).addClass('invalid_field');
+					}
+					else
+					{
+						jQuery(thisField).removeClass('invalid_field');
+					}
+				}
+				else
+				{
+					jQuery(thisField).removeClass('invalid_field');
+				}
+			}			
+
+		});
+
+		if(invalid_field.length === 0)
+		{
+			const hash = sha512(jQuery(thisForm).find('input[name="pax_num"]').val()+jQuery(thisForm).find('input[name="start_date"]').val());
+			const departure = Date.parse(jQuery('input[name="start_date"]').val());
+			let today = new Date();
+			today.setDate(today.getDate() - 2);
+			today = Date.parse(today);
+			const days_between = Math.round((departure-today)/(1000*60*60*24));				
+			const itinerary = jQuery('#aircraft_origin').val()+'/'+jQuery('#aircraft_destination').val();
+			
+			if(typeof gtag !== 'undefined')
+			{	
+				gtag('event', 'search_flight', {
+					itinerary,
+					days_between,
+					departure: jQuery('#start_date').val(),
+					pax: jQuery('#pax_num').val()
+				});
 			}
-		});			
+			else
+			{
+				console.log('dynamicaviation: gtag not defined');
+			}
+			jQuery(thisForm).attr({'action': jQuery(thisForm).attr('action')+hash});
+			jQuery(thisForm).submit();
+		}
+		else
+		{
+			console.log({invalid_field});
+			alert(JSON.stringify({invalid_field}));
+			grecaptcha.reset();
+		}
 	});
 }
 
@@ -193,7 +191,7 @@ const one_way_round_trip = () => {
 
 const algolia_execute = () => {
 
-jQuery('.aircraft_calculator').each(function(){
+jQuery('.aircraft_search_form').each(function(){
 
 	const htmlLang = (String(jQuery('html').attr('lang')).slice(0, 2)).toLowerCase() || 'en';
 	const thisForm = jQuery(this);
@@ -269,12 +267,15 @@ jQuery('.aircraft_calculator').each(function(){
 			jQuery(thisForm)
 				.find('#'+jQuery(this_field).attr('id')+'_l')
 				.val(`${airport}${icao || iata.length === 3 ? ' ('+ iata + ')':  ''}, ${city}, ${country_code}`);
+
+			jQuery(thisForm).find('button.fake').addClass('hidden');
+			jQuery(thisForm).find('button.real').removeClass('hidden');
 			
 			jQuery(this_field).attr({
 				'data-iata': iata,
 				'data-lat': _geoloc.lat,
 				'data-lon': _geoloc.lng
-			}).addClass('aircraft_selected').val(iata);	
+			}).addClass('aircraft_selected').val(iata);
 
 			jQuery(this_field).blur(() => {
 				if (jQuery(this_field).hasClass('aircraft_selected'))

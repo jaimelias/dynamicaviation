@@ -60,12 +60,12 @@
 {
 	display: none;
 }
- .aircraft_calculator
+ .aircraft_search_form
  {
 	font-weight: normal;
 	margin: 0 !important;
  }
- .aircraft_calculator input,  .aircraft_calculator select
+ .aircraft_search_form input,  .aircraft_search_form select
  {
 	font-size: .85em;
 	font-weight: 400;
@@ -140,8 +140,4 @@
 	text-decoration: none;
 	color: #262626;
 	background-color: #f7f7f7;
-}
-button#aircraft_submit
-{
-	margin-top: 20px;
 }
