@@ -10,7 +10,6 @@ class Dynamic_Aviation_Estimate_Page
         $this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
         $this->plugin_dir_url = plugin_dir_url( __DIR__ );
 		$this->pathname = 'instant_quote';
-		$this->valid_recaptcha = false;
 
 		//sets OOP vars
         add_action('init', array(&$this, 'init'), 1);
@@ -176,7 +175,7 @@ class Dynamic_Aviation_Estimate_Page
 		{
 			if(get_query_var('instant_quote') && isset($_POST['aircraft_origin']) && isset($_POST['aircraft_destination']) && isset($_POST['pax_num']) && isset($_POST['aircraft_flight']) && isset($_POST['start_date']) && isset($_POST['start_time']) && isset($_POST['end_date']) && isset($_POST['end_time']) && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']))
 			{
-				if($this->validate_nonce() && $this->valid_recaptcha)
+				if($this->validate_nonce())
 				{
 					$output = true;
 				}
@@ -203,7 +202,6 @@ class Dynamic_Aviation_Estimate_Page
 			{
 				if($query->query_vars[$this->pathname])
 				{
-					$this->valid_recaptcha = validate_recaptcha();
 					$GLOBALS['dy_load_recaptcha_scripts'] = true;
 				}
 			}

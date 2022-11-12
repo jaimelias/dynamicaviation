@@ -5,6 +5,7 @@ jQuery(() => {
 	dynamicaviation_cookies();
 	aircraft_datepicker();
 	aircraft_timepicker();
+	validateAircraftSearch();
 });
 
 const aircraft_timepicker = () =>	{
@@ -82,90 +83,103 @@ const dynamicaviation_cookies = () => {
 }		
 
 
-async function validateaircraftsearch (token) {
+
+
+const validateAircraftSearch = () => {
 	jQuery('.aircraft_search_form').each(function(){
 		
 		const thisForm = jQuery(this);
 		const excludeArr = ['end_date', 'end_time'];
 		let invalid_field = [];
-		const formData = jQuery(thisForm).serializeArray();
+		
 		const action = jQuery(thisForm).attr('data-action');
-		const nonce = jQuery(thisForm).attr('data-nonce');
+		const button = jQuery(thisForm).find('#aircraft_search_button');
+		const {homeUrl} = dyCoreArgs;
 
-		formData.forEach(o => {
-			const {name, value} = o;
-			const thisField = jQuery(`[name="${name}"]`);
+		jQuery(button).click(async () => {
 
-			if(value === '')
-			{
-				if(jQuery('#aircraft_flight').val() == 0 && excludeArr.includes(name))
+			const formData = jQuery(thisForm).serializeArray();
+			const now = Date.now();
+			const argsRes = await fetch(`${homeUrl}/wp-json/dy-core/args?timestamp=${now}`);
+			const argsData = await argsRes.json();
+			const nonce = argsData.dy_nonce;
+
+			formData.forEach(o => {
+				const {name, value} = o;
+				const thisField = jQuery(`[name="${name}"]`);
+
+				if(value === '')
 				{
-					jQuery(thisField).removeClass('invalid_field');
-				}
-				else if(name.endsWith('_submit'))
-				{
-					//fix date picke bug that adds end_date_submit and end_hour_submit
-					jQuery(thisField).removeClass('invalid_field');
-				}
-				else
-				{
-					invalid_field.push(name);
-					jQuery(thisField).addClass('invalid_field');
-				}
-			}
-			else
-			{
-				if(jQuery(thisField).hasClass('aircraft_list'))
-				{
-					if(!jQuery(thisField).hasClass('aircraft_selected'))
+					if(jQuery('#aircraft_flight').val() == 0 && excludeArr.includes(name))
+					{
+						jQuery(thisField).removeClass('invalid_field');
+					}
+					else if(name.endsWith('_submit'))
+					{
+						//fix date picke bug that adds end_date_submit and end_hour_submit
+						jQuery(thisField).removeClass('invalid_field');
+					}
+					else
 					{
 						invalid_field.push(name);
 						jQuery(thisField).addClass('invalid_field');
+					}
+				}
+				else
+				{
+					if(jQuery(thisField).hasClass('aircraft_list'))
+					{
+						if(!jQuery(thisField).hasClass('aircraft_selected'))
+						{
+							invalid_field.push(name);
+							jQuery(thisField).addClass('invalid_field');
+						}
+						else
+						{
+							jQuery(thisField).removeClass('invalid_field');
+						}
 					}
 					else
 					{
 						jQuery(thisField).removeClass('invalid_field');
 					}
+				}			
+
+			});
+
+			if(invalid_field.length === 0)
+			{
+				const departure = Date.parse(jQuery('input[name="start_date"]').val());
+				let today = new Date();
+				today.setDate(today.getDate() - 2);
+				today = Date.parse(today);
+				const days_between = Math.round((departure-today)/(1000*60*60*24));				
+				const itinerary = jQuery('#aircraft_origin').val()+'/'+jQuery('#aircraft_destination').val();
+				
+				if(typeof gtag !== 'undefined')
+				{	
+					gtag('event', 'search_flight', {
+						itinerary,
+						days_between,
+						departure: jQuery('#start_date').val(),
+						pax: jQuery('#pax_num').val()
+					});
 				}
 				else
 				{
-					jQuery(thisField).removeClass('invalid_field');
+					console.log('dynamicaviation: gtag not defined');
 				}
-			}			
-
-		});
-
-		if(invalid_field.length === 0)
-		{
-			const departure = Date.parse(jQuery('input[name="start_date"]').val());
-			let today = new Date();
-			today.setDate(today.getDate() - 2);
-			today = Date.parse(today);
-			const days_between = Math.round((departure-today)/(1000*60*60*24));				
-			const itinerary = jQuery('#aircraft_origin').val()+'/'+jQuery('#aircraft_destination').val();
-			
-			if(typeof gtag !== 'undefined')
-			{	
-				gtag('event', 'search_flight', {
-					itinerary,
-					days_between,
-					departure: jQuery('#start_date').val(),
-					pax: jQuery('#pax_num').val()
-				});
+				jQuery(thisForm).attr({'action': `${action}/${nonce}`});
+				jQuery(thisForm).submit();
 			}
 			else
 			{
-				console.log('dynamicaviation: gtag not defined');
+				console.log({invalid_field});
+				alert(JSON.stringify({invalid_field}));
 			}
-			jQuery(thisForm).attr({'action': `${action}/${nonce}`});
-			jQuery(thisForm).submit();
-		}
-		else
-		{
-			console.log({invalid_field});
-			alert(JSON.stringify({invalid_field}));
-			grecaptcha.reset();
-		}
+		});
+
+
 	});
 }
 

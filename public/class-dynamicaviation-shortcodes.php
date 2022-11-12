@@ -17,7 +17,6 @@ class Dynamic_Aviation_Shortcodes {
         //load core scripts
         add_action( 'parse_query', array( &$this, 'load_algolia_scripts' ), 100);
         add_action( 'parse_query', array( &$this, 'load_mapbox_scripts' ), 100);		
-        add_action( 'parse_query', array( &$this, 'load_recaptcha_scripts'));
     }
 
 	public function table($attr, $content = '')
@@ -89,20 +88,6 @@ class Dynamic_Aviation_Shortcodes {
 			}
         }
     }
-
-	public function load_recaptcha_scripts($query)
-	{
-		global $dy_load_recaptcha_scripts;
-		global $post;
-
-		if(!isset($dy_load_recaptcha_scripts) && isset($post))
-		{
-			if(is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'aviation_search_form'))
-			{
-				$GLOBALS['dy_load_recaptcha_scripts'] = true;
-			}
-		}
-	}
 
 }
 

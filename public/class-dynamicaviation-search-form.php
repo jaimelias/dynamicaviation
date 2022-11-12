@@ -35,7 +35,7 @@ class Dynamic_Aviation_Search_Form {
     {
 		ob_start(); 
         ?>
-            <form class="aircraft_search_form" method="post" data-nonce="<?php echo esc_attr(wp_create_nonce('dy_nonce')); ?>" data-action="<?php echo esc_url(home_lang().'instant_quote'); ?>" autocomplete="off">
+            <form class="aircraft_search_form" method="post" data-action="<?php echo esc_url(home_lang().'instant_quote'); ?>" autocomplete="off">
 
             <div class="bottom-20"><label><i class="linkcolor fas fa-map-marker"></i> <?php echo esc_html(__('Origin', 'dynamicaviation')); ?></label>
             <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l"  /></div>
@@ -93,20 +93,9 @@ class Dynamic_Aviation_Search_Form {
                 </div>	
             </div>
 
-            <?php if(get_option('dy_recaptcha_site_key')): ?>
-                <div class="text-center bottom-20">
-                    <button
-                        id="aircraft_search_button"
-                        data-badge="bottomleft" 
-                        data-callback="validateaircraftsearch" 
-                        class="g-recaptcha pure-button strong pure-button-primary" 
-                        data-sitekey="<?php echo esc_attr(get_option('dy_recaptcha_site_key')); ?>" 
-                        data-action='search'>
-                        <i class="fas fa-plane"></i> <?php echo esc_html(__('Find Aircrafts', 'dynamicaviation')); ?>
-                    </button>
-                </div>
-            <?php endif; ?>
-
+            <div class="text-center bottom-20">
+                <button type="button" id="aircraft_search_button" class="pure-button strong pure-button-primary"><i class="fas fa-plane"></i> <?php echo esc_html(__('Find Aircrafts', 'dynamicaviation')); ?></button>
+            </div>
             <div class="text-center"><small class="text-muted">Powered by</small> <img style="vertical-align: middle;" width="57" height="18" alt="algolia" src="<?php echo esc_url(plugin_dir_url(__DIR__) . 'public/img/algolia.svg'); ?>"/></div>
                 
             </form>
