@@ -126,7 +126,7 @@ class Dynamic_Aviation_Estimate_Page
 		}
 		else
 		{
-			if(wp_verify_nonce(get_query_var('instant_quote'), 'dy_nonce'))
+			if(wp_verify_nonce(get_query_var($this->pathname), 'dy_nonce'))
 			{
 				$output = true;
 			}
@@ -203,6 +203,7 @@ class Dynamic_Aviation_Estimate_Page
 				if($query->query_vars[$this->pathname])
 				{
 					$GLOBALS['dy_load_recaptcha_scripts'] = true;
+					$GLOBALS['dy_load_request_form_utilities_scripts'] = true;
 				}
 			}
 		}

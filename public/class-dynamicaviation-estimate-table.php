@@ -404,7 +404,7 @@ class Dynamic_Aviation_Estimate_Table {
 
             <div id="aircraft_booking_container" class="<?php echo ($hide_contact_form) ? 'hidden' : ''; ?> animate-fade">
 
-                <form method="post" id="aircraft_booking_request" action="<?php echo esc_url($this->home_lang.'request_submitted');?>/">
+                <form data-method="post" id="aircraft_booking_request" data-nonce="slug" data-action="<?php echo esc_url($this->home_lang.'request_submitted');?>">
 
                     <div class="modal-header clearfix">
                         <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php echo (esc_html__('Request a Quote', 'dynamicaviation')); ?></h3>

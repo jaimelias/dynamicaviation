@@ -35,7 +35,7 @@ class Dynamic_Aviation_Search_Form {
     {
 		ob_start(); 
         ?>
-            <form class="aircraft_search_form" method="post" data-action="<?php echo esc_url(home_lang().'instant_quote'); ?>" autocomplete="off">
+            <form class="aircraft_search_form" data-method="post" data-nonce="slug" data-action="<?php echo esc_url(home_lang().'instant_quote'); ?>" autocomplete="off">
 
             <div class="bottom-20"><label><i class="linkcolor fas fa-map-marker"></i> <?php echo esc_html(__('Origin', 'dynamicaviation')); ?></label>
             <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l"  /></div>

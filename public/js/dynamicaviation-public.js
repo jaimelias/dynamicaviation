@@ -90,19 +90,11 @@ const validateAircraftSearch = () => {
 		
 		const thisForm = jQuery(this);
 		const excludeArr = ['end_date', 'end_time'];
-		let invalid_field = [];
-		
-		const action = jQuery(thisForm).attr('data-action');
 		const button = jQuery(thisForm).find('#aircraft_search_button');
-		const {homeUrl} = dyCoreArgs;
 
 		jQuery(button).click(async () => {
-
+			let invalid_field = [];
 			const formData = jQuery(thisForm).serializeArray();
-			const now = Date.now();
-			const argsRes = await fetch(`${homeUrl}/wp-json/dy-core/args?timestamp=${now}`);
-			const argsData = await argsRes.json();
-			const nonce = argsData.dy_nonce;
 
 			formData.forEach(o => {
 				const {name, value} = o;
@@ -169,8 +161,8 @@ const validateAircraftSearch = () => {
 				{
 					console.log('dynamicaviation: gtag not defined');
 				}
-				jQuery(thisForm).attr({'action': `${action}/${nonce}`});
-				jQuery(thisForm).submit();
+
+				createFormSubmit(thisForm);
 			}
 			else
 			{

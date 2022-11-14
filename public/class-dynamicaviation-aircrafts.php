@@ -34,8 +34,7 @@ class Dynamic_Aviation_Aircrafts {
 		add_filter('minimal_archive_title', array(&$this, 'minimalizr_modify_archive_title'), 100);
         
         //load core scripts
-        add_action( 'parse_query', array( &$this, 'load_algolia_scripts' ), 100);
-        add_action( 'parse_query', array( &$this, 'load_mapbox_scripts' ), 100);
+        add_action( 'parse_query', array( &$this, 'load_scripts' ), 100);
 	}
 
     public function init()
@@ -288,29 +287,15 @@ class Dynamic_Aviation_Aircrafts {
 		return $title;
 	}
 
-    public function load_algolia_scripts($query)
+    public function load_scripts($query)
     {
         global $dy_aviation_load_algolia;
 
-		if(!isset($dy_aviation_load_algolia))
+        if(isset($query->query_vars[$this->pathname]))
         {
-            if(isset($query->query_vars[$this->pathname]))
-            {
-                $GLOBALS['dy_aviation_load_algolia'] = true;
-            }
-        }
-    }
-
-    public function load_mapbox_scripts($query)
-    {
-        global $dy_aviation_load_mapbox;
-
-		if(!isset($dy_aviation_load_mapbox))
-        {
-            if(isset($query->query_vars[$this->pathname]))
-            {
-                $GLOBALS['dy_aviation_load_mapbox'] = true;
-            }
+            $GLOBALS['dy_aviation_load_algolia'] = true;
+            $GLOBALS['dy_aviation_load_mapbox'] = true;
+            $GLOBALS['dy_load_picker_scripts'] = true;
         }
     }
 

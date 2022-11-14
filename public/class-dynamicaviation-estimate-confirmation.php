@@ -250,11 +250,38 @@ class Dynamic_Aviation_Estimate_Confirmation
 		}
 		else
 		{
-			if(get_query_var($this->pathname) && $this->validate_required_params() && $this->valid_recaptcha)
+			if(get_query_var($this->pathname) && $this->validate_required_params() && $this->valid_recaptcha && $this->validate_nonce())
 			{
 				$output = true;
 				$GLOBALS[$which_var] = $output;
 			}	
+		}
+
+		return $output;
+	}
+
+	public function validate_nonce()
+	{
+		$output = false;
+		$which_var = 'aviation_validate_hash';
+		global $$which_var;
+
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
+		}
+		else
+		{
+			if(wp_verify_nonce(get_query_var($this->pathname), 'dy_nonce'))
+			{
+				$output = true;
+			}
+			else
+			{
+				$output = false;
+			}
+
+			$GLOBALS[$which_var] = $output;
 		}
 
 		return $output;

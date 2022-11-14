@@ -35,8 +35,7 @@ class Dynamic_Aviation_Destinations {
         add_filter('template_include', array(&$this, 'locate_template'), 100 );
 
         //enqueue logic in public.php
-        add_action( 'parse_query', array( &$this, 'load_algolia_scripts' ), 100);
-        add_action( 'parse_query', array( &$this, 'load_mapbox_scripts' ), 100);
+        add_action( 'parse_query', array( &$this, 'load_scripts' ), 100);
 
 		//polylang
 		add_filter('pll_translation_url', array(&$this, 'pll_translation_url'), 100, 2);
@@ -543,7 +542,7 @@ class Dynamic_Aviation_Destinations {
 		return $template;
 	}
 
-    public function load_algolia_scripts()
+    public function load_scripts()
     {
         global $dy_aviation_load_algolia;
 
@@ -552,19 +551,8 @@ class Dynamic_Aviation_Destinations {
             if(get_query_var($this->pathname))
             {
                 $GLOBALS['dy_aviation_load_algolia'] = true;
-            }
-        }
-    }
-
-    public function load_mapbox_scripts()
-    {
-        global $dy_aviation_load_mapbox;
-
-		if(!isset($dy_aviation_load_mapbox))
-        {
-            if(get_query_var($this->pathname))
-            {
-                $GLOBALS['dy_aviation_load_mapbox'] = true;
+				$GLOBALS['dy_aviation_load_mapbox'] = true;
+				$GLOBALS['dy_load_picker_scripts'] = true;
             }
         }
     }

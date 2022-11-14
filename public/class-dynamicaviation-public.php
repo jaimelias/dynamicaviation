@@ -141,11 +141,6 @@ class Dynamic_Aviation_Public {
 		if(isset($dy_aviation_load_algolia))
 		{
 			wp_enqueue_style($this->plugin_name, $this->plugin_dir_url . 'css/dynamicaviation-public.css', array(), $this->version, 'all');
-
-			//date time picker
-			wp_enqueue_style( 'picker-css', $this->plugin_dir_url . 'css/picker/default.css', array(), 'dynamicaviation', 'all' );
-			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.date'));
-			wp_add_inline_style('picker-css', $this->get_inline_css('picker/default.time'));	
 		}
 
 		if(isset($dy_aviation_load_mapbox))
@@ -185,20 +180,6 @@ class Dynamic_Aviation_Public {
 				wp_add_inline_script('mapbox', $this->mapbox_vars(), 'after');
 				wp_add_inline_script('mapbox', $this->get_inline_js('dynamicaviation-mapbox'), 'after');
 			}
-
-			//start picker
-			wp_enqueue_script( 'picker-js', $this->plugin_dir_url . 'js/picker/picker.js', array('jquery'), '3.6.2', true);
-			wp_enqueue_script( 'picker-date-js', $this->plugin_dir_url . 'js/picker/picker.date.js', array('jquery', 'picker-js'), '3.6.2', true);
-			wp_enqueue_script( 'picker-time-js', $this->plugin_dir_url . 'js/picker/picker.time.js',array('jquery', 'picker-js'), '3.6.2', true);	
-			wp_enqueue_script( 'picker-legacy', $this->plugin_dir_url . 'js/picker/legacy.js', array('jquery', 'picker-js'), '3.6.2', true);
-
-			$picker_translation = 'js/picker/translations/'.get_locale().'.js';
-					
-			if(file_exists($this->plugin_dir_path.'/'.$picker_translation))
-			{
-				wp_enqueue_script( 'picker-time-translation', $this->plugin_dir_url.$picker_translation, array('jquery', 'picker-js'), '3.6.2', true);
-			}
-			//end picker
 			
 			wp_enqueue_script($this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-public.js', $dep, time(), true );
 		}

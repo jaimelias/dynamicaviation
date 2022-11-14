@@ -15,8 +15,7 @@ class Dynamic_Aviation_Shortcodes {
 		add_shortcode( 'aviation_table', array(&$this, 'table'));
 
         //load core scripts
-        add_action( 'parse_query', array( &$this, 'load_algolia_scripts' ), 100);
-        add_action( 'parse_query', array( &$this, 'load_mapbox_scripts' ), 100);		
+        add_action( 'parse_query', array( &$this, 'load_scripts' ), 100);
     }
 
 	public function table($attr, $content = '')
@@ -61,33 +60,25 @@ class Dynamic_Aviation_Shortcodes {
 		}	
 	}
 
-    public function load_algolia_scripts()
-    {
+	public function load_scripts()
+	{
+        global $dy_aviation_load_mapbox;
         global $dy_aviation_load_algolia;
 		global $post;
 
-		if(!isset($dy_aviation_load_algolia) && isset($post))
-        {
-			if(is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'aviation_search_form'))
+		if(isset($post))
+		{
+			if(is_a($post, 'WP_Post'))
 			{
-				$GLOBALS['dy_aviation_load_algolia'] = true;
+				if(has_shortcode( $post->post_content, 'aviation_search_form'))
+				{
+					$GLOBALS['dy_aviation_load_algolia'] = true;
+					$GLOBALS['dy_aviation_load_mapbox'] = true;
+					$GLOBALS['dy_load_picker_scripts'] = true;
+				}
 			}
-        }
-    }
-
-    public function load_mapbox_scripts()
-    {
-        global $dy_aviation_load_mapbox;
-		global $post;
-
-		if(!isset($dy_aviation_load_mapbox) && isset($post))
-        {
-			if(is_a($post, 'WP_Post') && has_shortcode( $post->post_content, 'aviation_search_form'))
-			{
-				$GLOBALS['dy_aviation_load_mapbox'] = true;
-			}
-        }
-    }
+		}
+	}
 
 }
 

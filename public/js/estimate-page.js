@@ -1,18 +1,6 @@
 jQuery(() => {
 	validate_instant_quote();
-	country_dropdown();
-});
-
-
-const country_dropdown = () => {
-	if(typeof jsonsrc !== 'undefined')
-	{
-		if(jQuery('form#aircraft_booking_request').find('.countrylist').length > 0)
-		{
-			aircraft_country_dropdown(jsonsrc(), jQuery('html').attr('lang').slice(0, -3));
-		}
-	}	
-}		
+});	
 
 
 // leave all function for algolia
@@ -22,7 +10,6 @@ async function validateAviationEstimateRequest (token) {
 	const thisForm = jQuery('#aircraft_booking_request');
 	const inputs = jQuery(thisForm).find('input').add('select').add('textarea');
 	const isOneWay = (parseInt(jQuery(thisForm).find('input[name="aircraft_flight"]').val()) === 0) ? true : false;
-	const action = jQuery(thisForm).attr('action')+token;
 	const requiredOnRoundTrip = ['end_date', 'end_time', 'end_itinerary'];
 
 	jQuery(inputs).each(function(){	
@@ -65,7 +52,7 @@ async function validateAviationEstimateRequest (token) {
 			
 	if(invalids.length === 0)
 	{
-		jQuery(thisForm).attr({action}).submit();
+		createFormSubmit(thisForm);
 	}
 	else
 	{
@@ -98,35 +85,5 @@ const validate_instant_quote = () =>
 	jQuery('#aircraft_booking_container').find('.close').click(function(){
 		jQuery('#aircraft_booking_container').addClass('hidden');
 		jQuery('.instant_quote_table').removeClass('hidden');
-	});
-	
-	
-}
-
-
-
-const aircraft_country_dropdown = (pluginurl, htmlLang) => {
-	$.getJSON( pluginurl + 'countries/'+htmlLang+'.json')
-		.done(data => {
-			aircraftCountryOptions(data);
-		})
-		.fail(() => {
-			$.getJSON(pluginurl + 'countries/en.json', data => {
-				aircraftCountryOptions(data);
-			});				
-		});			
-}	
-
-const aircraftCountryOptions = data => {
-
-	data = data
-		.filter(i => i[0] && i[1])
-		.sort((a, b) => a[1].localeCompare(b[1]));
-
-	jQuery('.countrylist').each(function() {
-		for (let x = 0; x < data.length; x++) 
-		{
-			jQuery(this).append('<option value=' + data[x][0] + '>' + data[x][1] + '</option>');
-		}
-	});		
+	});	
 }
