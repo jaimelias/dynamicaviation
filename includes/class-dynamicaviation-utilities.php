@@ -332,7 +332,7 @@ class Dynamic_Aviation_Utilities {
 	public function validate_hash($params)
 	{
 		$output = true;
-		$which_var = 'dy_validate_form_hash';
+		$which_var = 'dy_validate_hash';
 		global $$which_var;
 
 		if(isset($$which_var))
@@ -369,6 +369,34 @@ class Dynamic_Aviation_Utilities {
 			if(!$output)
 			{
 				$GLOBALS['dy_request_invalids'] = array(__('Invalid Hash', 'dynamicpackages'));
+			}
+
+			$GLOBALS[$which_var] = $output;
+		}
+
+		return $output;
+	}
+
+	public function validate_nonce($pathname)
+	{
+		$output = false;
+		$which_var = 'dy_validate_nonce';
+		global $$which_var;
+
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
+		}
+		else
+		{
+			if(wp_verify_nonce(get_query_var($pathname), 'dy_nonce'))
+			{
+				$output = true;
+			}
+			else
+			{
+				$GLOBALS['dy_request_invalids'] = array(__('Invalid Nonce', 'dynamicpackages'));
+				$output = false;
 			}
 
 			$GLOBALS[$which_var] = $output;

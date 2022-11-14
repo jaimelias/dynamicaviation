@@ -260,7 +260,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 				{
 					$params = $this->utilities->request_form_hash_param_names();
 
-					if($this->validate_nonce() && $this->utilities->validate_hash($params))
+					if($this->utilities->validate_nonce($this->pathname) && $this->utilities->validate_hash($params))
 					{
 						$output = true;
 						$GLOBALS[$which_var] = $output;
@@ -272,33 +272,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 		return $output;
 	}
 
-	public function validate_nonce()
-	{
-		$output = false;
-		$which_var = 'aviation_validate_request_form_nonce';
-		global $$which_var;
 
-		if(isset($$which_var))
-		{
-			$output = $$which_var;
-		}
-		else
-		{
-			if(wp_verify_nonce(get_query_var($this->pathname), 'dy_nonce'))
-			{
-				$output = true;
-			}
-			else
-			{
-				$GLOBALS['dy_request_invalids'] = array(__('Invalid Nonce', 'dynamicpackages'));
-				$output = false;
-			}
-
-			$GLOBALS[$which_var] = $output;
-		}
-
-		return $output;
-	}
 
 	public function validate_hash($params)
 	{

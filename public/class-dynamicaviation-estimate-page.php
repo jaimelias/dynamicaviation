@@ -114,34 +114,6 @@ class Dynamic_Aviation_Estimate_Page
         return $title;
     }
 
-	public function validate_nonce()
-	{
-		$output = false;
-		$which_var = 'aviation_validate_search_form_nonce';
-		global $$which_var;
-
-		if(isset($$which_var))
-		{
-			$output = $$which_var;
-		}
-		else
-		{
-			if(wp_verify_nonce(get_query_var($this->pathname), 'dy_nonce'))
-			{
-				$output = true;
-			}
-			else
-			{
-				$output = false;
-				$GLOBALS['dy_request_invalids'] = array(__('Invalid Nonce', 'dynamicpackages'));
-			}
-
-			$GLOBALS[$which_var] = $output;
-		}
-
-		return $output;
-	}
-
     public function modify_wp_title($title)
     {
 		if($this->validate_form_search())
@@ -174,13 +146,13 @@ class Dynamic_Aviation_Estimate_Page
 		}
 		else
 		{
-			if(get_query_var('instant_quote'))
+			if(get_query_var($this->pathname))
 			{
 				if(isset($_POST['aircraft_origin']) && isset($_POST['aircraft_destination']) && isset($_POST['pax_num']) && isset($_POST['aircraft_flight']) && isset($_POST['start_date']) && isset($_POST['start_time']) && isset($_POST['end_date']) && isset($_POST['end_time']) && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']))
 				{
 					$params = $this->utilities->search_form_hash_param_names();
 
-					if($this->validate_nonce() && $this->utilities->validate_hash($params))
+					if($this->utilities->validate_nonce($this->pathname) && $this->utilities->validate_hash($params))
 					{
 						$output = true;
 					}
