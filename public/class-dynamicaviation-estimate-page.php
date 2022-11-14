@@ -152,9 +152,12 @@ class Dynamic_Aviation_Estimate_Page
 				{
 					$params = $this->utilities->search_form_hash_param_names();
 
-					if($this->utilities->validate_nonce($this->pathname) && $this->utilities->validate_hash($params))
+					if($this->utilities->validate_hash($params))
 					{
-						$output = true;
+						if($this->utilities->validate_nonce($this->pathname))
+						{
+							$output = true;
+						}
 					}
 				}
 				else

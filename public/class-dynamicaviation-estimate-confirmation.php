@@ -260,10 +260,13 @@ class Dynamic_Aviation_Estimate_Confirmation
 				{
 					$params = $this->utilities->request_form_hash_param_names();
 
-					if($this->utilities->validate_nonce($this->pathname) && $this->utilities->validate_hash($params))
+					if($this->utilities->validate_hash($params))
 					{
-						$output = true;
-						$GLOBALS[$which_var] = $output;
+						if($this->utilities->validate_nonce($this->pathname))
+						{
+							$output = true;
+							$GLOBALS[$which_var] = $output;
+						}
 					}
 				}
 			}	

@@ -395,7 +395,8 @@ class Dynamic_Aviation_Utilities {
 			}
 			else
 			{
-				$GLOBALS['dy_request_invalids'] = array(__('Invalid Nonce', 'dynamicpackages'));
+				write_log(json_encode(array('invalid_nonce', $_POST)));
+				$GLOBALS['dy_request_invalids'] = array(__('invalid_nonce', 'dynamicpackages'));
 				$output = false;
 			}
 
