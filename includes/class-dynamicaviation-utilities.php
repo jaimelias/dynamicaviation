@@ -329,6 +329,54 @@ class Dynamic_Aviation_Utilities {
 		return array_merge(array('first_name', 'lastname', 'email', 'phone', 'country'), $this->search_form_hash_param_names());
 	}
 
+	public function validate_hash($params)
+	{
+		$output = true;
+		$which_var = 'dy_validate_form_hash';
+		global $$which_var;
+
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
+		}
+		else
+		{
+			if(isset($_POST['hash']))
+			{
+				$str = '';
+				$hash_param = sanitize_text_field($_POST['hash']);
+
+				for($x = 0; $x < count($params); $x++)
+				{
+					if(isset($_POST[$params[$x]]))
+					{
+						$str .= sanitize_text_field($_POST[$params[$x]]);
+					}
+					else
+					{
+						$output = false;
+					}
+				}
+
+				$hash = hash('sha512', $str);
+
+				if($hash !== $hash_param)
+				{
+					$output = false;
+				}
+			}
+
+			if(!$output)
+			{
+				$GLOBALS['dy_request_invalids'] = array(__('Invalid Hash', 'dynamicpackages'));
+			}
+
+			$GLOBALS[$which_var] = $output;
+		}
+
+		return $output;
+	}
+
 }
 
 

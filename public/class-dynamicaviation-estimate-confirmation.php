@@ -233,6 +233,10 @@ class Dynamic_Aviation_Estimate_Confirmation
 			}	
 		}
 
+		if(!$output)
+		{
+			$GLOBALS['dy_request_invalids'] = array(__('Invalid Params', 'dynamicpackages'));
+		}
 
 
 		return $output;
@@ -250,10 +254,18 @@ class Dynamic_Aviation_Estimate_Confirmation
 		}
 		else
 		{
-			if(get_query_var($this->pathname) && $this->validate_required_params() && $this->valid_recaptcha && $this->validate_nonce())
+			if(get_query_var($this->pathname))
 			{
-				$output = true;
-				$GLOBALS[$which_var] = $output;
+				if($this->validate_required_params() && $this->valid_recaptcha)
+				{
+					$params = $this->utilities->request_form_hash_param_names();
+
+					if($this->validate_nonce() && $this->utilities->validate_hash($params))
+					{
+						$output = true;
+						$GLOBALS[$which_var] = $output;
+					}
+				}
 			}	
 		}
 
@@ -263,7 +275,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 	public function validate_nonce()
 	{
 		$output = false;
-		$which_var = 'aviation_validate_hash';
+		$which_var = 'aviation_validate_request_form_nonce';
 		global $$which_var;
 
 		if(isset($$which_var))
@@ -278,7 +290,57 @@ class Dynamic_Aviation_Estimate_Confirmation
 			}
 			else
 			{
+				$GLOBALS['dy_request_invalids'] = array(__('Invalid Nonce', 'dynamicpackages'));
 				$output = false;
+			}
+
+			$GLOBALS[$which_var] = $output;
+		}
+
+		return $output;
+	}
+
+	public function validate_hash($params)
+	{
+		$output = true;
+		$which_var = 'aviation_validate_request_form_hash';
+		global $$which_var;
+
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
+		}
+		else
+		{
+			if(isset($_POST['hash']))
+			{
+				$str = '';
+				
+				$hash_param = sanitize_text_field($_POST['hash']);
+
+				for($x = 0; $x < count($params); $x++)
+				{
+					if(isset($_POST[$params[$x]]))
+					{
+						$str .= sanitize_text_field($_POST[$params[$x]]);
+					}
+					else
+					{
+						$output = false;
+					}
+				}
+
+				$hash = hash('sha512', $str);
+
+				if($hash !== $hash_param)
+				{
+					$output = false;
+				}
+			}
+
+			if(!$output)
+			{
+				$GLOBALS['dy_request_invalids'] = array(__('Invalid Hash', 'dynamicpackages'));
 			}
 
 			$GLOBALS[$which_var] = $output;

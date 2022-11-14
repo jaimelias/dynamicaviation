@@ -117,7 +117,7 @@ class Dynamic_Aviation_Estimate_Page
 	public function validate_nonce()
 	{
 		$output = false;
-		$which_var = 'aviation_validate_hash';
+		$which_var = 'aviation_validate_search_form_nonce';
 		global $$which_var;
 
 		if(isset($$which_var))
@@ -133,6 +133,7 @@ class Dynamic_Aviation_Estimate_Page
 			else
 			{
 				$output = false;
+				$GLOBALS['dy_request_invalids'] = array(__('Invalid Nonce', 'dynamicpackages'));
 			}
 
 			$GLOBALS[$which_var] = $output;
@@ -173,16 +174,22 @@ class Dynamic_Aviation_Estimate_Page
 		}
 		else
 		{
-			if(get_query_var('instant_quote') && isset($_POST['aircraft_origin']) && isset($_POST['aircraft_destination']) && isset($_POST['pax_num']) && isset($_POST['aircraft_flight']) && isset($_POST['start_date']) && isset($_POST['start_time']) && isset($_POST['end_date']) && isset($_POST['end_time']) && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']))
+			if(get_query_var('instant_quote'))
 			{
-				if($this->validate_nonce())
+				if(isset($_POST['aircraft_origin']) && isset($_POST['aircraft_destination']) && isset($_POST['pax_num']) && isset($_POST['aircraft_flight']) && isset($_POST['start_date']) && isset($_POST['start_time']) && isset($_POST['end_date']) && isset($_POST['end_time']) && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']))
 				{
-					$output = true;
+					$params = $this->utilities->search_form_hash_param_names();
+
+					if($this->validate_nonce() && $this->utilities->validate_hash($params))
+					{
+						$output = true;
+					}
 				}
-			}
-			else
-			{
-				$output = false;
+				else
+				{
+					$GLOBALS['dy_request_invalids'] = array(__('Invalid Params', 'dynamicpackages'));
+				}
+
 			}
 
 			$GLOBALS[$which_var] = $output;
