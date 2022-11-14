@@ -158,14 +158,10 @@ class Dynamic_Aviation_Public {
 		global $dy_aviation_load_mapbox;
 
 		$dep = array('jquery', 'landing-cookies');
-
-		wp_enqueue_script( 'landing-cookies', $this->plugin_dir_url.'js/cookies.js', array('jquery'), $this->version, true );	
 		
 		if(isset($dy_aviation_load_algolia) && !isset($_GET['fl_builder']))
 		{
-			array_push($dep, 'algolia', 'sha512', 'picker-date-js', 'picker-time-js');
-
-			wp_enqueue_script('sha512', $this->plugin_dir_url . 'js/sha512.js', array(), 'async_defer', true );
+			array_push($dep, 'algolia', 'picker-date-js', 'picker-time-js');
 			wp_enqueue_script('algolia', $this->plugin_dir_url.'js/algoliasearch.min.js', array( 'jquery' ), '3.32.0', true );
 			wp_add_inline_script('algolia', $this->utilities->algoliasearch_after(), 'after');
 			wp_enqueue_script('algolia_autocomplete', $this->plugin_dir_url.'js/autocomplete.jquery.min.js', array( 'jquery' ), '0.36.0', true );

@@ -319,6 +319,16 @@ class Dynamic_Aviation_Utilities {
 		return number_format(floatval($amount), 2, '.', ',');
 	}
 
+	public function search_form_hash_param_names()
+	{
+		return array('aircraft_origin', 'aircraft_destination', 'pax_num', 'aircraft_flight', 'start_date', 'start_time', 'end_date', 'end_time');
+	}
+
+	public function request_form_hash_param_names()
+	{
+		return array_merge(array('first_name', 'lastname', 'email', 'phone', 'country'), $this->search_form_hash_param_names());
+	}
+
 }
 
 

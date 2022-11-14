@@ -61,11 +61,6 @@ class Dynamic_Aviation_Estimate_Table {
         $obj = $this->get;
         $obj->start_itinerary = $this->start_itinerary();
         $obj->end_itinerary = $this->end_itinerary();
-        $obj->channel = '';
-        $obj->device = '';
-        $obj->landing_path = '';
-        $obj->landing_domain = '';
-
         $output .= "\r\n";
 
         foreach($obj as $key => $value)
@@ -404,7 +399,7 @@ class Dynamic_Aviation_Estimate_Table {
 
             <div id="aircraft_booking_container" class="<?php echo ($hide_contact_form) ? 'hidden' : ''; ?> animate-fade">
 
-                <form data-method="post" id="aircraft_booking_request" data-nonce="slug" data-action="<?php echo esc_url($this->home_lang.'request_submitted');?>">
+                <form data-method="post" id="aircraft_booking_request" data-hash-params="<?php echo esc_attr(implode(',', $this->utilities->request_form_hash_param_names()));?>" data-nonce="slug" data-action="<?php echo esc_url($this->home_lang.'request_submitted');?>">
 
                     <div class="modal-header clearfix">
                         <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php echo (esc_html__('Request a Quote', 'dynamicaviation')); ?></h3>

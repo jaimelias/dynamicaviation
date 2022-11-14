@@ -4,8 +4,9 @@
 class Dynamic_Aviation_Search_Form {
     
     
-    public function __construct()
+    public function __construct($utilities)
     {
+        $this->utilities = $utilities;
         add_filter('dy_aviation_full_search_form', array(&$this, 'full_search_form'));
         add_filter('dy_aviation_search_form', array(&$this, 'search_form'));        
     }
@@ -33,9 +34,10 @@ class Dynamic_Aviation_Search_Form {
 
     public function search_form()
     {
+
 		ob_start(); 
         ?>
-            <form class="aircraft_search_form" data-method="post" data-nonce="slug" data-action="<?php echo esc_url(home_lang().'instant_quote'); ?>" autocomplete="off">
+            <form class="aircraft_search_form" data-hash-params="<?php echo esc_attr(implode(',', $this->utilities->search_form_hash_param_names()));?>" data-method="post" data-nonce="slug" data-action="<?php echo esc_url(home_lang().'instant_quote'); ?>" autocomplete="off">
 
             <div class="bottom-20"><label><i class="linkcolor fas fa-map-marker"></i> <?php echo esc_html(__('Origin', 'dynamicaviation')); ?></label>
             <input type="text" id="aircraft_origin" name="aircraft_origin" class="aircraft_list" spellcheck="false" placeholder="<?php echo esc_html(__('country / city / airport', 'dynamicaviation')); ?>" /><input type="hidden" id="aircraft_origin_l" name="aircraft_origin_l"  /></div>
