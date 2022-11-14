@@ -135,7 +135,7 @@ const RenderMap =  () => {
 				reject(err);
 			}
 			
-			const htmlLang = (String(jQuery('html').attr('lang')).slice(0, 2)).toLowerCase() || 'en';
+			const {lang} = dyCoreArgs;
 
 			overlays.clearLayers();
 			const markers = new L.MarkerClusterGroup();
@@ -154,9 +154,9 @@ const RenderMap =  () => {
 
 				if(airport_names)
 				{
-					if(airport_names.hasOwnProperty(htmlLang))
+					if(airport_names.hasOwnProperty(lang))
 					{
-						title = airport_names[htmlLang];
+						title = airport_names[lang];
 					}
 				}
 				

@@ -2,7 +2,6 @@ jQuery(() => {
 	
 	one_way_round_trip();
 	algolia_execute();
-	dynamicaviation_cookies();
 	aircraft_datepicker();
 	aircraft_timepicker();
 	validateAircraftSearch();
@@ -34,54 +33,6 @@ const aircraft_datepicker = () =>	{
 		}	
 	});
 }
-
-const dynamicaviation_cookies = () => {
-	const thisForm = jQuery('#aircraft_booking_request');
-	const landing = ['channel', 'device', 'landing_domain', 'landing_path'];
-	let warnings = 0;
-	const getCookie = (cname) => {
-		let name = cname + '=';
-		const ca = document.cookie.split(';');
-		for(let i = 0; i < ca.length; i++) {
-			let c = ca[i];
-			while (c.charAt(0) == ' ') {
-				c = c.substring(1);
-			}
-			if (c.indexOf(name) == 0) {
-				return c.substring(name.length, c.length);
-			}
-		}
-		return '';
-	};	
-	
-	jQuery(thisForm).each(function(){
-		
-		for(let x = 0; x < landing.length; x++)
-		{	
-			jQuery(thisForm).find('input.'+landing[x]).each(function(){
-				jQuery(this).val(getCookie(landing[x]));
-			});
-			
-			if(jQuery(thisForm).find('input.'+landing[x]).length == 0)
-			{
-				console.warn('input.'+landing[x]+' not found');
-				warnings++;
-			}
-			
-		}
-		
-		if(warnings > 0)
-		{
-			console.warn('You can create custom fields with Pipedrive and track metrics.');
-		}
-		else
-		{
-			console.log('Pipedrive metric fields found.');
-		}
-		
-	});			
-}		
-
 
 
 
@@ -198,14 +149,14 @@ const algolia_execute = () => {
 
 jQuery('.aircraft_search_form').each(function(){
 
-	const htmlLang = (String(jQuery('html').attr('lang')).slice(0, 2)).toLowerCase() || 'en';
+	const {lang} = dyCoreArgs;
 	const thisForm = jQuery(this);
 
 	jQuery(this).find('.aircraft_list').each(function(){
 		
-		const this_field = jQuery(this);
+		const thisField = jQuery(this);
 		
-		jQuery(this_field).autocomplete({
+		jQuery(thisField).autocomplete({
 			hint: false
 		},[{
 			source: $.fn.autocomplete.sources.hits(algoliaIndex, {
@@ -228,9 +179,9 @@ jQuery('.aircraft_search_form').each(function(){
 
 							if(loc)
 							{
-								if(loc.hasOwnProperty(htmlLang))
+								if(loc.hasOwnProperty(lang))
 								{
-									_highlightResult[k] = loc[htmlLang];
+									_highlightResult[k] = loc[lang];
 								}
 							}
 						}
@@ -239,7 +190,7 @@ jQuery('.aircraft_search_form').each(function(){
 
 					const {airport, iata: _iata, city} = _highlightResult;
 
-					const country = (country_names.hasOwnProperty(htmlLang)) ? country_names[htmlLang] : null;
+					const country = (country_names.hasOwnProperty(lang)) ? country_names[lang] : null;
 					let flag_url = String(jsonsrc() + "img/flags/" + country_code + '.svg').toLowerCase();
 					const result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> <strong class="iata"></strong></div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
 					result.find('.sairport > .airport').html(airport.value);
@@ -263,44 +214,44 @@ jQuery('.aircraft_search_form').each(function(){
 			let {iata, icao, airport, airport_names, city, country_code, _geoloc} = suggestion;
 
 			airport = (typeof airport_names !== 'undefined')
-				? (airport_names.hasOwnProperty(htmlLang)) 
-				? airport_names[htmlLang] 
+				? (airport_names.hasOwnProperty(lang)) 
+				? airport_names[lang] 
 				: airport
 				: airport;
 			
 			jQuery(thisForm)
-				.find('#'+jQuery(this_field).attr('id')+'_l')
+				.find('#'+jQuery(thisField).attr('id')+'_l')
 				.val(`${airport}${icao || iata.length === 3 ? ' ('+ iata + ')':  ''}, ${city}, ${country_code}`);
 			
-			jQuery(this_field).attr({
+			jQuery(thisField).attr({
 				'data-iata': iata,
 				'data-lat': _geoloc.lat,
 				'data-lon': _geoloc.lng
 			}).addClass('aircraft_selected').val(iata);
 
-			jQuery(this_field).blur(() => {
-				if (jQuery(this_field).hasClass('aircraft_selected'))
+			jQuery(thisField).blur(() => {
+				if (jQuery(thisField).hasClass('aircraft_selected'))
 				{
-					jQuery(this_field).val(iata);
+					jQuery(thisField).val(iata);
 				}
 				else
 				{
-					jQuery(this_field).val('');
-					jQuery(this_field).removeClass('aircraft_selected');
-					jQuery(this_field).addClass('invalid_field');
-					jQuery(this_field).removeAttr('data-iata');
-					jQuery(this_field).removeAttr('data-lat');
-					jQuery(this_field).removeAttr('data-lon');						
+					jQuery(thisField).val('');
+					jQuery(thisField).removeClass('aircraft_selected');
+					jQuery(thisField).addClass('invalid_field');
+					jQuery(thisField).removeAttr('data-iata');
+					jQuery(thisField).removeAttr('data-lat');
+					jQuery(thisField).removeAttr('data-lon');						
 				}
 			});
 				
-			jQuery(this_field).focus(() => {
-				jQuery(this_field).val('');
-				jQuery(this_field).removeClass('aircraft_selected');
-				jQuery(this_field).removeClass('invalid_field');
-				jQuery(this_field).removeAttr('data-iata');
-				jQuery(this_field).removeAttr('data-lat');
-				jQuery(this_field).removeAttr('data-lon');
+			jQuery(thisField).focus(() => {
+				jQuery(thisField).val('');
+				jQuery(thisField).removeClass('aircraft_selected');
+				jQuery(thisField).removeClass('invalid_field');
+				jQuery(thisField).removeAttr('data-iata');
+				jQuery(thisField).removeAttr('data-lat');
+				jQuery(thisField).removeAttr('data-lon');
 			});					
 					
 			if(jQuery(thisForm).find('.aircraft_selected').length == 1)
@@ -313,7 +264,7 @@ jQuery('.aircraft_search_form').each(function(){
 			}
 			else
 			{
-				jQuery(this_field).blur();
+				jQuery(thisField).blur();
 			}
 			
 		});
