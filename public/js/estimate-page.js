@@ -52,6 +52,22 @@ async function validateAviationEstimateRequest (token) {
 			
 	if(invalids.length === 0)
 	{
+		const findAmount = formToArray(thisForm).find(i => i.name === 'aircraft_price');
+		const amount = (findAmount) ? (findAmount.value) ? parseFloat(findAmount.value) : 0 : 0;
+
+		if(typeof fbq !== typeof undefined)
+		{
+			fbq('track', 'Lead');
+		}
+
+		if(typeof gtag !== 'undefined' && amount)
+		{
+			gtag('event', 'generate_lead', {
+				value: parseFloat(amount),
+				currency: 'USD'
+			});
+		}
+
 		createFormSubmit(thisForm);
 	}
 	else
