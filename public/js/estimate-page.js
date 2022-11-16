@@ -62,6 +62,7 @@ async function validateAviationEstimateRequest (token) {
 
 		if(typeof gtag !== 'undefined' && amount)
 		{
+			//send to call
 			gtag('event', 'generate_lead', {
 				value: parseFloat(amount),
 				currency: 'USD'
@@ -96,6 +97,7 @@ const validate_instant_quote = () =>
 
 		if(typeof gtag !== 'undefined' && aircraft_price && aircraft_name)
 		{
+			//send to call
 			gtag('event', 'add_to_cart', {
 				value: parseFloat(aircraft_price),
 				currency: 'USD',

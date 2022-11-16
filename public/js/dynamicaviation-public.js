@@ -98,30 +98,32 @@ const validateAircraftSearch = () => {
 				
 				if(typeof gtag !== 'undefined')
 				{
+					const {gtag_tracking_id} = dyCoreArgs;
 					const origin = jQuery('#aircraft_origin').val();
 					const destination = jQuery('#aircraft_destination').val();
 					const paxNum = parseInt(jQuery('#pax_num').val());
 					const legs = parseInt(jQuery('#aircraft_flight').val()) + 1;
 
+					//send to analytics only
 					gtag('event', 'flight_pax_num', {
 						value: paxNum
-					});
+					}, {send_to: gtag_tracking_id});
 
 					gtag('event', 'flight_legs', {
 						value: legs
-					});
+					}, {send_to: gtag_tracking_id});
 
 					gtag('event', 'flight_origin', {
 						origin_name: origin
-					});
+					}, {send_to: gtag_tracking_id});
 
 					gtag('event', 'flight_destination', {
 						destination_name: destination
-					});
+					}, {send_to: gtag_tracking_id});
 
 					gtag('event', 'flight_route', {
 						route_name: `${origin}_${destination}`
-					});
+					}, {send_to: gtag_tracking_id});
 				}
 
 				if(typeof fbq !== 'undefined')
