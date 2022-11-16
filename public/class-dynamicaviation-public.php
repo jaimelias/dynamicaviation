@@ -157,7 +157,7 @@ class Dynamic_Aviation_Public {
 		global $dy_aviation_load_algolia;
 		global $dy_aviation_load_mapbox;
 
-		$dep = array('jquery', 'landing-cookies');
+		$dep = array('jquery', 'dy-core-utilities');
 		
 		if(isset($dy_aviation_load_algolia) && !isset($_GET['fl_builder']))
 		{
