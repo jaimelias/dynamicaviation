@@ -92,25 +92,41 @@ const validateAircraftSearch = () => {
 
 			if(invalid_field.length === 0)
 			{
-				const departure = Date.parse(jQuery('input[name="start_date"]').val());
 				let today = new Date();
 				today.setDate(today.getDate() - 2);
 				today = Date.parse(today);
-				const days_between = Math.round((departure-today)/(1000*60*60*24));				
-				const itinerary = jQuery('#aircraft_origin').val()+'/'+jQuery('#aircraft_destination').val();
 				
 				if(typeof gtag !== 'undefined')
-				{	
-					gtag('event', 'search_flight', {
-						itinerary,
-						days_between,
-						departure: jQuery('#start_date').val(),
-						pax: jQuery('#pax_num').val()
+				{
+					const origin = jQuery('#aircraft_origin').val();
+					const destination = jQuery('#aircraft_destination').val();
+					const paxNum = parseInt(jQuery('#pax_num').val());
+					const legs = parseInt(jQuery('#aircraft_flight').val()) + 1;
+
+					gtag('event', 'flight_pax_num', {
+						value: paxNum
+					});
+
+					gtag('event', 'flight_legs', {
+						value: legs
+					});
+
+					gtag('event', 'flight_origin', {
+						origin_name: origin
+					});
+
+					gtag('event', 'flight_destination', {
+						destination_name: destination
+					});
+
+					gtag('event', 'flight_route', {
+						route_name: `${origin}_${destination}`
 					});
 				}
-				else
+
+				if(typeof fbq !== 'undefined')
 				{
-					console.log('dynamicaviation: gtag not defined');
+					fbq('track', 'Search');
 				}
 
 				createFormSubmit(thisForm);

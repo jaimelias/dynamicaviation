@@ -83,7 +83,6 @@ const validate_instant_quote = () =>
 		
 		const aircraft_fields = jQuery('#aircraft_booking_request').find('#aircraft_fields');
 		let inputs = jQuery(this).attr('data-aircraft');
-		
 
 		inputs = JSON.parse(inputs);
 		jQuery(aircraft_fields).text('');
@@ -91,6 +90,22 @@ const validate_instant_quote = () =>
 		for(let k in inputs)
 		{
 			jQuery(aircraft_fields).append(jQuery('<input>').attr({'type': 'text', 'name': k, 'value': inputs[k]}));
+		}
+
+		const {aircraft_price, aircraft_name} = inputs;
+
+		if(typeof gtag !== 'undefined' && aircraft_price && aircraft_name)
+		{
+			gtag('event', 'add_to_cart', {
+				value: parseFloat(aircraft_price),
+				currency: 'USD',
+				items: [aircraft_name]
+			});
+		}
+
+		if(typeof fbq !== 'undefined')
+		{
+			fbq('track', 'AddToCart');
 		}
 		
 		jQuery('#aircraft_booking_container').removeClass('hidden');
