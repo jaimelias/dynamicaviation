@@ -78,14 +78,51 @@ async function validateAviationEstimateRequest (token) {
 	}
 }
 
+const formArrayToParams = () => {
+
+	const form = jQuery('#aircraft_booking_request');
+	const inputs = formToArray(form);
+	const params = {};
+
+	inputs.forEach(o => {
+		const {name, value} = o;
+
+		params[name] = value;
+	});
+
+	return params;
+
+};
+
+const getCheckoutEventArgs = formParams => {
+
+	const {aircraft_price, aircraft_name, aircraft_flight, aircraft_origin, aircraft_destination} = formParams;
+	const amount = parseFloat(aircraft_price);	
+	const legs = parseFloat(aircraft_flight) + 1;
+
+	return {
+		value: amount,
+		currency: 'USD',
+		items: [{
+			item_name: aircraft_name,
+			affiliation: 'Dynamic Aviation',
+			price: (amount / legs),
+			quantity: legs,
+			item_category: `Charter Flights`,
+			item_variant: `${aircraft_origin}_${aircraft_destination}`
+		}]
+	};
+};
+
 const validate_instant_quote = () =>
 {
 	jQuery('button[data-aircraft]').click(function(){
-		
+
 		const aircraft_fields = jQuery('#aircraft_booking_request').find('#aircraft_fields');
 		let inputs = jQuery(this).attr('data-aircraft');
 
 		inputs = JSON.parse(inputs);
+
 		jQuery(aircraft_fields).text('');
 		
 		for(let k in inputs)
@@ -93,29 +130,16 @@ const validate_instant_quote = () =>
 			jQuery(aircraft_fields).append(jQuery('<input>').attr({'type': 'text', 'name': k, 'value': inputs[k]}));
 		}
 
-		const {aircraft_price, aircraft_name} = inputs;
+		const formParams = formArrayToParams();
+		const {aircraft_price} = formParams;
 		const amount = parseFloat(aircraft_price);
 
-		if(typeof gtag !== 'undefined' && aircraft_price && aircraft_name)
-		{
-			const form = jQuery('#aircraft_booking_request');
-			const legs = parseFloat(jQuery(form).find('[name="aircraft_flight"]').val())  + 1;
-			const origin = jQuery(form).find('[name="aircraft_origin"]').val();
-			const destination = jQuery(form).find('[name="aircraft_destination"]').val();
-			const paxNum = jQuery(form).find('[name="pax_num"]').val();
 
-			let addToCartArgs = {
-				value: amount,
-				currency: 'USD',
-				items: [{
-					item_name: aircraft_name,
-					affiliation: 'Dynamic Aviation',
-					price: (amount / legs),
-					quantity: legs,
-					item_category: `${origin}_${destination}`,
-					item_variant: `${paxNum}_pax`
-				}]
-			};
+		if(typeof gtag !== 'undefined' && amount)
+		{
+			let addToCartArgs = getCheckoutEventArgs(formParams);
+
+			console.log(addToCartArgs);
 
 			//send to call
 			gtag('event', 'add_to_cart', addToCartArgs);
