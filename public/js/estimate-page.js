@@ -94,15 +94,31 @@ const validate_instant_quote = () =>
 		}
 
 		const {aircraft_price, aircraft_name} = inputs;
+		const amount = parseFloat(aircraft_price);
 
 		if(typeof gtag !== 'undefined' && aircraft_price && aircraft_name)
 		{
-			//send to call
-			gtag('event', 'add_to_cart', {
-				value: parseFloat(aircraft_price),
+			const form = jQuery('#aircraft_booking_request');
+			const legs = parseFloat(jQuery(form).find('[name="aircraft_flight"]').val())  + 1;
+			const origin = jQuery(form).find('[name="aircraft_origin"]').val();
+			const destination = jQuery(form).find('[name="aircraft_destination"]').val();
+			const paxNum = jQuery(form).find('[name="pax_num"]').val();
+
+			let addToCartArgs = {
+				value: amount,
 				currency: 'USD',
-				items: [aircraft_name]
-			});
+				items: [{
+					item_name: aircraft_name,
+					affiliation: 'Dynamic Aviation',
+					price: (amount / legs),
+					quantity: legs,
+					item_category: `${origin}_${destination}`,
+					item_variant: `${paxNum}_pax`
+				}]
+			};
+
+			//send to call
+			gtag('event', 'add_to_cart', addToCartArgs);
 		}
 
 		if(typeof fbq !== 'undefined')
