@@ -245,7 +245,7 @@ class Dynamic_Aviation_Destinations {
 
                 if( $can_user_edit )
                 {
-                    $output .= '<p><a class="pure-button" href="'.esc_url(get_edit_post_link($post->ID)).'"><i class="fas fa-pencil-alt" ></i> '.esc_html(__('Edit Destination', 'dynamicaviation')).'</a></p>';
+                    $output .= '<p><a class="pure-button" href="'.esc_url(get_edit_post_link($post->ID)).'"><span class="dashicons dashicons-edit"></span> '.esc_html(__('Edit Destination', 'dynamicaviation')).'</a></p>';
                 }
             }
 
@@ -255,7 +255,7 @@ class Dynamic_Aviation_Destinations {
         {
             if($can_user_edit)
             {
-                $output .= '<p><a class="pure-button" href="'.esc_url(admin_url('post-new.php?post_type=destinations&iata='.$iata)).'"><i class="fas fa-plus" ></i> '.esc_html(__('Add Destination', 'dynamicaviation')).'</a></p>';
+                $output .= '<p><a class="pure-button" href="'.esc_url(admin_url('post-new.php?post_type=destinations&iata='.$iata)).'"><span class="dashicons dashicons-plus"></span> '.esc_html(__('Add Destination', 'dynamicaviation')).'</a></p>';
             }
         }
 

@@ -134,13 +134,9 @@ const validate_instant_quote = () =>
 		const {aircraft_price} = formParams;
 		const amount = parseFloat(aircraft_price);
 
-
 		if(typeof gtag !== 'undefined' && amount)
 		{
 			let addToCartArgs = getCheckoutEventArgs(formParams);
-
-			console.log(addToCartArgs);
-
 			//send to call
 			gtag('event', 'add_to_cart', addToCartArgs);
 		}

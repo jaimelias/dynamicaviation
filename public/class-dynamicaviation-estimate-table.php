@@ -353,7 +353,7 @@ class Dynamic_Aviation_Estimate_Table {
         
         $aircraft_col = ($this->is_mobile) ? '<a href="'.esc_url($aircraft_url).'">'.$thumbnail.'</a><br/>' : '';            
         
-        $aircraft_col .= '<a class="strong" href="'.esc_url($aircraft_url).'">'.esc_html($post->post_title).'</a><br/><small>'.esc_html($this->utilities->aircraft_type(aviation_field( 'aircraft_type', $post->ID))).'</small> <strong><i class="fas fa-male" aria-hidden="true"></i> '.esc_html($seats).'</strong><br/><small>'.esc_html('Max').' ('.$weight_allowed.')</small>';
+        $aircraft_col .= '<a class="strong" href="'.esc_url($aircraft_url).'">'.esc_html($post->post_title).'</a><br/><small>'.esc_html($this->utilities->aircraft_type(aviation_field( 'aircraft_type', $post->ID))).'</small> <strong><span class="dashicons dashicons-admin-users"></span> '.esc_html($seats).'</strong><br/><small>'.esc_html('Max').' ('.$weight_allowed.')</small>';
 
         $price_col = '<small class="text-muted">USD</small><br/><strong '.$large_attr.'><span class="text-muted">$</span>'.esc_html($this->utilities->currency_format($price, 2)).'</strong>';
         
@@ -365,7 +365,7 @@ class Dynamic_Aviation_Estimate_Table {
         if($this->is_mobile)
         {
             //duration in mobile
-            $price_col .= '<hr style="margin-top: 10px; margin-bottom: 10px;"/><small class="text-muted"><i class="text-muted fas fa-clock" aria-hidden="true"></i></small><br/><strong '.$large_attr.'>'.esc_html($this->utilities->convertNumberToTime($duration)).'</strong>';
+            $price_col .= '<hr style="margin-top: 10px; margin-bottom: 10px;"/><small class="text-muted"><span class="dashicons dashicons-clock text-muted"></span></small><br/><strong '.$large_attr.'>'.esc_html($this->utilities->convertNumberToTime($duration)).'</strong>';
         }			
         
         $row = '<tr>';
@@ -380,12 +380,12 @@ class Dynamic_Aviation_Estimate_Table {
         
         if(!$this->is_mobile)
         {
-            $row .= '<td><i class="fas fa-clock" aria-hidden="true"></i> '.esc_html($this->utilities->convertNumberToTime($duration)).'</td>';
+            $row .= '<td><span class="dashicons dashicons-clock"></span> '.esc_html($this->utilities->convertNumberToTime($duration)).'</td>';
         }
         
         $row .= '<td>'.$price_col.'</td>';
         
-        $row .= '<td><button class="strong small button-success pure-button" data-aircraft="'.esc_html(htmlentities(json_encode($flight_array))).'"><i class="fas fa-envelope" aria-hidden="true"></i> '.esc_html(__('Quote', 'dynamicaviation')).'</button></td>';			
+        $row .= '<td><button class="strong small button-success pure-button" data-aircraft="'.esc_html(htmlentities(json_encode($flight_array))).'"><span class="dashicons dashicons-email"></span> '.esc_html(__('Quote', 'dynamicaviation')).'</button></td>';			
         $row .= "</tr>";		
         $table .= $row;
 
@@ -403,7 +403,7 @@ class Dynamic_Aviation_Estimate_Table {
 
                     <div class="modal-header clearfix">
                         <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php echo (esc_html__('Request a Quote', 'dynamicaviation')); ?></h3>
-                        <span class="close pointer pull-right large"><i class="fas fa-times"></i></span>
+                        <span class="close pointer pull-right large"><span class="dashicons dashicons-no"></span></span>
                     </div>				
 
                     <div class="pure-g gutters">
@@ -452,7 +452,7 @@ class Dynamic_Aviation_Estimate_Table {
                     </div>
                     
                     <?php if(get_option('dy_recaptcha_site_key')): ?>
-                            <button data-badge="bottomleft" data-callback="validateAviationEstimateRequest" class="g-recaptcha pure-button pure-button-primary" data-sitekey="<?php echo esc_attr(get_option('dy_recaptcha_site_key')); ?>" data-action='estimate'><i class="fas fa-plane"></i> <?php echo esc_html(__('Send Request', 'dynamicaviation'));?></button>	
+                            <button data-badge="bottomleft" data-callback="validateAviationEstimateRequest" class="g-recaptcha pure-button pure-button-primary" data-sitekey="<?php echo esc_attr(get_option('dy_recaptcha_site_key')); ?>" data-action='estimate'><span class="dashicons dashicons-airplane"></span> <?php echo esc_html(__('Send Request', 'dynamicaviation'));?></button>	
                     <?php endif; ?>
 
                 </form>
@@ -682,7 +682,7 @@ class Dynamic_Aviation_Estimate_Table {
 
                 $output .= '<tr>';
                 $output .= '<td><strong><a href="'.esc_url(get_the_permalink()).'">'.esc_html($post->post_title).'</a></strong></td>'; 
-                $output .= '<td><i class="fas fa-clock" aria-hidden="true"></i> '.esc_html($this->utilities->convertNumberToTime($duration)).'</td>';
+                $output .= '<td><span class="dashicons dashicons-clock"></span> '.esc_html($this->utilities->convertNumberToTime($duration)).'</td>';
                 $output .= '</tr>';
             }
 

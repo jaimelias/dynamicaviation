@@ -222,13 +222,13 @@ class Dynamic_Aviation_Price_Table {
 
 						if(!$is_aircraft_page)
 						{
-							$row .= '<td><strong><i class="fas fa-male" ></i> '.esc_html($seats).' </strong><br/><small>'.esc_html($weight_allowed).'</small></td>';
+							$row .= '<td><strong><span class="dashicons dashicons-admin-users"></span> '.esc_html($seats).' </strong><br/><small>'.esc_html($weight_allowed).'</small></td>';
 						}
 						
 						if(!$this->is_mobile)
 						{
 
-							$row .= '<td><i class="fas fa-clock" ></i> '.esc_html($this->utilities->convertNumberToTime($table_price[$x][2])).'</td>';
+							$row .= '<td><span class="dashicons dashicons-clock"></span> '.esc_html($this->utilities->convertNumberToTime($table_price[$x][2])).'</td>';
 						}
 
 						$row .= '<td><strong>'.esc_html('$'.$this->utilities->currency_format($price)).'</strong><br/><span class="text-muted">';
