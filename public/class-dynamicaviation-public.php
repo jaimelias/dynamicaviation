@@ -177,7 +177,7 @@ class Dynamic_Aviation_Public {
 				wp_add_inline_script('mapbox', get_inline_file($this->plugin_dir_path . 'public/js/dynamicaviation-mapbox.js'), 'after');
 			}
 			
-			wp_enqueue_script($this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-public.js', $dep, time(), true );
+			wp_enqueue_script($this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-public.js', $dep, $this->version, true );
 		}
 
 	}
