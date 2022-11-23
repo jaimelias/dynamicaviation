@@ -176,7 +176,7 @@ jQuery('.aircraft_search_form').each(function(){
 		jQuery(thisField).autocomplete({
 			hint: false
 		},[{
-			source: $.fn.autocomplete.sources.hits(algoliaIndex, {
+			source: jQuery.fn.autocomplete.sources.hits(algoliaIndex, {
 				hitsPerPage: 4
 			}),
 			displayKey: 'airport',
