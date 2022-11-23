@@ -1,6 +1,6 @@
 jQuery(() => {
 	
-	one_way_round_trip();
+	handleLegs();
 	algolia_execute();
 	aircraft_datepicker();
 	aircraft_timepicker();
@@ -143,19 +143,19 @@ const validateAircraftSearch = () => {
 	});
 }
 
-const one_way_round_trip = () => {
+const handleLegs = () => {
 	if(jQuery('#aircraft_flight').val() == 1)
 	{
-		jQuery('.aircraft_return').fadeIn();
+		jQuery('.aircraft_return').removeClass('hidden');
 	}
 	jQuery('#aircraft_flight').change(function(){
 		if(jQuery(this).val() == 1)
 		{
-			jQuery('.aircraft_return').fadeIn();
+			jQuery('.aircraft_return').removeClass('hidden');
 		}
 		else
 		{
-			jQuery('.aircraft_return').fadeOut();
+			jQuery('.aircraft_return').addClass('hidden');
 			jQuery('#end_date').val('');
 			jQuery('#end_time').val('');
 		}
