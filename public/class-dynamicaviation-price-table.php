@@ -19,6 +19,12 @@ class Dynamic_Aviation_Price_Table {
 
 	public function table($iata = '')
 	{
+
+		if(is_admin())
+		{
+			return '';
+		}
+
 		$output = '';
 		$airport_array = $this->utilities->airport_data();
 		$is_aircraft_page = is_singular('aircrafts');
