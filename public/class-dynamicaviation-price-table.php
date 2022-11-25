@@ -172,7 +172,7 @@ class Dynamic_Aviation_Price_Table {
 
 						for($y = 0; $y < count($all_airports_data); $y++)
 						{
-							if($origin_iata == $all_airports_data[$y]['iata'])
+							if($origin_iata === $all_airports_data[$y]['iata'])
 							{
 								$origin_airport = (array_key_exists('airport_names', $all_airports_data[$y])) 
 									? (array_key_exists($current_language, $all_airports_data[$y]['airport_names']))
