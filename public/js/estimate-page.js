@@ -94,7 +94,7 @@ const formArrayToParams = () => {
 
 };
 
-const getCheckoutEventArgs = formParams => {
+const getCheckoutEventArgs2 = formParams => {
 
 	const {aircraft_price, aircraft_name, aircraft_flight, aircraft_origin, aircraft_destination} = formParams;
 	const amount = parseFloat(aircraft_price);	
@@ -136,7 +136,7 @@ const validate_instant_quote = () =>
 
 		if(typeof gtag !== 'undefined' && amount)
 		{
-			let addToCartArgs = getCheckoutEventArgs(formParams);
+			let addToCartArgs = getCheckoutEventArgs2(formParams);
 			//send to call
 			gtag('event', 'add_to_cart', addToCartArgs);
 		}
