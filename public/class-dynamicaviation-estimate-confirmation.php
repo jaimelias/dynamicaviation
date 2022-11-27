@@ -183,63 +183,6 @@ class Dynamic_Aviation_Estimate_Confirmation
 		}
 	}
 
-	public function non_required_params()
-	{
-		return array(
-			'end_date',
-			'end_time',
-			'end_itinerary'
-		);
-	}
-
-	public function required_params()
-	{
-		return array(
-			'first_name',
-			'lastname',
-			'email',
-			'phone',
-			'country',
-			'g-recaptcha-response',
-			'aircraft_origin',
-			'aircraft_destination',
-			'start_date',
-			'start_time',
-			'start_itinerary'
-		);
-	}
-
-	public function validate_required_params()
-	{
-		$output = true;
-
-		$params = $this->required_params();
-
-		if(isset($_POST['aircraft_flight']))
-		{
-			if(intval($_POST['aircraft_flight']) === 1)
-			{
-				$output = array_merge($params, $this->non_required_params());
-			}
-		}
-
-		for($x = 0; $x < count($params); $x++)
-		{
-			if(!isset($_POST[$params[$x]]))
-			{
-				$output = false;
-			}	
-		}
-
-		if(!$output)
-		{
-			$GLOBALS['dy_request_invalids'] = array(__('Invalid Params', 'dynamicpackages'));
-		}
-
-
-		return $output;
-	}
-
 	public function validate_form_submit()
 	{
 		$output = false;
@@ -254,17 +197,14 @@ class Dynamic_Aviation_Estimate_Confirmation
 		{
 			if(get_query_var($this->pathname))
 			{
-				if($this->validate_required_params() && $this->valid_recaptcha)
+				if($this->valid_recaptcha)
 				{
-					$params = $this->utilities->request_form_hash_param_names();
+					$param_names = $this->utilities->request_form_hash_param_names();
 
-					if($this->utilities->validate_hash($params))
+					if($this->utilities->validate_params($param_names) && $this->utilities->validate_hash($param_names) && $this->utilities->validate_nonce($this->pathname))
 					{
-						if($this->utilities->validate_nonce($this->pathname))
-						{
-							$output = true;
-							$GLOBALS[$which_var] = $output;
-						}
+						$output = true;
+						$GLOBALS[$which_var] = $output;
 					}
 				}
 			}	

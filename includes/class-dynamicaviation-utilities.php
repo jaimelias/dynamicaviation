@@ -433,7 +433,7 @@ class Dynamic_Aviation_Utilities {
 		{
 			$not_set_params = array();
 			$invalid_params = array();
-			$param_names = $this->search_form_hash_param_names();
+
 			$round_trip = (isset($_POST['aircraft_flight'])) 
 				? (intval($_POST['aircraft_flight']) === 1)
 				? true
@@ -452,7 +452,14 @@ class Dynamic_Aviation_Utilities {
 				{
 					$value = sanitize_text_field($_POST[$param]);
 
-					if($param === 'aircraft_flight')
+					if($param === 'email')
+					{
+						if(!is_email($value))
+						{
+							$invalid_params[] = $param;
+						}
+					}
+					else if($param === 'aircraft_flight')
 					{
 						if(!$this->validate_legs($value))
 						{
@@ -511,12 +518,14 @@ class Dynamic_Aviation_Utilities {
 				}
 				else
 				{
-					$GLOBALS['dy_request_invalids'] = array(__('invalid_params', 'dynamicpackages'), $invalid_params);
+					cloudflare_ban_ip_address();
+					$GLOBALS['dy_request_invalids'] = array('invalid_params' => $invalid_params);
 				}
 			}
 			else
 			{
-				$GLOBALS['dy_request_invalids'] = array(__('not_set_params', 'dynamicpackages'), $not_set_params);
+				cloudflare_ban_ip_address();
+				$GLOBALS['dy_request_invalids'] = array('not_set_params' => $not_set_params);
 			}
 
 			$GLOBALS[$which_var] = $output;
