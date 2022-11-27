@@ -329,10 +329,10 @@ class Dynamic_Aviation_Utilities {
 		return array_merge(array('first_name', 'lastname', 'email', 'phone', 'country'), $this->search_form_hash_param_names());
 	}
 
-	public function validate_hash($params)
+	public function validate_hash($param_names)
 	{
 		$output = true;
-		$which_var = 'dy_validate_hash';
+		$which_var = 'dy_aviation_validate_hash';
 		global $$which_var;
 
 		if(isset($$which_var))
@@ -346,11 +346,11 @@ class Dynamic_Aviation_Utilities {
 				$str = '';
 				$hash_param = sanitize_text_field($_POST['hash']);
 
-				for($x = 0; $x < count($params); $x++)
+				for($x = 0; $x < count($param_names); $x++)
 				{
-					if(isset($_POST[$params[$x]]))
+					if(isset($_POST[$param_names[$x]]))
 					{
-						$str .= sanitize_text_field($_POST[$params[$x]]);
+						$str .= sanitize_text_field($_POST[$param_names[$x]]);
 					}
 					else
 					{
@@ -380,7 +380,7 @@ class Dynamic_Aviation_Utilities {
 	public function validate_nonce($pathname)
 	{
 		$output = false;
-		$which_var = 'dy_validate_nonce';
+		$which_var = 'dy_aviation_validate_nonce';
 		global $$which_var;
 
 		if(isset($$which_var))
@@ -389,16 +389,24 @@ class Dynamic_Aviation_Utilities {
 		}
 		else
 		{
-			if(wp_verify_nonce(get_query_var($pathname), 'dy_nonce'))
+			if(!is_user_logged_in())
 			{
-				$output = true;
+				if(wp_verify_nonce(get_query_var($pathname), 'dy_nonce'))
+				{
+					$output = true;
+				}
+				else
+				{
+					write_log(json_encode(array('invalid_nonce', $_POST)));
+					$GLOBALS['dy_request_invalids'] = array(__('invalid_nonce', 'dynamicpackages'));
+					$output = false;
+				}
 			}
 			else
 			{
-				write_log(json_encode(array('invalid_nonce', $_POST)));
-				$GLOBALS['dy_request_invalids'] = array(__('invalid_nonce', 'dynamicpackages'));
-				$output = false;
+				$output = true;
 			}
+
 
 			$GLOBALS[$which_var] = $output;
 		}
@@ -411,6 +419,111 @@ class Dynamic_Aviation_Utilities {
 		return in_array(intval($value), array(0,1));
 	}
 
+	public function validate_params($param_names)
+	{
+		$output = false;
+		$which_var = 'dy_aviation_validate_params';
+		global $$which_var;
+
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
+		}
+		else
+		{
+			$not_set_params = array();
+			$invalid_params = array();
+			$param_names = $this->search_form_hash_param_names();
+			$round_trip = (isset($_POST['aircraft_flight'])) 
+				? (intval($_POST['aircraft_flight']) === 1)
+				? true
+				: false
+				: false;
+
+			for($x = 0; $x < count($param_names); $x++)
+			{
+				$param = $param_names[$x];
+
+				if(!isset($_POST[$param]))
+				{
+					$not_set_params[] = $param;
+				}
+				else
+				{
+					$value = sanitize_text_field($_POST[$param]);
+
+					if($param === 'aircraft_flight')
+					{
+						if(!$this->validate_legs($value))
+						{
+							$invalid_params[] = $param;
+						}
+					}
+					else if($param === 'start_date')
+					{
+						if(!is_valid_date($value))
+						{
+							$invalid_params[] = $param;
+						}
+					}
+					else if($param === 'start_time')
+					{
+						if(!is_valid_time($value))
+						{
+							$invalid_params[] = $param;
+						}
+					}
+					else if($param === 'end_date')
+					{
+						if($round_trip)
+						{
+							if(!is_valid_date($value))
+							{
+								$invalid_params[] = $param;
+							}
+						}
+					}
+					else if($param === 'end_time')
+					{
+						if($round_trip)
+						{
+							if(!is_valid_time($value))
+							{
+								$invalid_params[] = $param;
+							}
+						}
+					}
+					else
+					{
+						if(empty($_POST[$param]))
+						{
+							$invalid_params[] = $param;
+						}
+					}
+				}
+			}
+
+			if(empty($not_set_params))
+			{
+				if(empty($invalid_params))
+				{
+					$output = true;
+				}
+				else
+				{
+					$GLOBALS['dy_request_invalids'] = array(__('invalid_params', 'dynamicpackages'), $invalid_params);
+				}
+			}
+			else
+			{
+				$GLOBALS['dy_request_invalids'] = array(__('not_set_params', 'dynamicpackages'), $not_set_params);
+			}
+
+			$GLOBALS[$which_var] = $output;
+		}
+
+		return $output;
+	}
 }
 
 
