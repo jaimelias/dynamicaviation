@@ -184,6 +184,13 @@ class Dynamic_Aviation_Estimate_Page
 								$invalid_params[] = $param;
 							}
 						}
+						else if($param === 'start_time')
+						{
+							if(!is_valid_time($value))
+							{
+								$invalid_params[] = $param;
+							}
+						}
 						else if($param === 'end_date')
 						{
 							if($round_trip)
@@ -198,7 +205,7 @@ class Dynamic_Aviation_Estimate_Page
 						{
 							if($round_trip)
 							{
-								if(empty($value))
+								if(!is_valid_time($value))
 								{
 									$invalid_params[] = $param;
 								}
