@@ -1,13 +1,13 @@
 <?php
 
 $transport_title = __('Charter Flight', 'dynamicaviation');
-$this_id = sanitize_text_field($_POST['aircraft_id']);
-$aircraft_name = sanitize_text_field($_POST['aircraft_name']);
+$this_id = sanitize_text_field($_POST['post_id']);
+$title = sanitize_text_field($_POST['title']);
 $aircraft_seats = sanitize_text_field($_POST['aircraft_seats']);
 $aircraft_weight = sanitize_text_field($_POST['aircraft_weight']);
 $aircraft_url = sanitize_text_field($_POST['aircraft_url']);
 $passengers = sanitize_text_field($_POST['pax_num']);
-$aircraft_settings = $aircraft_name . ' ('.$aircraft_seats.' '.__('seats or', 'dynamicaviation').' '.$aircraft_weight.')';
+$aircraft_settings = $title . ' ('.$aircraft_seats.' '.__('seats or', 'dynamicaviation').' '.$aircraft_weight.')';
 $aircraft_link = '<a href="'.esc_url($aircraft_url).'">'.esc_html($aircraft_settings).'</a>';
 
 $today = date_i18n(get_option('date_format'), strtotime(null));
@@ -38,7 +38,7 @@ $itinerary_html = ($end_itinerary) ? $start_itinerary.'<br/><br/>'.$end_itinerar
 $itinerary_html .= '<br/><br/>' . __('Passengers', 'dynamicaviation') . ': ' . $passengers;
 $itinerary_text = ($end_itinerary) ? $start_itinerary . ' || ' . $end_itinerary : $start_itinerary;
 $itinerary_text .= ' || ' . __('Passengers', 'dynamicaviation') . ': ' . $passengers;
-$itinerary_text = $aircraft_name . ' || ' . $itinerary_text;
+$itinerary_text = $title . ' || ' . $itinerary_text;
 
 
 $label_notes = __('Notes', 'dynamicaviation');

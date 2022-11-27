@@ -96,7 +96,7 @@ const formArrayToParams = () => {
 
 const getCheckoutEventArgs2 = formParams => {
 
-	const {aircraft_price, aircraft_name, aircraft_flight, aircraft_origin, aircraft_destination} = formParams;
+	const {aircraft_price, title, aircraft_flight, aircraft_origin, aircraft_destination} = formParams;
 	const amount = parseFloat(aircraft_price);	
 	const legs = parseFloat(aircraft_flight) + 1;
 
@@ -104,7 +104,7 @@ const getCheckoutEventArgs2 = formParams => {
 		value: amount,
 		currency: 'USD',
 		items: [{
-			item_name: aircraft_name,
+			item_name: title,
 			affiliation: 'Dynamic Aviation',
 			price: (amount / legs),
 			quantity: legs,

@@ -130,7 +130,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 
 	public function subject($output)
 	{
-		if(!isset($_POST['aircraft_id']))
+		if(!isset($_POST['post_id']))
 		{
 			$output = sprintf(__('%s, Your request has been sent to our specialists at %s!', 'dynamicaviation'), sanitize_text_field($_POST['first_name']), $this->site_name);
 		}
@@ -156,11 +156,11 @@ class Dynamic_Aviation_Estimate_Confirmation
 				$data['lang'] = $this->current_language;
 				$notes = apply_filters('dy_aviation_estimate_notes', '');
 				$subject = apply_filters('dy_aviation_estimate_subject', '');
-				$price = isset($_POST['aircraft_id']) 
+				$price = isset($_POST['post_id']) 
 					? $this->utilities->currency_format(sanitize_text_field($_POST['aircraft_price']))
 					: 0;
 				
-				if(!isset($_POST['aircraft_id']))
+				if(!isset($_POST['post_id']))
 				{
 					require_once( $this->plugin_dir_path . 'public/email_templates/general.php');
 				}
