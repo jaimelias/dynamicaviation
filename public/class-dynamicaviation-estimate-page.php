@@ -149,21 +149,91 @@ class Dynamic_Aviation_Estimate_Page
 		{
 			if(get_query_var($this->pathname))
 			{
-				if(isset($_POST['aircraft_origin']) && isset($_POST['aircraft_destination']) && isset($_POST['pax_num']) && isset($_POST['aircraft_flight']) && isset($_POST['start_date']) && isset($_POST['start_time']) && isset($_POST['end_date']) && isset($_POST['end_time']) && isset($_POST['aircraft_origin_l']) && isset($_POST['aircraft_destination_l']))
-				{
-					$params = $this->utilities->search_form_hash_param_names();
+				$not_set_params = array();
+				$invalid_params = array();
+				$param_names = $this->utilities->search_form_hash_param_names();
+				$round_trip = (isset($_POST['aircraft_flight'])) 
+					? (intval($_POST['aircraft_flight']) === 1)
+					? true
+					: false
+					: false;
 
-					if($this->utilities->validate_hash($params))
+				for($x = 0; $x < count($param_names); $x++)
+				{
+					$param = $param_names[$x];
+
+					if(!isset($_POST[$param]))
 					{
-						if($this->utilities->validate_nonce($this->pathname))
+						$not_set_params[] = $param;
+					}
+					else
+					{
+						$value = sanitize_text_field($_POST[$param]);
+
+						if($param === 'aircraft_flight')
 						{
-							$output = true;
+							if(!$this->utilities->validate_legs($value))
+							{
+								$invalid_params[] = $param;
+							}
 						}
+						else if($param === 'start_date')
+						{
+							if(!is_date($value))
+							{
+								$invalid_params[] = $param;
+							}
+						}
+						else if($param === 'end_date')
+						{
+							if($round_trip)
+							{
+								if(!is_date($value))
+								{
+									$invalid_params[] = $param;
+								}
+							}
+						}
+						else if($param === 'end_time')
+						{
+							if($round_trip)
+							{
+								if(empty($value))
+								{
+									$invalid_params[] = $param;
+								}
+							}
+						}
+						else
+						{
+							if(empty($_POST[$param]))
+							{
+								$invalid_params[] = $param;
+							}
+						}
+					}
+				}
+
+				if(empty($not_set_params))
+				{
+					if(empty($invalid_params))
+					{
+						if($this->utilities->validate_hash($param_names))
+						{
+							if($this->utilities->validate_nonce($this->pathname))
+							{
+								$output = true;
+							}
+						}
+					}
+					else
+					{
+						$GLOBALS['dy_request_invalids'] = array(__('invalid_params', 'dynamicpackages'), $invalid_params);
 					}
 				}
 				else
 				{
-					$GLOBALS['dy_request_invalids'] = array(__('Invalid Params', 'dynamicpackages'));
+					$GLOBALS['dy_request_invalids'] = array(__('not_set_params', 'dynamicpackages'), $not_set_params);
 				}
 
 			}

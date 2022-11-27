@@ -406,6 +406,11 @@ class Dynamic_Aviation_Utilities {
 		return $output;
 	}
 
+	public function validate_legs($value)
+	{
+		return in_array(intval($value), array(0,1));
+	}
+
 }
 
 

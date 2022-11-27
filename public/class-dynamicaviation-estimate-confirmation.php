@@ -195,8 +195,6 @@ class Dynamic_Aviation_Estimate_Confirmation
 	public function required_params()
 	{
 		return array(
-			'aircraft_origin_l',
-			'aircraft_destination_l',
 			'first_name',
 			'lastname',
 			'email',

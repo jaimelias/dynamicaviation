@@ -25,9 +25,7 @@ class Dynamic_Aviation_Estimate_Table {
         $this->param_names = array(
             'pax_num', 
             'aircraft_flight', 
-            'start_date', 
-            'aircraft_origin_l', 
-            'aircraft_destination_l', 
+            'start_date',
             'start_time',
             'end_date',
             'end_time',
@@ -90,9 +88,9 @@ class Dynamic_Aviation_Estimate_Table {
     public function start_itinerary()
     {
         $output = '';
-        $output .= $this->get->aircraft_origin_l;
+        $output .= $this->get->aircraft_origin;
         $output .= ' &rsaquo;&rsaquo;&rsaquo; ';
-        $output .= $this->get->aircraft_destination_l;
+        $output .= $this->get->aircraft_destination;
         $output .= ' '.__('on', 'dynamicaviation').' ';
         $output .= date_i18n(get_option( 'date_format' ), strtotime($this->get->start_date));
         $output .= ' '.__('at', 'dynamicaviation').' ';
@@ -107,9 +105,9 @@ class Dynamic_Aviation_Estimate_Table {
         if($this->get->aircraft_flight === 1)
         {
             $output = '';            
-            $output .= $this->get->aircraft_destination_l;
+            $output .= $this->get->aircraft_destination;
             $output .= ' &rsaquo;&rsaquo;&rsaquo; ';
-            $output .= $this->get->aircraft_origin_l;
+            $output .= $this->get->aircraft_origin;
             $output .= ' '.__('on', 'dynamicaviation').' ';
             $output .= date_i18n(get_option('date_format'), strtotime($this->get->end_date));
             $output .= ' '.__('at', 'dynamicaviation').' ';
@@ -657,7 +655,7 @@ class Dynamic_Aviation_Estimate_Table {
 
         if ( $wp_query->have_posts() )
         {
-            $output = '<hr/><h4>'.esc_html(sprintf(__('Alternative transport options to %s', 'dynamicaviation'), $this->get->aircraft_destination_l)).'</h4>';
+            $output = '<hr/><h4>'.esc_html(sprintf(__('Alternative transport options to %s', 'dynamicaviation'), $this->get->aircraft_destination)).'</h4>';
 
             $output .= '<table class="bottom-40 pure-table pure-table-bordered pure-table-striped text-center small"><thead><tr>';
 
