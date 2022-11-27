@@ -179,7 +179,7 @@ class Dynamic_Aviation_Estimate_Page
 						}
 						else if($param === 'start_date')
 						{
-							if(!is_date($value))
+							if(!is_valid_date($value))
 							{
 								$invalid_params[] = $param;
 							}
@@ -188,7 +188,7 @@ class Dynamic_Aviation_Estimate_Page
 						{
 							if($round_trip)
 							{
-								if(!is_date($value))
+								if(!is_valid_date($value))
 								{
 									$invalid_params[] = $param;
 								}
