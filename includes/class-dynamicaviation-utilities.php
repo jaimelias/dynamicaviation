@@ -314,7 +314,7 @@ class Dynamic_Aviation_Utilities {
         }
     }
 
-	public function currency_format($amount)
+	public function money_format($amount)
 	{
 		return number_format(floatval($amount), 2, '.', ',');
 	}

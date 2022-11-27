@@ -353,11 +353,11 @@ class Dynamic_Aviation_Estimate_Table {
         
         $aircraft_col .= '<a class="strong" href="'.esc_url($aircraft_url).'">'.esc_html($post->post_title).'</a><br/><small>'.esc_html($this->utilities->aircraft_type(aviation_field( 'aircraft_type', $post->ID))).'</small> <strong><span class="dashicons dashicons-admin-users"></span> '.esc_html($seats).'</strong><br/><small>'.esc_html('Max').' ('.$weight_allowed.')</small>';
 
-        $price_col = '<small class="text-muted">USD</small><br/><strong '.$large_attr.'><span class="text-muted">$</span>'.esc_html($this->utilities->currency_format($price, 2)).'</strong>';
+        $price_col = '<small class="text-muted">USD</small><br/><strong '.$large_attr.'><span class="text-muted">$</span>'.esc_html($this->utilities->money_format($price, 2)).'</strong>';
         
         if(floatval($fees) > 0)
         {
-            $price_col .= '<br/><span class="text-muted">'.__('Fees per pers.', 'dynamicaviation').' $'.esc_html($this->utilities->currency_format($fees)).'</span>';
+            $price_col .= '<br/><span class="text-muted">'.__('Fees per pers.', 'dynamicaviation').' $'.esc_html($this->utilities->money_format($fees)).'</span>';
         }
         
         if($this->is_mobile)
