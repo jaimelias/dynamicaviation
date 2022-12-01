@@ -15,6 +15,7 @@ class Dynamic_Aviation_Utilities {
 		$this->algolia_token = get_option('algolia_token');
 		$this->algolia_index = get_option('algolia_index');
 		$this->algolia_id = get_option('algolia_id');
+		$this->ip = get_ip_address();
 	}
 
 	public function airport_img_url($json)
@@ -368,7 +369,9 @@ class Dynamic_Aviation_Utilities {
 
 			if(!$output)
 			{
-				$GLOBALS['dy_request_invalids'] = array(__('Invalid Hash', 'dynamicpackages'));
+				$log = array(__('invalid_hash', 'dynamicpackages'));
+				write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
+				$GLOBALS['dy_request_invalids'] = $log;
 			}
 
 			$GLOBALS[$which_var] = $output;
@@ -397,8 +400,9 @@ class Dynamic_Aviation_Utilities {
 				}
 				else
 				{
-					write_log(json_encode(array('invalid_nonce', $_POST)));
-					$GLOBALS['dy_request_invalids'] = array(__('invalid_nonce', 'dynamicpackages'));
+					$log = array(__('invalid_nonce', 'dynamicpackages'));
+					write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
+					$GLOBALS['dy_request_invalids'] = $log;
 					$output = false;
 				}
 			}
@@ -518,13 +522,19 @@ class Dynamic_Aviation_Utilities {
 				}
 				else
 				{
-					$GLOBALS['dy_request_invalids'] = array('invalid_params' => $invalid_params);
+					$log = array('invalid_params' => $invalid_params);
+					$GLOBALS['dy_request_invalids'] = $log;
+					write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
+
+					//block ip
+					cloudflare_ban_ip_address();
 				}
 			}
 			else
 			{
-				cloudflare_ban_ip_address();
-				$GLOBALS['dy_request_invalids'] = array('not_set_params' => $not_set_params);
+				$log = array('not_set_params' => $not_set_params);
+				write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
+				$GLOBALS['dy_request_invalids'] = $log;
 			}
 
 			$GLOBALS[$which_var] = $output;
