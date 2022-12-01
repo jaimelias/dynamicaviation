@@ -518,7 +518,6 @@ class Dynamic_Aviation_Utilities {
 				}
 				else
 				{
-					cloudflare_ban_ip_address();
 					$GLOBALS['dy_request_invalids'] = array('invalid_params' => $invalid_params);
 				}
 			}
