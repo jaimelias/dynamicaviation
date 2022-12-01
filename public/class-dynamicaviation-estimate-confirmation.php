@@ -136,7 +136,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 		}
 		else
 		{
-			$price = $this->utilities->money_format(sanitize_text_field($_POST['aircraft_price']));
+			$price = $this->utilities->money(sanitize_text_field($_POST['aircraft_price']));
 			$output = sprintf(__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), sanitize_text_field($_POST['first_name']), $this->site_name, $price);
 		}
 
@@ -157,7 +157,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 				$notes = apply_filters('dy_aviation_estimate_notes', '');
 				$subject = apply_filters('dy_aviation_estimate_subject', '');
 				$price = isset($_POST['post_id']) 
-					? $this->utilities->money_format(sanitize_text_field($_POST['aircraft_price']))
+					? $this->utilities->money(sanitize_text_field($_POST['aircraft_price']))
 					: 0;
 				
 				if(!isset($_POST['post_id']))
