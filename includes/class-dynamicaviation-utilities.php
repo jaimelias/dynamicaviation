@@ -380,6 +380,44 @@ class Dynamic_Aviation_Utilities {
 		return $output;
 	}
 
+	public function validate_nonce($pathname)
+	{
+		$output = false;
+		$which_var = 'dy_aviation_validate_nonce';
+		global $$which_var;
+
+		if(isset($$which_var))
+		{
+			$output = $$which_var;
+		}
+		else
+		{
+			if(!is_user_logged_in())
+			{
+				if(wp_verify_nonce(get_query_var($pathname), 'dy_nonce'))
+				{
+					$output = true;
+				}
+				else
+				{
+					$log = array(__('invalid_nonce', 'dynamicpackages'));
+					write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
+					$GLOBALS['dy_request_invalids'] = $log;
+					$output = false;
+				}
+			}
+			else
+			{
+				$output = true;
+			}
+
+
+			$GLOBALS[$which_var] = $output;
+		}
+
+		return $output;
+	}
+
 	public function validate_legs($value)
 	{
 		return in_array(intval($value), array(0,1));
