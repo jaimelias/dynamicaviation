@@ -201,6 +201,8 @@ class Dynamic_Aviation_Estimate_Confirmation
 				{
 					$param_names = $this->utilities->request_form_hash_param_names();
 
+					write_log($param_names);
+
 					if($this->utilities->validate_params($param_names) && $this->utilities->validate_hash($param_names))
 					{
 						$output = true;
@@ -208,57 +210,6 @@ class Dynamic_Aviation_Estimate_Confirmation
 					}
 				}
 			}	
-		}
-
-		return $output;
-	}
-
-
-
-	public function validate_hash($params)
-	{
-		$output = true;
-		$which_var = 'aviation_validate_request_form_hash';
-		global $$which_var;
-
-		if(isset($$which_var))
-		{
-			$output = $$which_var;
-		}
-		else
-		{
-			if(isset($_POST['hash']))
-			{
-				$str = '';
-				
-				$hash_param = sanitize_text_field($_POST['hash']);
-
-				for($x = 0; $x < count($params); $x++)
-				{
-					if(isset($_POST[$params[$x]]))
-					{
-						$str .= sanitize_text_field($_POST[$params[$x]]);
-					}
-					else
-					{
-						$output = false;
-					}
-				}
-
-				$hash = hash('sha512', $str);
-
-				if($hash !== $hash_param)
-				{
-					$output = false;
-				}
-			}
-
-			if(!$output)
-			{
-				$GLOBALS['dy_request_invalids'] = array(__('Invalid Hash', 'dynamicpackages'));
-			}
-
-			$GLOBALS[$which_var] = $output;
 		}
 
 		return $output;
