@@ -331,13 +331,13 @@ class Dynamic_Aviation_Estimate_Table {
             return '';
         }
 
-        $price = $itinerary['price'];
-        $fees = $itinerary['fees'];
+        $price = floatval($itinerary['price']);
+        $fees = floatval($itinerary['fees']);
         $duration = $itinerary['duration'];
         $seats = $itinerary['seats'];
-        $weight_pounds = $itinerary['weight_pounds'];
+        $weight_pounds = floatval($itinerary['weight_pounds']);
         $aircraft_price = $price + ($fees * $this->get->pax_num);
-        $weight_kg = intval($weight_pounds * 0.453592);
+        $weight_kg = round(($weight_pounds * 0.453592));
         $weight_allowed = esc_html($weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation'));
 
         $flight_array = array(
