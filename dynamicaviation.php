@@ -51,6 +51,10 @@ function deactivate_dynamicaviation() {
 register_activation_hook( __FILE__, 'activate_dynamicaviation' );
 register_deactivation_hook( __FILE__, 'deactivate_dynamicaviation' );
 
+if(!defined('DY_CORE_FUNCTIONS'))
+{
+	require plugin_dir_path( __FILE__ ) . 'dy-core-functions.php';
+}
 
 // admin and public
 require plugin_dir_path( __FILE__ ) . 'includes/class-dynamicaviation.php';
