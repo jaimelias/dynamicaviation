@@ -1,6 +1,6 @@
 <?php
 
-$today = date_i18n(get_option('date_format'), strtotime(null));
+$today = date_i18n(get_option('date_format'), strtotime('today UTC'));
 $label_doc = __('Estimate', 'dynamicaviation');
 $greeting = sprintf(__('Hello %s,', 'dynamicaviation'), sanitize_text_field($_POST['first_name']));
 $passengers = sanitize_text_field($_POST['pax_num']);

@@ -10,7 +10,7 @@ $passengers = sanitize_text_field($_POST['pax_num']);
 $aircraft_settings = $title . ' ('.$aircraft_seats.' '.__('seats or', 'dynamicaviation').' '.$aircraft_weight.')';
 $aircraft_link = '<a href="'.esc_url($aircraft_url).'">'.esc_html($aircraft_settings).'</a>';
 
-$today = date_i18n(get_option('date_format'), strtotime(null));
+$today = date_i18n(get_option('date_format'), strtotime('today UTC'));
 $label_doc = __('Estimate', 'dynamicaviation');
 $greeting = sprintf(__('Hello %s,', 'dynamicaviation'), sanitize_text_field($_POST['first_name']));
 $intro = __('Thank You for Your Request!', 'dynamicaviation');
