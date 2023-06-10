@@ -1,5 +1,6 @@
 <?php
 
+#[AllowDynamicProperties]
 class Dynamic_Aviation_Image {
 
 	public function __construct( $plugin_name, $version, $utilities ) 

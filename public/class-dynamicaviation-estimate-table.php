@@ -1,6 +1,6 @@
 <?php
 
-
+#[AllowDynamicProperties]
 class Dynamic_Aviation_Estimate_Table {
 
     public function __construct($utilities) {

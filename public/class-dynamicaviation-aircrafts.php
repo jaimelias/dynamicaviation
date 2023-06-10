@@ -1,5 +1,6 @@
 <?php
 
+#[AllowDynamicProperties]
 class Dynamic_Aviation_Aircrafts {
 
 

@@ -1,5 +1,6 @@
 <?php
 
+#[AllowDynamicProperties]
 class Dynamic_Aviation_Admin {
 
 	private $plugin_name;

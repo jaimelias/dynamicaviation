@@ -40,7 +40,7 @@ $email_template = <<<EOT
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>${company_name}</title>
+		<title>{$company_name}</title>
 		<meta http-equiv="x-ua-compatible" content="ie=edge">
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -107,18 +107,18 @@ $email_template = <<<EOT
 	</head>
 	<body style="font-family: Arial, sans-serif; line-height: 1.5; font-size: 14px;">
 		<div style="max-width: 800px; width: 100%; margin: 0 auto 0 auto;">
-			<div class="preheader" style="display: none; max-width: 0; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">${itinerary_html}</div>
+			<div class="preheader" style="display: none; max-width: 0; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">{$itinerary_html}</div>
 		
 			<div style="margin: 20px 0 40px 0; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
-				<p>${greeting}</p>
-				<p>${subject}</p>
+				<p>{$greeting}</p>
+				<p>{$subject}</p>
 			</div>
 		
 			<div class="doc_box" style="margin-bottom: 40px; padding: 20px; border: 1px solid #eee; box-sizing: border-box">
-                <p>${itinerary_html}</p>
+                <p>{$itinerary_html}</p>
 			</div>
 			
-			${whatsapp}
+			{$whatsapp}
 		</div>		
 	</body>
 </html>

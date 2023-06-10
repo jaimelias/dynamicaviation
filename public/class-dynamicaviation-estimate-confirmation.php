@@ -1,6 +1,6 @@
 <?php 
 
-
+#[AllowDynamicProperties]
 class Dynamic_Aviation_Estimate_Confirmation
 {
     public function __construct($plugin_name, $version, $utilities)

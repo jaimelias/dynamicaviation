@@ -1,5 +1,6 @@
 <?php
 
+#[AllowDynamicProperties]
 class Dynamic_Aviation_Settings
 {
 	public function __construct($utilities)
