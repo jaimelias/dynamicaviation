@@ -247,7 +247,7 @@ class Dynamic_Aviation_Aircrafts {
 
             <?php echo apply_filters('dy_aviation_price_table', ''); ?>
 
-            <h2><?php echo (esc_html__('Instant Quotes', 'dynamicaviation')); ?></h2>
+            <h2><?php echo esc_html(__('Instant Quotes', 'dynamicaviation')); ?></h2>
             <div class="bottom-20">
                 <?php echo apply_filters('dy_aviation_search_form', ''); ?>
             </div>
