@@ -25,7 +25,7 @@ class Dynamic_Aviation_Destinations {
 		add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);		
 		add_filter('wp_title', array(&$this, 'modify_wp_title'), 100);
         add_filter('the_title', array(&$this, 'modify_title'));
-        add_filter('the_content', array(&$this, 'modify_content'));
+        add_filter('the_content', array(&$this, 'modify_content'), 100);
 
         //meta tags
         add_action('wp_head', array(&$this, 'meta_tags'));

@@ -21,6 +21,7 @@ class Dynamic_Aviation_Price_Table {
 	public function table($iata = '')
 	{
 		$output = '';
+		$count = 0;
 		$airport_array = $this->utilities->airport_data();
 		$is_aircraft_page = is_singular('aircrafts');
 		$is_destination_page = get_query_var('fly');
@@ -48,8 +49,6 @@ class Dynamic_Aviation_Price_Table {
 		
 		if ( $wp_query->have_posts() )
 		{
-
-			$count = 0;
 			$routes = array();
 			$current_language = current_language();
 			$all_airports_data = $this->utilities->all_airports_data();

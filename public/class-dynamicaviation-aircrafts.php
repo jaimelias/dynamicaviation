@@ -232,7 +232,6 @@ class Dynamic_Aviation_Aircrafts {
 
     public function container($content, $table)
     {
-        ob_start();
         ?>
             <div class="pure-g gutters">
                 <div class="pure-u-1 pure-u-md-2-3">
