@@ -49,11 +49,12 @@ class Dynamic_Aviation_Utilities {
   
 	  public function convertNumberToTime($dec)
 	  {
-		  $seconds = ($dec * 3600);
-		  $hours = floor($dec);
-		  $seconds -= $hours * 3600;
-		  $minutes = floor($seconds / 60);
-		  return $this->lz($hours).":".$this->lz($minutes);
+		$dec = (empty($dec)) ? 1 : $dec;
+		$seconds = ($dec * 3600);
+		$hours = floor($dec);
+		$seconds -= $hours * 3600;
+		$minutes = floor($seconds / 60);
+		return $this->lz($hours).":".$this->lz($minutes);
 	  }
   
 	  public function lz($num)
