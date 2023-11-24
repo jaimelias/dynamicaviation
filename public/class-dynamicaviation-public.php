@@ -67,7 +67,7 @@ class Dynamic_Aviation_Public {
 					
 					for($x = 0; $x < count($languages); $x++)
 					{
-						if($languages[$x] != pll_default_language())
+						if($languages[$x] != default_language())
 						{
 							$language_list[] = $languages[$x];
 						}

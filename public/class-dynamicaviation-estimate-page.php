@@ -52,7 +52,7 @@ class Dynamic_Aviation_Estimate_Page
 
 		for($x = 0; $x < count($languages); $x++)
 		{
-			if($languages[$x] != pll_default_language())
+			if($languages[$x] != default_language())
 			{
 				$arr[] = $languages[$x];
 			}

@@ -70,7 +70,7 @@ class Dynamic_Aviation_Destinations {
 
 		for($x = 0; $x < count($languages); $x++)
 		{
-			if($languages[$x] != pll_default_language())
+			if($languages[$x] != default_language())
 			{
 				$arr[] = $languages[$x];
 			}
@@ -563,7 +563,7 @@ class Dynamic_Aviation_Destinations {
 
 		if(isset($polylang) && get_query_var($this->pathname))
 		{
-			if($slug === pll_default_language())
+			if($slug === default_language())
 			{
 				$url = home_url('fly/' . get_query_var($this->pathname));
 			}
