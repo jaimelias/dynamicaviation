@@ -168,15 +168,8 @@ class Dynamic_Aviation_Estimate_Confirmation
 				{
 					require_once($this->plugin_dir_path . 'public/email_templates/quote.php');
 				}
-				
-				
-				$args = array(
-					'subject' => $subject,
-					'to' => sanitize_email($_POST['email']),
-					'message' => $email_template
-				);
 
-				sg_mail($args);
+				wp_mail(sanitize_email($_POST['email']), $subject, $email_template);
 
 				$GLOBALS[$which_var] = true;
 			}
