@@ -426,23 +426,20 @@ class Dynamic_Aviation_Estimate_Table {
                             </div>
                         </div>
                         <div class="pure-u-1 pure-u-md-1-2">
-                            <div class="bottom-20">
-                                <label for="phone"><?php echo (esc_html__('Phone', 'dynamicaviation')); ?></label>
-                                <input type="text" name="phone" />								
+                            
+                            <label for="phone"><?php echo (esc_html__('Phone', 'dynamicaviation')); ?></label>
+
+                            <div class="pure-g bottom-20">
+                                <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
+                                    <select name="country" class="countrylist"><option>--</option></select>
+                                </div>
+                                <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
+                                    <input type="text" name="phone" />
+                                </div>								
                             </div>
                         </div>
                     </div>
-                    <div class="pure-g gutters">
-                        <div class="pure-u-1 pure-u-md-1-2">
-                            <div class="bottom-20">
-                                <label for="country"><?php echo (esc_html__('Country', 'dynamicaviation')); ?></label>
-                                <select name="country" class="countrylist"><option>--</option></select>								
-                            </div>
-                        </div>
-                        <div class="pure-u-1 pure-u-md-1-2">
-                            <! -- empty col -->
-                        </div>
-                    </div>				
+
                                     
                     <div class="hidden">
                         <div id="aircraft_fields"></div>                    
