@@ -24,7 +24,7 @@ $company_tax_id = get_option('dy_tax_id');
 $label_client = __('Client', 'dynamicaviation');
 $client_name = sanitize_text_field($_POST['first_name']) . ' ' . sanitize_text_field($_POST['lastname']);
 $client_email = sanitize_email($_POST['email']);
-$client_phone = sanitize_text_field($_POST['phone']);
+$client_phone = sanitize_text_field($_POST['country_calling_code']).sanitize_text_field($_POST['phone']);
 $label_item = __('Service', 'dynamicaviation');
 $label_total = __('Total', 'dynamicaviation');
 $label_subtotal = __('Subtotal', 'dynamicaviation');
@@ -147,7 +147,7 @@ $email_template = <<<EOT
 						<td colspan="2" style="padding: 5px;vertical-align: top; text-align: right;">
 							<strong style="color: #666666">{$label_client}</strong>
 							<br/> {$client_name}
-							<br/>{$client_phone}
+							<br/>+{$client_phone}
 							<br />{$client_email}
 							<br/>
 							<br/>

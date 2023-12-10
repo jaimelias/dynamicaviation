@@ -328,7 +328,7 @@ class Dynamic_Aviation_Utilities {
 
 	public function request_form_hash_param_names()
 	{
-		return array_merge(array('first_name', 'lastname', 'email', 'phone', 'country'), $this->search_form_hash_param_names());
+		return array_merge(array('first_name', 'lastname', 'email', 'repeat_email', 'phone', 'country_calling_code'), $this->search_form_hash_param_names());
 	}
 
 	public function validate_hash($param_names)
@@ -460,6 +460,13 @@ class Dynamic_Aviation_Utilities {
 					if($param === 'email')
 					{
 						if(!is_email($value))
+						{
+							$invalid_params[] = $param;
+						}
+					}
+					else if($param === 'repeat_email')
+					{
+						if(!is_email($value) || $value !== sanitize_text_field($_POST['email']))
 						{
 							$invalid_params[] = $param;
 						}

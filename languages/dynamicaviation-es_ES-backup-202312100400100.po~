@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Panama Jet Hub\n"
 "POT-Creation-Date: 2020-09-29 04:29+0000\n"
-"PO-Revision-Date: 2022-10-26 18:20+0000\n"
+"PO-Revision-Date: 2022-11-08 07:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish (Spain)\n"
 "Language: es_ES\n"
@@ -18,38 +18,41 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "X-Loco-Version: 2.6.2; wp-6.0.2"
 
-#: public/class-dynamicaviation-public.php:324
+#: public/class-dynamicaviation-aircrafts.php:139
 #, php-format
 msgid "%s %s %s in %s"
 msgstr "%s %s %s en %s"
 
-#: includes/class-dynamicaviation-price-table.php:228
+#: public/class-dynamicaviation-price-table.php:268
 #, php-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
-#: public/class-dynamicaviation-public.php:858
+#: public/class-dynamicaviation-aircrafts.php:77
 #, php-format
-msgid "%s for rent in %s. %s Service %s %s in %s, %s from %s per hour."
+#| msgid "%s for rent in %s. %s Service %s %s in %s, %s from %s per hour."
+msgid ""
+"%s for rent in %s. Charter Flight Service %s %s in %s, %s from %s per hour."
 msgstr ""
-"%s para alquiler en %s. Servicio de %s %s %s en %s, %s desde %s por hora."
+"%s para alquiler en %s. Servicio de vuelos privados en %s %s en %s, %s desde "
+"%s por hora."
 
-#: includes/class-dynamicaviation-price-table.php:263
+#: public/class-dynamicaviation-price-table.php:303
 #, php-format
 msgid "%s from %s"
 msgstr "%s desde %s"
 
-#: public/class-dynamicaviation-public.php:96
+#: public/class-dynamicaviation-estimate-confirmation.php:148
 #, php-format
 msgid "%s, %s has sent you an estimate for $%s"
 msgstr "%s, %s te ha enviado una cotización por $%s"
 
-#: public/class-dynamicaviation-public.php:91
+#: public/class-dynamicaviation-estimate-confirmation.php:143
 #, php-format
 msgid "%s, Your request has been sent to our specialists at %s!"
 msgstr "¡%s, tu solicitud ha sido enviada a nuestros especialistas %s!"
 
-#: includes/class-dynamicaviation-destination-details.php:65
+#: public/class-dynamicaviation-destinations.php:259
 msgid "Add Destination"
 msgstr "Agregar destino"
 
@@ -72,11 +75,11 @@ msgstr "Aeronave"
 
 #: includes/class-dynamicaviation-post-type.php:18
 #: includes/class-dynamicaviation-post-type.php:19
-#: public/class-dynamicaviation-public.php:892
+#: public/class-dynamicaviation-aircrafts.php:285
 msgid "Aircrafts"
 msgstr "Aeronaves"
 
-#: public/class-dynamicaviation-public.php:316
+#: public/class-dynamicaviation-aircrafts.php:132
 msgid "Aircrafts for Rent"
 msgstr "Aeronaves para alquiler"
 
@@ -88,27 +91,27 @@ msgstr "Lista de aeronaves"
 msgid "Aircrafts list navigation"
 msgstr "Lista de navegación de aeronave"
 
-#: includes/class-dynamicaviation-utilities.php:173
+#: includes/class-dynamicaviation-utilities.php:85
 msgid "Airliner"
 msgstr "Avión"
 
-#: public/class-dynamicaviation-public.php:222
+#: public/class-dynamicaviation-destinations.php:500
 msgid "Airplanes and helicopter rides in"
 msgstr "Aviones y tours en helicóptero en"
 
-#: includes/class-dynamicaviation-destination-details.php:89
+#: public/class-dynamicaviation-destinations.php:283
 msgid "Airport"
 msgstr "Aeropuerto"
 
-#: admin/class-dynamicaviation-settings.php:209
+#: admin/class-dynamicaviation-settings.php:208
 msgid "Algolia Api Id"
 msgstr "Algolia Api Id"
 
-#: admin/class-dynamicaviation-settings.php:192
+#: admin/class-dynamicaviation-settings.php:191
 msgid "Algolia Api Key"
 msgstr "Algolia Api Key"
 
-#: admin/class-dynamicaviation-settings.php:201
+#: admin/class-dynamicaviation-settings.php:200
 msgid "Algolia Index Name"
 msgstr ""
 "Algolia Index Name\n"
@@ -121,21 +124,21 @@ msgstr "Todas las aeronaves"
 msgid "All Destinations"
 msgstr "Todos los destinos"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:511
+#: public/class-dynamicaviation-estimate-table.php:665
 #, php-format
 msgid "Alternative transport options to %s"
 msgstr "Opciones alternativas de transporte a %s"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:97
-#: includes/class-dynamicaviation-aircrafts-table.php:114
+#: public/class-dynamicaviation-estimate-table.php:103
+#: public/class-dynamicaviation-estimate-table.php:120
 msgid "at"
 msgstr "a las"
 
-#: includes/class-dynamicaviation-aircraft-single.php:29
+#: public/class-dynamicaviation-aircrafts.php:158
 msgid "Base Airport"
 msgstr "Aeropuerto base"
 
-#: includes/class-dynamicaviation-meta-box.php:97
+#: includes/class-dynamicaviation-meta-box.php:90
 msgid "Base City"
 msgstr "Ciudad bse"
 
@@ -143,82 +146,78 @@ msgstr "Ciudad bse"
 msgid "Base IATA"
 msgstr "IATA Base"
 
-#: admin/class-dynamicaviation-settings.php:174
+#: admin/class-dynamicaviation-settings.php:173
 msgid "Base Latitud"
 msgstr "Latitud base"
 
-#: includes/class-dynamicaviation-meta-box.php:101
+#: includes/class-dynamicaviation-meta-box.php:94
 msgid "Base Latitude"
 msgstr "Latitud base"
 
-#: includes/class-dynamicaviation-aircraft-single.php:30
+#: public/class-dynamicaviation-aircrafts.php:159
 msgid "Base Location"
 msgstr "Ubicación base"
 
-#: admin/class-dynamicaviation-settings.php:183
+#: admin/class-dynamicaviation-settings.php:182
 msgid "Base Longitud"
 msgstr "Longitud base"
 
-#: includes/class-dynamicaviation-meta-box.php:105
+#: includes/class-dynamicaviation-meta-box.php:98
 msgid "Base Longitude"
 msgstr "Longitud base"
 
-#: includes/class-dynamicaviation-meta-box.php:93
+#: includes/class-dynamicaviation-meta-box.php:86
 msgid "Base Name"
 msgstr "Nombre de base"
 
-#: includes/class-dynamicaviation-meta-box.php:84
-#: includes/class-dynamicaviation-price-table.php:195
-#: includes/class-dynamicaviation-utilities.php:49
+#: public/class-dynamicaviation-price-table.php:236
+#: public/email_templates/quote.php:3
 msgid "Charter Flight"
 msgstr "Vuelo privado"
 
-#: includes/class-dynamicaviation-utilities.php:30
-#: public/class-dynamicaviation-public.php:220
+#: public/class-dynamicaviation-aircrafts.php:138
+#: public/class-dynamicaviation-destinations.php:498
+#: public/class-dynamicaviation-price-table.php:207
+#: public/class-dynamicaviation-price-table.php:299
+#: public/class-dynamicaviation-price-table.php:303
 msgid "Charter Flights"
 msgstr "Vuelos Privados"
 
-#: public/class-dynamicaviation-public.php:367
+#: public/class-dynamicaviation-destinations.php:181
 msgid "Charter Flights to"
 msgstr "Vuelos privados a"
 
-#: public/class-dynamicaviation-public.php:291
+#: public/class-dynamicaviation-destinations.php:143
+#: public/class-dynamicaviation-destinations.php:325
 #, php-format
 msgid "Charter Flights to %s"
 msgstr "Vuelos privados a %s"
 
-#: includes/class-dynamicaviation-destination-details.php:121
+#: public/class-dynamicaviation-destinations.php:315
 msgid "City"
 msgstr "Ciudad"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:210
-#: includes/class-dynamicaviation-meta-box.php:85
-#: includes/class-dynamicaviation-price-table.php:175
-#: includes/class-dynamicaviation-utilities.php:53
-msgid "Commercial Flight"
-msgstr "Vuelo comercial"
+#: public/email_templates/general.php:14 public/email_templates/quote.php:24
+msgid "Client"
+msgstr ""
 
-#: includes/class-dynamicaviation-utilities.php:34
-msgid "Commercial Flights"
-msgstr "Vuelos comerciales"
-
-#: admin/class-dynamicaviation-settings.php:92
+#: admin/class-dynamicaviation-settings.php:91
 msgid "Company Address"
 msgstr "Dirección de la empresa"
 
-#: admin/class-dynamicaviation-settings.php:65
+#: admin/class-dynamicaviation-settings.php:64
 msgid "Company Email"
 msgstr "Email de la empresa"
 
-#: admin/class-dynamicaviation-settings.php:83
+#: admin/class-dynamicaviation-settings.php:82
 msgid "Company Phone"
 msgstr "Teléfono de la empresa"
 
-#: admin/class-dynamicaviation-settings.php:101
+#: admin/class-dynamicaviation-settings.php:100
 msgid "Company Tax ID"
 msgstr "ID de contribuyente"
 
-#: admin/class-dynamicaviation-settings.php:74
+#: admin/class-dynamicaviation-settings.php:73
 msgid "Company Whatsapp"
 msgstr "Whatsapp de la empresa"
 
@@ -226,51 +225,49 @@ msgstr "Whatsapp de la empresa"
 msgid "Connected Package IDs"
 msgstr "IDs de paquetes conectados"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:308
-#: includes/class-dynamicaviation-destination-details.php:122
+#: public/class-dynamicaviation-destinations.php:316
+#: public/class-dynamicaviation-estimate-table.php:445
 msgid "Country"
 msgstr "País"
 
-#: includes/class-dynamicaviation-search-form.php:46
-#: includes/class-dynamicaviation-search-form.php:51
+#: public/class-dynamicaviation-search-form.php:47
+#: public/class-dynamicaviation-search-form.php:52
 msgid "country / city / airport"
 msgstr "país, ciudad, aeropuerto"
 
-#: includes/class-dynamicaviation-aircraft-single.php:26
+#: public/class-dynamicaviation-aircrafts.php:155
 msgid "Cruise Speed"
 msgstr "Velocidad crucero"
 
-#: includes/class-dynamicaviation-meta-box.php:138
+#: includes/class-dynamicaviation-meta-box.php:131
 msgid "Cruise Speed (knots)"
 msgstr "Velocidad crucero en nudos"
 
-#: includes/class-dynamicaviation-price-table.php:68
+#: admin/class-dynamicaviation-settings.php:143
+msgid "Dark"
+msgstr ""
+
+#: public/class-dynamicaviation-price-table.php:72
 msgid "Database is not or invalid."
 msgstr "Base de datos no es válida."
 
-#: includes/class-dynamicaviation-search-form.php:76
-msgid "Date of Departure"
-msgstr "Fecha de partida"
-
-#: includes/class-dynamicaviation-search-form.php:90
-msgid "Date of Return"
-msgstr "Fecha de regreso"
-
-#: includes/class-dynamicaviation-aircrafts-table.php:347
-#: public/general_email_template.php:25 public/quote_email_template.php:36
+#: public/class-dynamicaviation-estimate-table.php:499
+#: public/class-dynamicaviation-search-form.php:77
+#: public/class-dynamicaviation-search-form.php:82
+#: public/email_templates/general.php:25 public/email_templates/quote.php:35
 msgid "Departure"
 msgstr "Partida"
 
 #: includes/class-dynamicaviation-post-type.php:84
-#: includes/class-dynamicaviation-price-table.php:274
-#: includes/class-dynamicaviation-search-form.php:50
+#: public/class-dynamicaviation-price-table.php:314
+#: public/class-dynamicaviation-search-form.php:51
 msgid "Destination"
 msgstr "Destino"
 
-#: public/class-dynamicaviation-public.php:295
-#: public/class-dynamicaviation-public.php:300
-#: public/class-dynamicaviation-public.php:371
-#: public/class-dynamicaviation-public.php:376
+#: public/class-dynamicaviation-destinations.php:147
+#: public/class-dynamicaviation-destinations.php:152
+#: public/class-dynamicaviation-destinations.php:185
+#: public/class-dynamicaviation-destinations.php:190
 msgid "Destination Not Found"
 msgstr "Destino no encontrado"
 
@@ -287,14 +284,14 @@ msgstr "Lista de destinos"
 msgid "Destinations list navigation"
 msgstr "Lista de navegación de destinos"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:135
-#: includes/class-dynamicaviation-aircrafts-table.php:517
-#: includes/class-dynamicaviation-price-table.php:282
+#: public/class-dynamicaviation-estimate-table.php:141
+#: public/class-dynamicaviation-estimate-table.php:671
+#: public/class-dynamicaviation-price-table.php:325
 msgid "Duration"
 msgstr "Duración"
 
 #. Name of the plugin
-#: admin/class-dynamicaviation-settings.php:26
+#: admin/class-dynamicaviation-settings.php:25
 msgid "Dynamic Aviation"
 msgstr "Vuelos privados"
 
@@ -302,23 +299,26 @@ msgstr "Vuelos privados"
 msgid "Edit Aircraft"
 msgstr "Editar aeronave"
 
-#: includes/class-dynamicaviation-destination-details.php:55
 #: includes/class-dynamicaviation-post-type.php:72
+#: public/class-dynamicaviation-destinations.php:249
 msgid "Edit Destination"
 msgstr "Editar destino"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:294
+#: public/class-dynamicaviation-estimate-table.php:431
 msgid "Email"
 msgstr "Email"
 
-#: admin/class-dynamicaviation-settings.php:115
+#: public/email_templates/general.php:4 public/email_templates/quote.php:14
+msgid "Estimate"
+msgstr ""
+
+#: admin/class-dynamicaviation-settings.php:114
 #, php-format
 msgid "Estimate Notes in %s language"
 msgstr "Notas de cotización en el idioma %s"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:216
-#: includes/class-dynamicaviation-aircrafts-table.php:227
-#: includes/class-dynamicaviation-price-table.php:201
+#: public/class-dynamicaviation-estimate-table.php:367
+#: public/class-dynamicaviation-price-table.php:242
 msgid "Fees per pers."
 msgstr "Cargos por pers."
 
@@ -327,62 +327,59 @@ msgstr "Cargos por pers."
 msgid "Filter items list"
 msgstr ""
 
-#: includes/class-dynamicaviation-search-form.php:101
+#: public/class-dynamicaviation-search-form.php:102
 msgid "Find Aircrafts"
 msgstr "Encontrar aeronaves"
 
-#: public/class-dynamicaviation-public.php:341
+#: public/class-dynamicaviation-estimate-page.php:118
 msgid "Find an Aircraft"
 msgstr "Aeronaves disponibles"
 
-#: public/class-dynamicaviation-public.php:312
+#: public/class-dynamicaviation-estimate-page.php:159
 #, php-format
 msgid "Find an Aircraft %s - %s"
 msgstr "Encontrar aeronaves %s - %s"
 
-#: includes/class-dynamicaviation-search-form.php:64
+#: public/class-dynamicaviation-search-form.php:65
 msgid "Flight"
 msgstr "Vuelo"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:132
 #: includes/class-dynamicaviation-meta-box.php:17
 #: includes/class-dynamicaviation-meta-box.php:26
-#: includes/class-dynamicaviation-price-table.php:270
+#: public/class-dynamicaviation-estimate-table.php:138
+#: public/class-dynamicaviation-price-table.php:310
 msgid "Flights"
 msgstr "Vuelos"
 
-#: includes/class-dynamicaviation-price-table.php:181
+#: public/class-dynamicaviation-price-table.php:218
 #, php-format
 msgid "Flights to %s"
 msgstr "Vuelos a %s"
 
-#: includes/class-dynamicaviation-price-table.php:168
+#: public/class-dynamicaviation-price-table.php:207
 msgid "from"
 msgstr "desde"
 
-#: includes/class-dynamicaviation-aircraft-single.php:84
+#: public/class-dynamicaviation-aircrafts.php:213
 msgid "ft"
 msgstr "ft"
 
-#: admin/class-dynamicaviation-settings.php:58
+#: admin/class-dynamicaviation-settings.php:57
 msgid "General Settings"
 msgstr "Configuración general"
 
-#: includes/class-dynamicaviation-utilities.php:169
+#: includes/class-dynamicaviation-utilities.php:81
 msgid "Heavy Jet"
 msgstr "Jet pesado"
 
-#: includes/class-dynamicaviation-utilities.php:177
+#: includes/class-dynamicaviation-utilities.php:89
 msgid "Helicopter"
 msgstr "Helicóptero"
 
-#: includes/class-dynamicaviation-search-form.php:81
-msgid "Hour of Departure"
-msgstr "Hora de partida"
-
-#: includes/class-dynamicaviation-search-form.php:95
-msgid "Hour of Return"
-msgstr "Hora de regreso"
+#: public/email_templates/general.php:5 public/email_templates/quote.php:15
+#, php-format
+msgid "Hello %s,"
+msgstr ""
 
 #. Author URI of the plugin
 msgid "https://jaimelias.com"
@@ -392,16 +389,16 @@ msgstr ""
 msgid "https://www.jaimelias.com"
 msgstr ""
 
-#: includes/class-dynamicaviation-aircraft-single.php:121
+#: public/class-dynamicaviation-aircrafts.php:250
 #, fuzzy
 msgid "Instant Quotes"
 msgstr "Cotizaciones instantaneas"
 
-#: public/class-dynamicaviation-public.php:405
+#: public/class-dynamicaviation-estimate-confirmation.php:112
 msgid "Invalid Recaptcha"
 msgstr "Recaptcha inválido"
 
-#: public/class-dynamicaviation-public.php:416
+#: public/class-dynamicaviation-estimate-page.php:107
 msgid "Invalid Request"
 msgstr "Solicitud inválida"
 
@@ -409,95 +406,99 @@ msgstr "Solicitud inválida"
 msgid "Jaimelías"
 msgstr ""
 
-#: includes/class-dynamicaviation-aircrafts-table.php:180
-#: includes/class-dynamicaviation-price-table.php:165
+#: public/class-dynamicaviation-estimate-table.php:348
+#: public/class-dynamicaviation-price-table.php:204
 msgid "kg"
 msgstr "kg"
 
-#: includes/class-dynamicaviation-aircraft-single.php:76
+#: public/class-dynamicaviation-aircrafts.php:205
 msgid "km"
 msgstr "km"
 
-#: includes/class-dynamicaviation-aircraft-single.php:80
+#: public/class-dynamicaviation-aircrafts.php:209
 msgid "kn"
 msgstr "kn"
 
-#: includes/class-dynamicaviation-aircraft-single.php:80
+#: public/class-dynamicaviation-aircrafts.php:209
 msgid "kph"
 msgstr "kph"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:286
+#: public/class-dynamicaviation-estimate-table.php:423
 msgid "Last Name"
 msgstr "Apellido"
 
-#: includes/class-dynamicaviation-destination-details.php:124
+#: public/class-dynamicaviation-destinations.php:318
 msgid "Latitude"
 msgstr "Latitud"
 
-#: includes/class-dynamicaviation-utilities.php:161
+#: admin/class-dynamicaviation-settings.php:139
+msgid "Light"
+msgstr ""
+
+#: includes/class-dynamicaviation-utilities.php:73
 msgid "Light Jet"
 msgstr "Jet ligero"
 
-#: includes/class-dynamicaviation-price-table.php:64
+#: public/class-dynamicaviation-price-table.php:68
 msgid "Local price table is null or invalid."
 msgstr ""
 
-#: includes/class-dynamicaviation-search-form.php:81
-#: includes/class-dynamicaviation-search-form.php:95
+#: public/class-dynamicaviation-search-form.php:82
+#: public/class-dynamicaviation-search-form.php:96
 msgid "Local Time"
 msgstr "Hora local"
 
-#: includes/class-dynamicaviation-destination-details.php:123
+#: public/class-dynamicaviation-destinations.php:317
 msgid "Longitude"
 msgstr "Longitud"
 
-#: includes/class-dynamicaviation-aircraft-single.php:84
+#: public/class-dynamicaviation-aircrafts.php:213
 msgid "m"
 msgstr "m"
 
-#: includes/class-dynamicaviation-aircraft-single.php:20
-#: includes/class-dynamicaviation-meta-box.php:147
+#: includes/class-dynamicaviation-meta-box.php:140
+#: public/class-dynamicaviation-aircrafts.php:149
 msgid "Manufacturer"
 msgstr "Fabricante"
 
-#: admin/class-dynamicaviation-settings.php:156
+#: admin/class-dynamicaviation-settings.php:155
 msgid "Map ID"
 msgstr "ID del Mapa"
 
-#: admin/class-dynamicaviation-settings.php:165
+#: admin/class-dynamicaviation-settings.php:164
 msgid "Mapbox Map Zoom"
 msgstr ""
 
-#: admin/class-dynamicaviation-settings.php:125
+#: admin/class-dynamicaviation-settings.php:124
 msgid "Mapbox Token"
 msgstr "Token de Mapbox"
 
-#: includes/class-dynamicaviation-aircraft-single.php:27
+#: public/class-dynamicaviation-aircrafts.php:156
 msgid "Max Altitude"
 msgstr "Altitud máxima"
 
-#: includes/class-dynamicaviation-meta-box.php:141
+#: includes/class-dynamicaviation-meta-box.php:134
 msgid "Max. Altitude (feet)"
 msgstr "Altitud Máxima"
 
-#: includes/class-dynamicaviation-aircraft-single.php:76
+#: public/class-dynamicaviation-aircrafts.php:205
 msgid "mi"
 msgstr "mi"
 
-#: includes/class-dynamicaviation-utilities.php:165
+#: includes/class-dynamicaviation-utilities.php:77
 msgid "Mid-size Jet"
 msgstr "Jet medio"
 
-#: includes/class-dynamicaviation-aircraft-single.php:21
-#: includes/class-dynamicaviation-meta-box.php:150
+#: includes/class-dynamicaviation-meta-box.php:143
+#: public/class-dynamicaviation-aircrafts.php:150
 msgid "Model"
 msgstr "Modelo"
 
-#: includes/class-dynamicaviation-aircraft-single.php:80
+#: public/class-dynamicaviation-aircrafts.php:209
 msgid "mph"
 msgstr "mph"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:280
+#: public/class-dynamicaviation-estimate-table.php:417
 msgid "Name"
 msgstr "Nombre"
 
@@ -509,7 +510,7 @@ msgstr "Nueva aeronave"
 msgid "New Destination"
 msgstr "Nuevo destino"
 
-#: includes/class-dynamicaviation-aircraft-single.php:76
+#: public/class-dynamicaviation-aircrafts.php:205
 msgid "nm"
 msgstr "mn"
 
@@ -523,12 +524,16 @@ msgstr ""
 msgid "Not found in Trash"
 msgstr ""
 
-#: includes/class-dynamicaviation-meta-box.php:110
+#: public/email_templates/general.php:33 public/email_templates/quote.php:44
+msgid "Notes"
+msgstr ""
+
+#: includes/class-dynamicaviation-meta-box.php:103
 msgid "Number of Flights"
 msgstr "Número de vuelos"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:95
-#: includes/class-dynamicaviation-aircrafts-table.php:112
+#: public/class-dynamicaviation-estimate-table.php:101
+#: public/class-dynamicaviation-estimate-table.php:118
 msgid "on"
 msgstr "el"
 
@@ -536,17 +541,21 @@ msgstr "el"
 msgid "One ID per line"
 msgstr "1 ID por línea"
 
-#: includes/class-dynamicaviation-price-table.php:285
+#: public/class-dynamicaviation-price-table.php:328
 msgid "One Way"
-msgstr "Una vía"
+msgstr "Sólo ida"
 
-#: includes/class-dynamicaviation-search-form.php:66
+#: public/class-dynamicaviation-search-form.php:67
 msgid "One way"
-msgstr "Una vía"
+msgstr "Sólo ida"
 
-#: includes/class-dynamicaviation-search-form.php:45
+#: public/class-dynamicaviation-search-form.php:46
 msgid "Origin"
 msgstr "Origen"
+
+#: admin/class-dynamicaviation-settings.php:147
+msgid "Outdoors"
+msgstr ""
 
 #: includes/class-dynamicaviation-post-type.php:20
 msgid "Parent Aircraft:"
@@ -556,47 +565,42 @@ msgstr ""
 msgid "Parent Destination:"
 msgstr ""
 
-#: includes/class-dynamicaviation-aircraft-single.php:24
-#: includes/class-dynamicaviation-aircrafts-table.php:86
-#: includes/class-dynamicaviation-meta-box.php:132
-#: includes/class-dynamicaviation-price-table.php:281
-#: includes/class-dynamicaviation-search-form.php:58
-#: public/class-dynamicaviation-public.php:882
-#: public/general_email_template.php:28 public/general_email_template.php:30
-#: public/quote_email_template.php:39 public/quote_email_template.php:41
+#: includes/class-dynamicaviation-meta-box.php:125
+#: public/class-dynamicaviation-aircrafts.php:153
+#: public/class-dynamicaviation-aircrafts.php:275
+#: public/class-dynamicaviation-estimate-table.php:92
+#: public/class-dynamicaviation-price-table.php:319
+#: public/class-dynamicaviation-search-form.php:59
+#: public/email_templates/general.php:28 public/email_templates/general.php:30
+#: public/email_templates/quote.php:38 public/email_templates/quote.php:40
 msgid "Passengers"
 msgstr "Pasajeros"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:212
-#: includes/class-dynamicaviation-price-table.php:195
-msgid "Per Person"
-msgstr "Por persona"
-
-#: includes/class-dynamicaviation-aircrafts-table.php:300
+#: public/class-dynamicaviation-estimate-table.php:437
 msgid "Phone"
 msgstr "Teléfono"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:180
-#: includes/class-dynamicaviation-price-table.php:165
+#: public/class-dynamicaviation-estimate-table.php:348
+#: public/class-dynamicaviation-price-table.php:204
 msgid "pounds"
 msgstr "libras"
 
-#: includes/class-dynamicaviation-aircraft-single.php:22
-#: includes/class-dynamicaviation-meta-box.php:157
-#: public/class-dynamicaviation-public.php:883
+#: includes/class-dynamicaviation-meta-box.php:150
+#: public/class-dynamicaviation-aircrafts.php:151
+#: public/class-dynamicaviation-aircrafts.php:276
 msgid "Price Per Hour"
 msgstr "Precio por hora"
 
-#: includes/class-dynamicaviation-meta-box.php:115
+#: includes/class-dynamicaviation-meta-box.php:108
 msgid "Prices Per Flight"
 msgstr "Precios por vuelo"
 
-#: public/class-dynamicaviation-public.php:221
-#: public/class-dynamicaviation-public.php:222
+#: public/class-dynamicaviation-destinations.php:499
+#: public/class-dynamicaviation-destinations.php:500
 msgid "Private Charter Flight"
 msgstr "Vuelo charter privado"
 
-#: public/class-dynamicaviation-public.php:504
+#: public/class-dynamicaviation-destinations.php:397
 #, php-format
 msgid ""
 "Private charter flights to %s. Jets, planes and helicopter rental services "
@@ -605,41 +609,43 @@ msgstr ""
 "Vuelos charter privados a %s. Servicio de alquiler de jets, avionetas y "
 "helicópteros en %s."
 
-#: includes/class-dynamicaviation-aircrafts-table.php:254
+#: public/class-dynamicaviation-estimate-table.php:393
 msgid "Quote"
 msgstr "Cotizar"
 
-#: includes/class-dynamicaviation-destination-details.php:139
+#: public/class-dynamicaviation-destinations.php:333
 msgid "Quote Charter Flight to"
 msgstr "Cotizar vuelo privado a"
 
-#: includes/class-dynamicaviation-aircraft-single.php:25
+#: public/class-dynamicaviation-aircrafts.php:154
 msgid "Range"
 msgstr "Rango"
 
-#: includes/class-dynamicaviation-meta-box.php:135
+#: includes/class-dynamicaviation-meta-box.php:128
 msgid "Range (nautical miles)"
 msgstr "Rango en millas nauticas"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:273
+#: public/class-dynamicaviation-estimate-table.php:410
 msgid "Request a Quote"
 msgstr "Solicitar cotización"
 
-#: public/class-dynamicaviation-public.php:401
+#: public/class-dynamicaviation-estimate-confirmation.php:108
 msgid "Request received. Our sales team will be in touch with you soon."
 msgstr "Solicitud recibida. Nuestro equipo de ventas en contácto muy pronto."
 
-#: public/class-dynamicaviation-public.php:305
-#: public/class-dynamicaviation-public.php:345
+#: public/class-dynamicaviation-estimate-confirmation.php:123
+#: public/class-dynamicaviation-estimate-confirmation.php:133
 msgid "Request Submitted"
 msgstr "Solicitar cotización"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:351
-#: public/general_email_template.php:26 public/quote_email_template.php:37
+#: public/class-dynamicaviation-estimate-table.php:503
+#: public/class-dynamicaviation-search-form.php:91
+#: public/class-dynamicaviation-search-form.php:96
+#: public/email_templates/general.php:26 public/email_templates/quote.php:36
 msgid "Return"
 msgstr "Regreso"
 
-#: includes/class-dynamicaviation-search-form.php:67
+#: public/class-dynamicaviation-search-form.php:68
 msgid "Round trip"
 msgstr "Ida y Vuelta"
 
@@ -651,23 +657,39 @@ msgstr "Buscar aeronaves"
 msgid "Search Destination"
 msgstr "buscar destinos"
 
-#: public/quote_email_template.php:9
+#: public/email_templates/quote.php:10
 msgid "seats or"
 msgstr "puestos o"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:324
+#: public/class-dynamicaviation-estimate-table.php:460
 msgid "Send Request"
 msgstr "Enviar solicitud"
 
-#: includes/class-dynamicaviation-aircraft-single.php:28
+#: public/email_templates/general.php:18 public/email_templates/quote.php:28
+msgid "Service"
+msgstr ""
+
+#: admin/class-dynamicaviation-settings.php:135
+msgid "Streets"
+msgstr ""
+
+#: public/email_templates/general.php:20 public/email_templates/quote.php:30
+msgid "Subtotal"
+msgstr ""
+
+#: public/class-dynamicaviation-aircrafts.php:157
 msgid "Takeoff Field"
 msgstr "Capacidad despegue"
 
-#: includes/class-dynamicaviation-meta-box.php:144
+#: includes/class-dynamicaviation-meta-box.php:137
 msgid "Takeoff Field Lenght (feet)"
 msgstr "Largo de pista para despegue (pies)"
 
-#: includes/class-dynamicaviation-aircrafts-table.php:80
+#: public/email_templates/quote.php:16
+msgid "Thank You for Your Request!"
+msgstr ""
+
+#: public/class-dynamicaviation-estimate-table.php:86
 msgid ""
 "The requested quote is not available in our website yet. Please contact our "
 "sales team for an immediate answer."
@@ -681,41 +703,41 @@ msgid ""
 "WordPress admin area."
 msgstr ""
 
-#: includes/class-dynamicaviation-destination-details.php:125
+#: public/class-dynamicaviation-destinations.php:319
 msgid "Timezone"
 msgstr "Zona horaria"
 
-#: includes/class-dynamicaviation-price-table.php:168
+#: public/class-dynamicaviation-price-table.php:207
 msgid "to"
 msgstr "hasta"
 
-#: includes/class-dynamicaviation-price-table.php:246
+#: public/class-dynamicaviation-price-table.php:286
 #, php-format
 msgid "to %s"
-msgstr ""
+msgstr "a %s"
 
-#: includes/class-dynamicaviation-price-table.php:242
+#: public/class-dynamicaviation-price-table.php:282
 #, php-format
 msgid "to %s (%s)"
+msgstr "a %s (%s)"
+
+#: public/email_templates/general.php:19 public/email_templates/quote.php:29
+msgid "Total"
 msgstr ""
 
-#: includes/class-dynamicaviation-aircrafts-table.php:515
+#: public/class-dynamicaviation-estimate-table.php:669
 msgid "Transport"
 msgstr "Transporte"
 
-#: includes/class-dynamicaviation-utilities.php:157
+#: includes/class-dynamicaviation-utilities.php:69
 msgid "Turbo Prop"
 msgstr "Avioneta"
 
-#: includes/class-dynamicaviation-aircraft-single.php:19
-#: includes/class-dynamicaviation-meta-box.php:120
-#: public/class-dynamicaviation-public.php:881
+#: includes/class-dynamicaviation-meta-box.php:113
+#: public/class-dynamicaviation-aircrafts.php:148
+#: public/class-dynamicaviation-aircrafts.php:274
 msgid "Type"
 msgstr "Tipo"
-
-#: includes/class-dynamicaviation-meta-box.php:82
-msgid "Type of Transport"
-msgstr "Tipo de transporte"
 
 #: includes/class-dynamicaviation-post-type.php:26
 msgid "Update Aircraft"
@@ -733,11 +755,20 @@ msgstr ""
 msgid "View Destination"
 msgstr ""
 
-#: admin/class-dynamicaviation-settings.php:218
+#: admin/class-dynamicaviation-settings.php:217
 msgid "Webhook"
 msgstr ""
 
-#: includes/class-dynamicaviation-aircraft-single.php:23
-#: includes/class-dynamicaviation-meta-box.php:153
+#: public/email_templates/general.php:37 public/email_templates/quote.php:48
+msgid "Whatsapp Advisory"
+msgstr ""
+
+#: includes/class-dynamicaviation-meta-box.php:146
+#: public/class-dynamicaviation-aircrafts.php:152
 msgid "Year of Construction"
 msgstr "Año de construcción"
+
+#: public/class-dynamicaviation-search-form.php:77
+#: public/class-dynamicaviation-search-form.php:91
+msgid "YYYY-MM-DD"
+msgstr ""
