@@ -53,7 +53,7 @@ register_deactivation_hook( __FILE__, 'deactivate_dynamicaviation' );
 
 if(!defined('DY_CORE_FUNCTIONS'))
 {
-	require plugin_dir_path( __FILE__ ) . 'dy-core/loader.php';
+	require plugin_dir_path( __FILE__ ) . 'submodules/dy-core/loader.php';
 }
 
 // admin and public
