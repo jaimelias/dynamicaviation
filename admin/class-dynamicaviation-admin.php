@@ -23,7 +23,6 @@ class Dynamic_Aviation_Admin {
 
 		if(!is_customize_preview() && isset($dy_aviation_load_admin_scripts))
 		{
-			wp_enqueue_style( 'handsontableCss', $this->plugin_dir_url . 'css/handsontable.full.min.css', array(), $this->version, 'all' );		 
 			wp_enqueue_style( $this->plugin_name, $this->plugin_dir_url . 'css/dynamicaviation-admin.css', array(), time(), 'all' );
 		}
 	}
@@ -34,10 +33,9 @@ class Dynamic_Aviation_Admin {
 
 		if(!is_customize_preview() && isset($dy_aviation_load_admin_scripts))
 		{
-			wp_enqueue_script( 'handsontableJS', $this->plugin_dir_url . 'js/handsontable.full.min.js', array('jquery'), $this->version, true);			
 			wp_enqueue_script('algolia', '//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js', array( 'jquery' ), $this->version, true);			
 			wp_enqueue_script('algolia_autocomplete', '//cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js', array( 'jquery' ), $this->version, true );			
-			wp_enqueue_script( $this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-admin.js', array( 'jquery', 'algolia', 'algolia_autocomplete', 'handsontableJS'), time(), true );
+			wp_enqueue_script( $this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-admin.js', array( 'jquery', 'algolia', 'algolia_autocomplete', 'hot'), time(), true );
 			wp_add_inline_script($this->plugin_name, $this->utilities->plugin_public_args(), 'before');
 			wp_add_inline_script($this->plugin_name, $this->utilities->algoliasearch_after(), 'before');
 		}
