@@ -443,7 +443,7 @@ class Dynamic_Aviation_Estimate_Table {
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
                                 <label for="phone"><?php echo (esc_html__('Phone', 'dynamicaviation')); ?></label>
-                                <input type="text" name="phone" />
+                                <input type="number" name="phone" />
                             </div>
                         </div>								
                     </div>
