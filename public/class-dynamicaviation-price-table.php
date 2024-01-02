@@ -63,6 +63,12 @@ class Dynamic_Aviation_Price_Table {
 				$aircraft_url = $this->home_lang.$post->post_type.'/'.$post->post_name;
 				$base = aviation_field( 'aircraft_base_iata', $post->ID);
 				
+
+				if(empty($table_price) || !is_array($table_price))
+				{
+					return ''; 
+				}
+
 				if(!array_key_exists('aircraft_rates_table', $table_price))
 				{
 					return __('Local price table is null or invalid.', 'dynamicaviation');
