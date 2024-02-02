@@ -10,7 +10,7 @@ class Dynamic_Aviation {
 	public function __construct() {
 
 		$this->plugin_name = 'dynamicaviation';
-		$this->version = '1.0.2.1';
+		$this->version = '1.0.2.2';
 		$this->load_dependencies();
 		$this->set_locale();
 

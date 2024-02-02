@@ -64,6 +64,11 @@ const RenderMap =  () => {
 						const allSelectedFields = jQuery(thisForm).find('.aircraft_selected');
 						const countAllSelectedFields = jQuery(thisForm).find('.aircraft_selected').length;
 
+						if(!jQuery(this).attr('data-lat') || !jQuery(this).attr('data-lon'))
+						{
+							return false;
+						}
+
 						if(jQuery(allSelectedFields).length)
 						{
 							if(countAllSelectedFields == 1)

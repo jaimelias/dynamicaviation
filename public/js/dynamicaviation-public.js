@@ -173,6 +173,8 @@ jQuery('.aircraft_search_form').each(function(){
 		
 		const thisField = jQuery(this);
 		
+
+
 		jQuery(thisField).autocomplete({
 			hint: false
 		},[{
@@ -284,6 +286,13 @@ jQuery('.aircraft_search_form').each(function(){
 				jQuery(thisField).blur();
 			}
 			
+		}).on('autocomplete:closed', function(){
+
+			if(!jQuery(thisField).attr('data-iata'))
+			{
+				jQuery(thisField).val('');
+			}
+
 		});
 	});
 });
