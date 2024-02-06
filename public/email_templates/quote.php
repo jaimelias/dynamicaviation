@@ -46,6 +46,9 @@ $notes = nl2br($notes);
 $footer = $company_address;
 $whatsapp_url = esc_url('https://wa.me/' . get_option('dy_whatsapp') . '?text=' . urlencode($itinerary_text));
 $whatsapp = (get_option('dy_whatsapp')) ? '<a style="border: 16px solid #25d366; text-align: center; background-color: #25d366; color: #fff; font-size: 18px; line-height: 18px; display: block; width: 100%; box-sizing: border-box; text-decoration: none; font-weight: 900;" href="'.esc_url($whatsapp_url).'">'.__('Whatsapp Advisory', 'dynamicaviation').'</a>' : null;
+$weights = __('To confirm that the aircraft quoted below meets the requirements for this flight, please send us a list with the weight of each passenger, along with a detailed list of the quantity, sizes, and weight of each travel suitcase.', 'dynamicaviation');
+
+
 
 $email_template = <<<EOT
 <!DOCTYPE html>
@@ -123,6 +126,7 @@ $email_template = <<<EOT
 			<div style="margin: 20px 0 40px 0; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
 				<p>{$greeting}</p>
 				<p>{$intro}</p>
+				<p><strong>{$weights}</strong></p>
 			</div>
 		
 			<div class="doc_box" style="margin-bottom: 40px; padding: 20px; border: 1px solid #eee; box-sizing: border-box">
