@@ -45,7 +45,22 @@ async function validateAviationEstimateRequest (token) {
 			}
 			else
 			{
-				jQuery(this).removeClass('invalid_field');
+				if(thisName === 'repeat_email')
+				{
+					if(thisVal !== jQuery(thisForm).find('input[name="email"]').val())
+					{
+						jQuery(this).addClass('invalid_field');
+						invalids.push(thisName);
+					}
+					else
+					{
+						jQuery(this).removeClass('invalid_field');
+					}
+				}
+				else
+				{
+					jQuery(this).removeClass('invalid_field');
+				}
 			}
 		}
 	});
