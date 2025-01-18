@@ -533,6 +533,9 @@ class Dynamic_Aviation_Utilities {
 					$log = array('invalid_params' => $invalid_params);
 					$GLOBALS['dy_request_invalids'] = $log;
 					write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
+
+					//block ip
+					cloudflare_ban_ip_address();
 				}
 			}
 			else
