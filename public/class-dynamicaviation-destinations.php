@@ -35,7 +35,7 @@ class Dynamic_Aviation_Destinations {
         add_filter('template_include', array(&$this, 'locate_template'), 100 );
 
         //enqueue logic in public.php
-        add_action( 'parse_query', array( &$this, 'load_scripts' ), 100);
+        add_action( 'wp', array( &$this, 'load_scripts' ), 100);
 
 		//polylang
 		add_filter('pll_translation_url', array(&$this, 'pll_translation_url'), 100, 2);

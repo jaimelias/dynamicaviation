@@ -15,7 +15,7 @@ class Dynamic_Aviation_Shortcodes {
 		add_shortcode( 'aviation_table', array(&$this, 'table'));
 
         //load core scripts
-        add_action( 'parse_query', array( &$this, 'load_scripts' ), 100);
+        add_action( 'wp', array( &$this, 'load_scripts' ), 100);
     }
 
 	public function table($attr, $content = '')

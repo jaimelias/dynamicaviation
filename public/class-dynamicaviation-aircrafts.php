@@ -35,7 +35,7 @@ class Dynamic_Aviation_Aircrafts {
 		add_filter('minimal_archive_title', array(&$this, 'minimalizr_modify_archive_title'), 100);
         
         //load core scripts
-        add_action( 'parse_query', array( &$this, 'load_scripts' ), 100);
+        add_action( 'wp', array( &$this, 'load_scripts' ), 100);
 	}
 
     public function init()
