@@ -248,7 +248,7 @@ class Dynamic_Aviation_Aircrafts {
 
             <h2><?php echo esc_html(__('Instant Quotes', 'dynamicaviation')); ?></h2>
             <div class="bottom-20">
-                <?php echo apply_filters('dy_aviation_search_form', ''); ?>
+                <?php echo apply_filters('dy_aviation_search_form', true); ?>
             </div>
         <?php
     }

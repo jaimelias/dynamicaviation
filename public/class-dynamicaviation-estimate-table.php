@@ -125,7 +125,7 @@ class Dynamic_Aviation_Estimate_Table {
 
             <hr/>
             
-            <table class="bottom-40 pure-table pure-table-bordered pure-table-striped text-center instant_quote_table small">
+            <table class="bottom-40 pure-table pure-table-bordered pure-table-striped text-center instant_quote_table small width-100">
                 <thead>
                     <tr>
                         <th <?php echo (!$this->is_mobile) ? ' colspan="2" ' : '' ;?>><?php echo (esc_html__('Flights', 'dynamicaviation')); ?></th>
@@ -338,7 +338,9 @@ class Dynamic_Aviation_Estimate_Table {
         $weight_pounds = floatval($itinerary['weight_pounds']);
         $aircraft_price = $price + ($fees * $this->get->pax_num);
         $weight_kg = round(($weight_pounds * 0.453592));
-        $weight_allowed = esc_html($weight_pounds.' '.__('pounds', 'dynamicaviation').' | '.$weight_kg.__('kg', 'dynamicaviation'));
+        $weight_allowed = sprintf(__('%s pounds or %s kg', 'dynamicaviation'), $weight_pounds, $weight_kg);
+
+        
 
         $flight_array = array(
             'aircraft_price' => $aircraft_price,
@@ -351,7 +353,18 @@ class Dynamic_Aviation_Estimate_Table {
         
         $aircraft_col = ($this->is_mobile) ? '<a href="'.esc_url($aircraft_url).'">'.$thumbnail.'</a><br/>' : '';            
         
-        $aircraft_col .= '<a class="strong" href="'.esc_url($aircraft_url).'">'.esc_html($post->post_title).'</a><br/><small>'.esc_html($this->utilities->aircraft_type(aviation_field( 'aircraft_type', $post->ID))).'</small> <strong><span class="dashicons dashicons-admin-users"></span> '.esc_html($seats).'</strong><br/><small>'.esc_html('Max').' ('.$weight_allowed.')</small>';
+        $aircraft_col .= sprintf(
+            '<a class="strong" href="%s">%s</a> - <small>%s</small> 
+            <br><strong>%s %s</strong><br/>
+            <small>%s %s</small>',
+            esc_url($aircraft_url),
+            esc_html($post->post_title),
+            esc_html($this->utilities->aircraft_type(aviation_field('aircraft_type', $post->ID))),
+            esc_html($seats),
+            __('passengers', 'dynamicaviation'),
+            esc_html('Max'),
+            $weight_allowed
+        );
 
         $price_col = '<small class="text-muted">USD</small><br/><strong '.$large_attr.'><span class="text-muted">$</span>'.esc_html($this->utilities->money($price, 2)).'</strong>';
         

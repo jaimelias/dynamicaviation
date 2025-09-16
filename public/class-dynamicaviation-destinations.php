@@ -192,23 +192,41 @@ class Dynamic_Aviation_Destinations {
 		return $title;
 	}
     
-	public function modify_content($content)
-	{	if(in_the_loop() && get_query_var($this->pathname))
-		{
-			$airport_array = $this->utilities->airport_data();
-			$output = '';
+	public function modify_content( $content ) {
+		// Fast exits
+		if ( ! in_the_loop() || ! get_query_var( $this->pathname ) ) {
+			return $content;
+		}
 
-			if(!empty($airport_array))
-			{
-				$output .= apply_filters('dy_aviation_price_table', '');
-				$output .= $this->template();
-			}
-			
-			return $output;
-		}		
+		// Ensure we actually have airport data; otherwise keep original content
+		$airport_data = (array) $this->utilities->airport_data();
+		if ( empty( $airport_data ) ) {
+			return $content;
+		}
 
-		return $content;
+		// Resolve dynamic pieces once
+		$search_form = apply_filters( 'dy_aviation_search_form', false );
+		$price_table = apply_filters( 'dy_aviation_price_table', '' );
+		$template    = $this->template();
+
+		// Build the markup in one go (no repeated concatenation)
+		$output = sprintf(
+			'<div class="pure-g gutters">
+				<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
+					<aside><div id="quote-sidebar">%s</div></aside>
+				</div>
+				<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3 height-100 entry-content">
+					%s%s
+				</div>
+			</div>',
+			$search_form,
+			$price_table,
+			$template
+		);
+
+		return $output;
 	}
+
 
     public function get_destination_content($iata)
     {
@@ -301,7 +319,7 @@ class Dynamic_Aviation_Destinations {
             <div class="pure-g gutters bottom-20">
 
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
-                    <table class="airport_description pure-table pure-table-striped bottom-20">
+                    <table class="airport_description pure-table pure-table-striped bottom-20 small width-100">
                         <?php if($iata != null && $icao != null): ?>
                             <?php if($iata != null): ?>
                             <tr><td>IATA</td><td><?php echo esc_html($iata); ?></td></tr>
@@ -330,9 +348,6 @@ class Dynamic_Aviation_Destinations {
             <hr/>
 
             <h4><span class="linkcolor"><?php echo (esc_html__('Quote Charter Flight to', 'dynamicaviation'));?></span> <?php echo esc_html($airport); ?><span class="linkcolor">, <?php echo esc_html($city);?></span></h4>
-            <div id="quote-sidebar">
-                <?php echo apply_filters('dy_aviation_search_form', ''); ?>
-            </div>
 
 
         <?php
@@ -463,7 +478,7 @@ class Dynamic_Aviation_Destinations {
 						$table_price = html_entity_decode(aviation_field('aircraft_rates'));
 						$table_price = json_decode($table_price, true);
 
-						if(array_key_exists('aircraft_rates_table', $table_price))
+						if(is_array($table_price) && array_key_exists('aircraft_rates_table', $table_price))
 						{
 							$table_price = $table_price['aircraft_rates_table'];
 

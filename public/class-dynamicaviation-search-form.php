@@ -11,14 +11,14 @@ class Dynamic_Aviation_Search_Form {
         add_filter('dy_aviation_search_form', array(&$this, 'search_form'));        
     }
 
-	public function full_search_form()
+	public function full_search_form($is_two_cols = true)
 	{
         ob_start(); 
         ?>
 
         <div class="pure-g">
             <div class="aviation_search_form_container pure-u-1 pure-u-sm-1-1 pure-u-md-2-5">
-                <?php echo $this->search_form(); ?>
+                <?php echo $this->search_form($is_two_cols); ?>
             </div>
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-3-5">
                     <div class="map" id="aviation_map"></div>
@@ -32,7 +32,7 @@ class Dynamic_Aviation_Search_Form {
 		return $content;
 	}
 
-    public function search_form()
+    public function search_form($is_two_cols = true)
     {
 
 		ob_start(); 
@@ -50,14 +50,14 @@ class Dynamic_Aviation_Search_Form {
             </div>
 
 
-            <div class="pure-g gutters">
-                <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
+            <div <?php echo ($is_two_cols) ? 'class="pure-g gutters"' : ''; ?>>
+                <div <?php echo ($is_two_cols) ? 'class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2"' : ''; ?>>
                     <div class="bottom-20">
                         <label><span class="dashicons linkcolor dashicons-admin-users"></span> <?php echo esc_html(__('Passengers', 'dynamicaviation')); ?></label>
                     <input type="number" min="1" name="pax_num" id="pax_num" />
                     </div>
                 </div>
-                <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
+                <div <?php echo ($is_two_cols) ? 'class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2"' : ''; ?>>
                     <div class="bottom-20">
                         <label><span class="dashicons linkcolor dashicons-airplane"></span> <?php echo esc_html(__('Flight', 'dynamicaviation')); ?></label>
                         <select name="aircraft_flight" id="aircraft_flight" >
@@ -68,13 +68,13 @@ class Dynamic_Aviation_Search_Form {
                 </div>
             </div>	
 
-            <div class="pure-g gutters">
-                <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
+            <div <?php echo ($is_two_cols) ? 'class="pure-g gutters"' : ''; ?>>
+                <div <?php echo ($is_two_cols) ? 'class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2"' : ''; ?>>
                     <div class="bottom-20">
                         <label><span class="dashicons linkcolor dashicons-calendar"></span> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="start_date" id="start_date" placeholder="<?php echo esc_html(__('YYYY-MM-DD', 'dynamicaviation')); ?>" />
                     </div>
                 </div>
-                <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
+                <div <?php echo ($is_two_cols) ? 'class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2"' : ''; ?>>
                     <div class="bottom-20">
                         <label><span class="dashicons linkcolor dashicons-clock"></span> <?php echo esc_html(__('Departure', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="start_time" id="start_time" />
                     </div>
@@ -82,13 +82,13 @@ class Dynamic_Aviation_Search_Form {
             </div>
 
             <div class="aircraft_return hidden animate-fade">
-                <div class="pure-g gutters">
-                    <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
+                <div <?php echo ($is_two_cols) ? 'class="pure-g gutters"' : ''; ?>>
+                    <div <?php echo ($is_two_cols) ? 'class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2"' : ''; ?>>
                         <div class="bottom-20">
                             <label><span class="dashicons linkcolor dashicons-calendar"></span> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input type="text" class="datepicker" name="end_date" id="end_date" placeholder="<?php echo esc_html(__('YYYY-MM-DD', 'dynamicaviation')); ?>"  />
                         </div>
                     </div>
-                    <div class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2">
+                    <div <?php echo ($is_two_cols) ? 'class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2"' : ''; ?>>
                         <div class="bottom-20">
                             <label><span class="dashicons linkcolor dashicons-clock"></span> <?php echo esc_html(__('Return', 'dynamicaviation')); ?></label><input placeholder="<?php echo esc_html(__('Local Time', 'dynamicaviation')); ?>" type="text" class="timepicker" name="end_time" id="end_time" />
                         </div>

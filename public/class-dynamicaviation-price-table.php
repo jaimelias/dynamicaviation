@@ -91,6 +91,8 @@ class Dynamic_Aviation_Price_Table {
 					$destination_iata = $table_price[$x][1];
 					$destination_slug = '';
 
+					if($base_iata !== $origin_iata) continue;
+
 					if($iata)
 					{
 						$origin_iata = ($iata === $origin_iata) ? $table_price[$x][1] : $origin_iata;
@@ -309,15 +311,15 @@ class Dynamic_Aviation_Price_Table {
 					$table .= '<h4 itemprop="about">'.esc_html(sprintf(__('%s from %s', 'dynamicaviation'), __('Charter Flights', 'dynamicaviation'), $label_origin)).'</h4>';
 				}
 
-				$table .= '<table class="dy_table text-center small pure-table pure-table-bordered bottom-40"><thead><tr>';
+				$table .= '<table class="dy_table text-center small pure-table pure-table-bordered bottom-40 width-100"><thead><tr>';
 
 				if(!$is_aircraft_page)
 				{
-					$table .= '<th>'.esc_html(__('Flights', 'dynamicaviation')).'</th>';
+					$table .= '<th>'.esc_html(__('Aircrafts', 'dynamicaviation')).'</th>';
 				}
 				else
 				{
-					$table .= '<th>'.esc_html(__('Destination', 'dynamicaviation')).'</th>';
+					$table .= '<th>'.esc_html(__('Destinations', 'dynamicaviation')).'</th>';
 				}
 
 				if(!$is_aircraft_page)

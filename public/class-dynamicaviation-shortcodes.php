@@ -52,11 +52,11 @@ class Dynamic_Aviation_Shortcodes {
 
 		if($is_full)
 		{
-			return apply_filters('dy_aviation_full_search_form', '');
+			return apply_filters('dy_aviation_full_search_form', true);
 		}
 		else
 		{
-			return apply_filters('dy_aviation_search_form', '');
+			return apply_filters('dy_aviation_search_form', true);
 		}	
 	}
 

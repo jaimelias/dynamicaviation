@@ -73,6 +73,28 @@ class Dynamic_Aviation_Meta_Box
 		<?php
 	}
 
+    public function select_number($name, $min = 1, $max = 50)
+    {
+		$max = $max + $min;
+        $options = '';
+        $value = aviation_field($name);
+
+        for ($x = $min; $x < $max; $x++)
+        {
+            $selected = '';
+
+            if ($value == $x)
+            {
+                $selected = 'selected';
+            }
+
+            $options .= '<option ' . esc_attr($selected) . '>' . $x . '</option>';
+        }
+
+        echo '<select id="' . esc_attr($name) . '" name="' . esc_attr($name) . '" >' . $options . '</select>';
+
+    }
+
 	public function aircraft_fields($post) {
 		$this->echo_nonce();
 		
@@ -102,7 +124,7 @@ class Dynamic_Aviation_Meta_Box
 	
 		<p>
 			<label for="aircraft_flights"><?php _e( 'Number of Flights', 'dynamicaviation' ); ?></label><br>
-			<input type="number" min="10" name="aircraft_flights" id="aircraft_flights" value="<?php echo aviation_field( 'aircraft_flights' ); ?>">
+			<?php $this->select_number('aircraft_flights', 1, 100); ?>
 		</p>	
 
 		<p>
