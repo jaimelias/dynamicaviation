@@ -318,8 +318,6 @@ class Dynamic_Aviation_Destinations {
 
 			<?php echo $this->get_destination_content($iata); ?>
 
-			<hr/>
-
             <div class="pure-g gutters bottom-20">
 
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
