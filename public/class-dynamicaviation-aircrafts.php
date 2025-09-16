@@ -234,22 +234,20 @@ class Dynamic_Aviation_Aircrafts {
     {
         ?>
             <div class="pure-g gutters">
-                <div class="pure-u-1 pure-u-md-2-3">
-                 <?php echo $content; ?>
+                <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
+                    <aside><?php echo apply_filters('dy_aviation_search_form', false); ?></aside>
                 </div>
-                <div class="pure-u-1 pure-u-md-1-3">
+                <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3 height-100 entry-content">
+                    <?php echo $content; ?>
+
+                    <?php echo apply_filters('dy_aviation_price_table', ''); ?>
+                    
                     <?php echo $table; ?>
                 </div>
             </div>
 
             <hr/>
 
-            <?php echo apply_filters('dy_aviation_price_table', ''); ?>
-
-            <h2><?php echo esc_html(__('Instant Quotes', 'dynamicaviation')); ?></h2>
-            <div class="bottom-20">
-                <?php echo apply_filters('dy_aviation_search_form', true); ?>
-            </div>
         <?php
     }
 
