@@ -237,7 +237,7 @@ class Dynamic_Aviation_Price_Table {
 							$row .= '<td><span class="dashicons dashicons-clock"></span> '.esc_html($this->utilities->convertNumberToTime($table_price[$x][2])).'</td>';
 						}
 
-						$row .= '<td><strong>'.esc_html('$'.$this->utilities->money($price)).'</strong><br/><span class="text-muted">';
+						$row .= '<td><strong>'.esc_html('$'.money($price)).'</strong><br/><span class="text-muted">';
 
 						$row .= __('Charter Flight', 'dynamicaviation');
 
@@ -245,7 +245,7 @@ class Dynamic_Aviation_Price_Table {
 						
 						if(floatval($fees) > 0)
 						{
-							$row .= '<br/><span class="text-muted">' . esc_html(__('Fees per pers.', 'dynamicaviation').' '.'$'.$this->utilities->money($fees)) . '</span>';
+							$row .= '<br/><span class="text-muted">' . esc_html(__('Fees per pers.', 'dynamicaviation').' '.'$'.money($fees)) . '</span>';
 						}
 						
 						$row .= '</td></tr>';
