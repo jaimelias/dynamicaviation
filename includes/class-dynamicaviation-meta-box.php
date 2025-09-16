@@ -140,7 +140,8 @@ class Dynamic_Aviation_Meta_Box
 				<option value="2" <?php echo ($aircraft_type == 2 ) ? 'selected' : '' ?>>Mid-size Jet</option>
 				<option value="3" <?php echo ($aircraft_type == 3 ) ? 'selected' : '' ?>>Heavy Jet</option>
 				<option value="4" <?php echo ($aircraft_type == 4 ) ? 'selected' : '' ?>>Airliner</option>
-				<option value="5" <?php echo ($aircraft_type == 5 ) ? 'selected' : '' ?>>Helicopter</option>				
+				<option value="5" <?php echo ($aircraft_type == 5 ) ? 'selected' : '' ?>>Helicopter</option>			
+				<option value="6" <?php echo ($aircraft_type == 6 ) ? 'selected' : '' ?>>Light Aircraft</option>	
 			</select>
 		</p>
 		

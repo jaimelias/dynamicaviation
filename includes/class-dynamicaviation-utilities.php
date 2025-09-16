@@ -62,35 +62,22 @@ class Dynamic_Aviation_Utilities {
 		  return (strlen($num) < 2) ? "0{$num}" : $num;
 	  }
 
-	  public function aircraft_type($type)
-	  {
-		  $type = intval($type);
-  
-		  if($type === 0)
-		  {
-			  return __('Turbo Prop', 'dynamicaviation');
-		  }
-		  elseif($type === 1)
-		  {
-			  return __('Light Jet', 'dynamicaviation');			
-		  }
-		  elseif($type === 2)
-		  {
-			  return __('Mid-size Jet', 'dynamicaviation');			
-		  }
-		  elseif($type === 3)
-		  {
-			  return __('Heavy Jet', 'dynamicaviation');			
-		  }
-		  elseif($type === 4)
-		  {
-			  return __('Airliner', 'dynamicaviation');		
-		  }
-		  elseif($type === 5)
-		  {
-			  return __('Helicopter', 'dynamicaviation');		
-		  }		
-	  }
+		public function aircraft_type($type)
+		{
+			$types = [
+				0 => __('Turbo Prop', 'dynamicaviation'),
+				1 => __('Light Jet', 'dynamicaviation'),
+				2 => __('Mid-size Jet', 'dynamicaviation'),
+				3 => __('Heavy Jet', 'dynamicaviation'),
+				4 => __('Airliner', 'dynamicaviation'),
+				5 => __('Helicopter', 'dynamicaviation'),
+				6 => __('Light Aircraft', 'dynamicaviation'),
+			];
+
+			$type = (int) $type;
+
+			return $types[$type] ?? '';
+		}
 
 	  public function sanitize_pathname($url)
 	  {
