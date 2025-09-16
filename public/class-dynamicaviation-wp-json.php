@@ -26,6 +26,8 @@ class Dynamic_Aviation_WP_JSON {
     public function core_args_callback($req)
     {
         return $this->arrayToGeoJSON($this->utilities->all_airports_data());
+
+        
     }
 
     public function arrayToGeoJSON($inputArray) {
