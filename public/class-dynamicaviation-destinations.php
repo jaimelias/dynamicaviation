@@ -525,13 +525,13 @@ class Dynamic_Aviation_Destinations {
 					{
 						$offers['@type'] = 'Offer';
 						$offers['@type'] = 'Offer';
-						$offers['price'] = $this->utilities->money($prices[0]);					
+						$offers['price'] = money($prices[0]);					
 					}
 					else
 					{
 						$offers['@type'] = 'AggregateOffer';
-						$offers['lowPrice'] = $this->utilities->money(min($prices));
-						$offers['highPrice'] = $this->utilities->money(max($prices));					
+						$offers['lowPrice'] = money(min($prices));
+						$offers['highPrice'] = money(max($prices));					
 					}
 					
 					$arr['offers'] = $offers;				
