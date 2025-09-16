@@ -91,8 +91,6 @@ class Dynamic_Aviation_Price_Table {
 					$destination_iata = $table_price[$x][1];
 					$destination_slug = '';
 
-					if($base_iata !== $origin_iata) continue;
-
 					if($iata)
 					{
 						$origin_iata = ($iata === $origin_iata) ? $table_price[$x][1] : $origin_iata;
