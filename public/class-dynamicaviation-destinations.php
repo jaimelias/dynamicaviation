@@ -316,6 +316,10 @@ class Dynamic_Aviation_Destinations {
         ob_start(); 
         ?>
 
+			<?php echo $this->get_destination_content($iata); ?>
+
+			<hr/>
+
             <div class="pure-g gutters bottom-20">
 
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
@@ -338,16 +342,9 @@ class Dynamic_Aviation_Destinations {
                     </table>
                 </div>
                 <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3">
-                    <div class="entry-content">
-                        <img class="bottom-20" width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php echo esc_html(sprintf(__('Charter Flights to %s', 'dynamicaviation'), $airport)).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/>
-                        
-                    </div>
+                        <img class="bottom-20" width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php echo esc_html(sprintf(__('Charter Flights to %s', 'dynamicaviation'), $airport)).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/> 
                 </div>
             </div>
-
-            <hr/>
-
-            <?php echo $this->get_destination_content($iata); ?>
 
 
         <?php
