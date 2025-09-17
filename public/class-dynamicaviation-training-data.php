@@ -48,15 +48,46 @@ class Dynamic_Aviation_Training_Data {
 
     public function export_single_file() {
 
+
         $query_var = get_query_var( 'fly' );
 
         if(!empty($query_var) && isset($_GET['training-data'])) {
+            $destination_airport = $this->utilities->airport_data($query_var);
 
-            $airport_array = $this->utilities->airport_data($query_var);
+            if (!is_array($destination_airport) || empty($destination_airport)) wp_die('Unable to fetch airport_data from DB.');
+            if (!array_key_exists('iata', $destination_airport)) wp_die('Invalid airport_data schema.');
 
-            if (!is_array($airport_array) || empty($airport_array)) wp_die('Unable to fetch airport_data from DB.');
+            $output = [];
+
+            $args = array(
+                'post_type' => 'aircrafts',
+                'posts_per_page' => 200, 
+                'post_parent' => 0,
+                'meta_key' => 'aircraft_price_per_hour',
+                'orderby' => 'meta_value_num',
+                'order' => 'ASC',
+            );
+
+            $wp_query = new WP_Query($args);
+
+            if ( $wp_query->have_posts() )
+            {
+                while ($wp_query->have_posts() ) {
+                    $wp_query->the_post();
+                    global $post;
+                    $output[] = $post->ID;
+
+                    $base_iata = aviation_field('aircraft_base_iata');
+
+                    if($base_iata === $destination_airport['iata']) continue;
+
+                 }
+
+                wp_reset_postdata();
+            }
+
             
-            exit(json_encode($airport_array));
+            exit(json_encode($output));
         }
     }
 
