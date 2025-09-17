@@ -85,7 +85,7 @@ class Dynamic_Aviation_Training_Data {
                     if ($language === $default_language) {
                         $output->service_links_by_language[$lang_name] = esc_url("{$home_lang}fly/{$query_var}");
                     }  else {
-                        $output->service_links_by_language[$lang_name] = esc_url("{$home_lang}${language}/fly/{$query_var}");
+                        $output->service_links_by_language[$lang_name] = esc_url("{$home_lang}{$language}/fly/{$query_var}");
                     }
 
                     $output->service_name_translations[$lang_name] = sprintf(pll_translate_string('Charter Flights %s', $language), $destination_airport_name);
