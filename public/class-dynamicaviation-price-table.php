@@ -326,7 +326,7 @@ class Dynamic_Aviation_Price_Table {
 				if (!$this->is_mobile) {
 					$table .= sprintf('<th>%s</th>', esc_html(__('Duration', 'dynamicaviation')));
 				}
-				$table .= sprintf('<th>%s</th>', esc_html(__('One Way', 'dynamicaviation')));
+				$table .= sprintf('<th>%s (%s)</th>', esc_html(__('One-way', 'dynamicaviation')), currency_name());
 				$table .= '</tr></thead><tbody>';
 				$table .= $v['rows'];
 				$table .= '</tbody></table><hr/>';

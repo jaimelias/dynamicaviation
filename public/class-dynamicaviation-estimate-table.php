@@ -119,37 +119,38 @@ class Dynamic_Aviation_Estimate_Table {
 
     public function table_container($rows)
     {
-        ob_start(); 
+        $content = null;
 
-        if($rows): ?>
+        if ($rows) {
+            $colspanAttr  = $this->is_mobile ? '' : ' colspan="2"';
+            $durationTh   = $this->is_mobile ? '' :  esc_html(__('Duration', 'dynamicaviation'));
+            $tripLabel    = ($this->get->aircraft_flight === 0)
+                ? sprintf(__('One-way (%s)', 'dynamicaviation'), currency_name())
+                : sprintf(__('Round Trip (%s)', 'dynamicaviation'), currency_name());
 
-            <hr/>
-            
-            <table class="bottom-40 pure-table pure-table-bordered pure-table-striped text-center instant_quote_table small width-100">
-                <thead>
-                    <tr>
-                        <th <?php echo (!$this->is_mobile) ? ' colspan="2" ' : '' ;?>><?php echo esc_html(__('Flights', 'dynamicaviation')); ?></th>
-        
-                        <?php if(!$this->is_mobile): ?>
-                            <th><?php echo esc_html(__('Duration', 'dynamicaviation')); ?></th>
-                        <?php endif; ?>
-                        
-                        <th colspan="2"><?php esc_html_e(($this->get->aircraft_flight === 0) ? __('One Way', 'dynamicaviation') : __('Round Trip', 'dynamicaviation'));?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php echo $rows; ?>
-                </tbody>
-            </table>
+            $content = sprintf(
+                '<hr/>' .
+                '<table class="bottom-40 pure-table pure-table-bordered pure-table-striped text-center instant_quote_table small width-100">' .
+                    '<thead>' .
+                        '<tr>' .
+                            '<th%s>%s</th>' .
+                            '<th>%s</th>' .
+                            '<th colspan="2">%s</th>' .
+                        '</tr>' .
+                    '</thead>' .
+                    '<tbody>%s</tbody>' .
+                '</table>',
+                $colspanAttr,
+                esc_html(__('Flights', 'dynamicaviation')),
+                $durationTh,
+                esc_html($tripLabel),
+                $rows
+            );
+        }
 
+        return $content;
+    }
 
-        <?php
-            $content = ob_get_contents();
-            ob_end_clean();	
-            endif;
-
-		    return $content;
-    } 
 
     public function get_rates($itinerary, $table_price)
     {
