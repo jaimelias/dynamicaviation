@@ -93,75 +93,56 @@ class Dynamic_Aviation_Utilities {
 		  return $url;
 	  }
 
-	  public function airport_data($query_var = null) {
-		
-		$output = array();
-
-		if(!$query_var)
-		{
-			if(get_query_var( 'fly' ))
-			{
-				$query_var = get_query_var( 'fly' );
+	public function airport_data($query_var = null) {
+		// Pull from query var if not provided explicitly (but don't clobber valid "0")
+		if ($query_var === null || $query_var === '') {
+			$fly = get_query_var('fly');
+			if ($fly !== null && $fly !== '') {
+				$query_var = $fly;
 			}
 		}
 
-		if(!$query_var)
-		{
-			return $this->all_airports_data();
+		// Load once
+		$all_airports_data = $this->all_airports_data();
+
+		// If still no query, return the whole dataset (no second call)
+		if ($query_var === null || $query_var === '') {
+			return is_array($all_airports_data) ? $all_airports_data : [];
 		}
 
-		$query_param = '?query='.$query_var.'&hitsPerPage=1';
-		$which_var = 'dynamicaviation_airport_data_'.$query_var;
-		global $$which_var;
-		
-		if(isset($$which_var))
-		{
-			$output = $$which_var;
+		// Normalize the query to match how items are stored/compared
+		$normalized_query = $this->sanitize_pathname($query_var);
+
+		// Use a consistent, safe cache key (only in $GLOBALS)
+		$which_var = 'dynamicaviation_airport_data_' . $normalized_query;
+
+		if (isset($GLOBALS[$which_var])) {
+			return $GLOBALS[$which_var];
 		}
-		else
-		{
-			$url = 'https://'.$this->algolia_id.'-dsn.algolia.net/1/indexes/'.$this->algolia_index.'/'.$query_param;
-			
-			$headers = array(
-				'X-Algolia-API-Key' => $this->algolia_token, 
-				'X-Algolia-Application-Id' =>$this->algolia_id,
-				'Content-Type' => 'application/json'
-			);
 
-			$resp = wp_remote_get($url, array(
-				'headers' => $headers
-			));
+		$output = [];
 
-			if ( is_array( $resp ) && ! is_wp_error( $resp ) )
-			{
-				if($resp['response']['code'] === 200)
-				{
-					$body = json_decode($resp['body'], true);
-
-					if(array_key_exists('hits', $body))
-					{
-						$hits = $body['hits'];
-						
-						if(is_array($hits))
-						{
-							for($x = 0; $x < count($hits); $x++)
-							{
-								if($query_var === $this->sanitize_pathname($hits[$x]['airport']))
-								{
-									$output = $hits[$x];
-								}
-							}			
-							
-						}
-					}
+		if (is_array($all_airports_data)) {
+			foreach ($all_airports_data as $row) {
+				// Be defensive about missing keys
+				if (!isset($row['airport'])) {
+					continue;
+				}
+				if ($normalized_query === $this->sanitize_pathname($row['airport'])) {
+					$output = $row;
+					break; // stop on first match
 				}
 			}
+		}
 
+		// Only cache non-empty hits (optional; avoids sticky empty misses)
+		if (!empty($output)) {
 			$GLOBALS[$which_var] = $output;
 		}
 
 		return $output;
 	}
+
 
 	public function airport_url_string($json)
 	{
@@ -204,43 +185,43 @@ class Dynamic_Aviation_Utilities {
 	public function all_airports_data()
 	{
 		$output = array();
-		$which_var = 'dynamicaviation_all_airports_data';
-		global $$which_var;
+		$transient_key = 'dynamicaviation_all_airports_data';
 
-		if(isset($$which_var))
-		{
-			$output = $$which_var;
+		// Try from cache first
+		$cached = get_transient($transient_key);
+
+		if ($cached !== false) {
+			return $cached;
 		}
-		else
-		{
-			$query_param = 'browse?cursor=';
-			$url = 'https://'.$this->algolia_id.'-dsn.algolia.net/1/indexes/'.$this->algolia_index.'/'.$query_param;
 
-			$headers = array(
-				'X-Algolia-API-Key' => $this->algolia_token, 
-				'X-Algolia-Application-Id' => $this->algolia_id,
-				'Content-Type' => 'application/json'
-			);
-			
-			$resp = wp_remote_get($url, array(
-				'headers' => $headers
-			));
+		$query_param = 'browse?cursor=';
+		$url = 'https://' . $this->algolia_id . '-dsn.algolia.net/1/indexes/' . $this->algolia_index . '/' . $query_param;
 
+		$headers = array(
+			'X-Algolia-API-Key' => $this->algolia_token,
+			'X-Algolia-Application-Id' => $this->algolia_id,
+			'Content-Type' => 'application/json'
+		);
 
-			if ( is_array( $resp ) && ! is_wp_error( $resp ) )
-			{
-				if($resp['response']['code'] === 200)
-				{
-					$body = json_decode($resp['body'], true);
+		$resp = wp_remote_get($url, array('headers' => $headers));
+
+		if (is_array($resp) && !is_wp_error($resp)) {
+			if ($resp['response']['code'] === 200) {
+				$body = json_decode($resp['body'], true);
+
+				if (!empty($body['hits'])) {
 					$output = $body['hits'];
-					$GLOBALS[$which_var] = $output;
+
+					// Store in cache for 6 hours (21600 seconds)
+					set_transient($transient_key, $output, 21600);
 				}
 			}
-
-		}		
+		}
 
 		return $output;
 	}
+
+
 
     public function get_rates_from_itinerary($routes, $table_price)
     {

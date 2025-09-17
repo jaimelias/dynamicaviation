@@ -47,6 +47,7 @@ class Dynamic_Aviation {
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-confirmation.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-image.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-wp-json.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-training-data.php';
 
 		$this->loader = new Dynamic_Aviation_Loader();
 	}
@@ -89,6 +90,8 @@ class Dynamic_Aviation {
 		new Dynamic_Aviation_Image($this->get_plugin_name(), $this->get_version(), $utilities);
 
 		new Dynamic_Aviation_WP_JSON($this->get_plugin_name(), $this->get_version(), $utilities);
+
+		new Dynamic_Aviation_Training_Data($utilities);
 	}
 
 	public function run() {
