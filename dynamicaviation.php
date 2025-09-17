@@ -90,7 +90,7 @@ function aviation_field($name, $this_id = null)
 	}
 	else
 	{
-		$package_field = get_post_meta($this_id, $name, true);
+		$package_field = (string) get_post_meta($this_id, $name, true);
 		$GLOBALS[$which_var] = $package_field;
 		return $package_field;
 	}	

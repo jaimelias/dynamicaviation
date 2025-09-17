@@ -65,20 +65,30 @@ class Dynamic_Aviation_Aircrafts {
             endif;
     }
 
-	public function modify_excerpt($excerpt)
-	{
-		if(is_singular($this->pathname))
-		{
-            $title = get_the_title();
-			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
-			$city = aviation_field('aircraft_base_city');
-			$airport = aviation_field('aircraft_base_name');
-			$price_per_hour = '$'.aviation_field('aircraft_price_per_hour');
-			return sprintf(__('%s for rent in %s. Charter Flight Service %s %s in %s, %s from %s per hour.', 'dynamicaviation'), $title, $city, $aircraft_type, $title, $airport, $city, $price_per_hour);
-		}
+    public function modify_excerpt($excerpt)
+    {
+        if (is_singular($this->pathname)) {
+            $title          = get_the_title();
+            $aircraft_type  = $this->utilities->aircraft_type(aviation_field('aircraft_type'));
+            $city           =  aviation_field('aircraft_base_city');
+            $airport        =  aviation_field('aircraft_base_name');
+            $price_per_hour = (string) sprintf('$%s', aviation_field('aircraft_price_per_hour'));
 
-		return $excerpt;
-	}
+            return sprintf(
+                __('%s for rent in %s. Charter Flight Service %s %s in %s, %s from %s per hour.', 'dynamicaviation'),
+                $title,
+                $city,
+                $aircraft_type,
+                $title,
+                $airport,
+                $city,
+                $price_per_hour
+            );
+        }
+
+        return $excerpt;
+    }
+
 
 
 	public function locate_template($template)
@@ -103,16 +113,19 @@ class Dynamic_Aviation_Aircrafts {
 
     public function modify_title($title)
     {
+        if (in_the_loop() && is_singular($this->pathname)) {
+            $aircraft_type = (string) $this->utilities->aircraft_type(aviation_field('aircraft_type'));
 
-        if(in_the_loop() && is_singular($this->pathname))
-        {
-            $aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
-            $title = '<span class="linkcolor">'.esc_html($aircraft_type).'</span> '.$title;
-            return $title;				
-        }	        
+            return sprintf(
+                '<span class="linkcolor">%s</span> %s',
+                esc_html($aircraft_type),
+                $title
+            );
+        }
 
         return $title;
     }
+
 
 
 	public function main_wp_query($query)
@@ -127,17 +140,20 @@ class Dynamic_Aviation_Aircrafts {
     
     public function modify_wp_title($title)
     {
-		if(is_post_type_archive($this->pathname))
-		{
-			$output = __('Aircrafts for Rent', 'dynamicaviation') . ' | '. $this->site_name;
-		}
-		elseif(is_singular($this->pathname))
-		{			
-			$aircraft_type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
-			$city = aviation_field('aircraft_base_city');
-			$label = __('Charter Flights', 'dynamicaviation');
-			$title = sprintf(__('%s %s %s in %s', 'dynamicaviation'), $label, $aircraft_type, get_the_title(), $city) .' | '.$this->site_name;
-		}
+        // Note: On post type archives, the original code computes but does NOT use a new title.
+        // We preserve that exact behavior (no change to $title).
+
+        if (is_singular($this->pathname)) {
+            $aircraft_type =  $this->utilities->aircraft_type(aviation_field('aircraft_type'));
+            $city          =  aviation_field('aircraft_base_city');
+            $label         = __('Charter Flights', 'dynamicaviation');
+
+            $title = sprintf(
+                '%s | %s',
+                sprintf(__('%s %s %s in %s', 'dynamicaviation'), $label, $aircraft_type, get_the_title(), $city),
+                $this->site_name
+            );
+        }
 
         return $title;
     }
@@ -180,76 +196,108 @@ class Dynamic_Aviation_Aircrafts {
 
     public function table($content)
     {
-        $labels = $this->get_table_labels();
-        $keys = $this->get_table_keys();
-        $base = aviation_field('aircraft_base_name');
-        $table = '<table class="text-center pure-table small pure-table-striped bottom-40">';
-        
-        for($x = 0; $x < count($keys); $x++)
-        {
-            $key = $keys[$x];
+        $labels = (array) $this->get_table_labels();
+        $keys   = (array) $this->get_table_keys();
+        $base   =  aviation_field('aircraft_base_name');
+
+        $table  = '<table class="text-center pure-table small pure-table-striped bottom-40">';
+
+        $count  = count($keys);
+        for ($x = 0; $x < $count; $x++) {
+            $key   = $keys[$x];
             $value = aviation_field($key);
 
-            if($value !== '')
-            {
-                if($key == 'aircraft_type')
-                {
-                    $value = $this->utilities->aircraft_type($value);
-                }
-                if($key == 'aircraft_price_per_hour')
-                {
-                    $value = '$'.$value;
-                }
-                else if($key == 'aircraft_range')
-                {
-                    $value = $value.__('nm', 'dynamicaviation').' | '.round(intval($value)*1.15078).__('mi', 'dynamicaviation').' | '.round(intval($value)*1.852).__('km', 'dynamicaviation');
-                }
-                else if($key == 'aircraft_cruise_speed')
-                {
-                    $value = $value.__('kn', 'dynamicaviation').' | '.round(intval($value)*1.15078).__('mph', 'dynamicaviation').' | '.round(intval($value)*1.852).__('kph', 'dynamicaviation');			
-                }
-                else if($key == 'aircraft_max_altitude')
-                {
-                    $value = $value.__('ft', 'dynamicaviation').' | '.round(intval($value)*0.3048).__('m', 'dynamicaviation');
-                }
-                else if($key == 'aircraft_base_iata')
-                {
-                    $value = $base;
-                }
-                
-                $table .= '<tr>';
-                $table .= '<td><span class="semibold">'.esc_html($labels[$x]).'</span></td>';
-                $table .= '<td>'.esc_html($value).'</td>';
-                $table .= '</tr>';			
+            if ($value === '') {
+                continue;
             }
+
+            switch ($key) {
+                case 'aircraft_type':
+                    $value = $this->utilities->aircraft_type($value);
+                    break;
+
+                case 'aircraft_price_per_hour':
+                    $value = sprintf('$%s', $value);
+                    break;
+
+                case 'aircraft_range':
+                    $nm  = intval($value);
+                    $mi  = round($nm * 1.15078);
+                    $km  = round($nm * 1.852);
+                    $value = sprintf(
+                        '%s%s | %s%s | %s%s',
+                        $nm, __('nm', 'dynamicaviation'),
+                        $mi, __('mi', 'dynamicaviation'),
+                        $km, __('km', 'dynamicaviation')
+                    );
+                    break;
+
+                case 'aircraft_cruise_speed':
+                    $kn  = intval($value);
+                    $mph = round($kn * 1.15078);
+                    $kph = round($kn * 1.852);
+                    $value = sprintf(
+                        '%s%s | %s%s | %s%s',
+                        $kn, __('kn', 'dynamicaviation'),
+                        $mph, __('mph', 'dynamicaviation'),
+                        $kph, __('kph', 'dynamicaviation')
+                    );
+                    break;
+
+                case 'aircraft_max_altitude':
+                    $ft = intval($value);
+                    $m  = round($ft * 0.3048);
+                    $value = sprintf(
+                        '%s%s | %s%s',
+                        $ft, __('ft', 'dynamicaviation'),
+                        $m, __('m', 'dynamicaviation')
+                    );
+                    break;
+
+                case 'aircraft_base_iata':
+                    $value = $base;
+                    break;
+            }
+
+            $table .= sprintf(
+                '<tr><td><span class="semibold">%s</span></td><td>%s</td></tr>',
+                esc_html($labels[$x]),
+                esc_html($value)
+            );
         }
-        
+
         $table .= '</table>';
-        
+
         return $this->container($content, $table);
     }
 
 
+
     public function container($content, $table)
     {
-        ?>
-            <div class="pure-g gutters">
-                <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
-                    <aside><?php echo apply_filters('dy_aviation_search_form', false); ?></aside>
+        // Run filters once and reuse
+        $search_form = apply_filters('dy_aviation_search_form', false);
+        $price_table = apply_filters('dy_aviation_price_table', '');
+
+        echo sprintf(
+            '<div class="pure-g gutters">
+                    <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
+                        <aside>%s</aside>
+                    </div>
+                    <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3 height-100 entry-content">
+                        %s
+                        %s
+                        %s
+                    </div>
                 </div>
-                <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3 height-100 entry-content">
-                    <?php echo $content; ?>
-
-                    <?php echo apply_filters('dy_aviation_price_table', ''); ?>
-                    
-                    <?php echo $table; ?>
-                </div>
-            </div>
-
-            <hr/>
-
-        <?php
+                <hr/>',
+            $search_form, // intentionally unescaped: original output passes raw filter result
+            $content,     // intentionally unescaped: original output expects raw HTML
+            $price_table, // intentionally unescaped: filter returns markup
+            $table        // already-built HTML table string
+        );
     }
+
 
 	public function minimalizr_hide_posted_on($posted_on)
 	{
@@ -261,20 +309,31 @@ class Dynamic_Aviation_Aircrafts {
 		return $posted_on;
 	}
 
-	public function minimalizr_modify_archive_excerpt($excerpt)
-	{
-		if(is_post_type_archive($this->pathname))
-		{
-			$type = $this->utilities->aircraft_type(aviation_field( 'aircraft_type' ));
-			$passengers = aviation_field('aircraft_passengers');
-			$price_per_hour = aviation_field('aircraft_price_per_hour');
-			$excerpt = '<p><strong>'.esc_html(__('Type', 'dynamicaviation')).'</strong>: '.esc_html($type).'<br/>';
-			$excerpt .= '<strong>'.esc_html(__('Passengers', 'dynamicaviation')).'</strong>: '.esc_html($passengers).'<br/>';
-			$excerpt .= '<strong>'.esc_html(__('Price Per Hour', 'dynamicaviation')).'</strong>: $'.esc_html($price_per_hour).'</p>';
-		}
+    public function minimalizr_modify_archive_excerpt($excerpt)
+    {
+        if (is_post_type_archive($this->pathname)) {
+            $type           = $this->utilities->aircraft_type(aviation_field('aircraft_type'));
+            $passengers     = aviation_field('aircraft_passengers');
+            $price_per_hour = aviation_field('aircraft_price_per_hour');
 
-		return $excerpt;
-	}
+            $label_type       = esc_html(__('Type', 'dynamicaviation'));
+            $label_passengers = esc_html(__('Passengers', 'dynamicaviation'));
+            $label_price      = esc_html(__('Price Per Hour', 'dynamicaviation'));
+
+            $excerpt = sprintf(
+                '<p><strong>%s</strong>: %s<br/>' .
+                '<strong>%s</strong>: %s<br/>' .
+                '<strong>%s</strong>: $%s</p>',
+                $label_type, esc_html($type),
+                $label_passengers, esc_html($passengers),
+                $label_price, esc_html($price_per_hour)
+            );
+        }
+
+        return $excerpt;
+    }
+
+
 	public function minimalizr_modify_archive_title($title)
 	{
 		if(is_post_type_archive($this->pathname))

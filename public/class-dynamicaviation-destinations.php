@@ -109,47 +109,44 @@ class Dynamic_Aviation_Destinations {
 
 	public function modify_wp_title($title)
 	{
-		if(get_query_var($this->pathname))
-		{
+		if (get_query_var($this->pathname)) {
 			$airport_array = $this->utilities->airport_data();
-			
-			if(!empty($airport_array))
-			{
-				if(count($airport_array) > 0)
-				{
-					$country = '';
 
-					if(array_key_exists('country_names', $airport_array))
-					{
-						if(array_key_exists($this->current_language, $airport_array['country_names']))
-						{
-							$country .= ', ' . $airport_array['country_names'][$this->current_language];
-						}
-					}					
-
-					$airport = ($airport_array['airport'] !== $airport_array['city']) 
-						? $airport_array['airport'] . ', ' . $airport_array['city']
-						: $airport_array['airport'] . $country;
-
-					if(array_key_exists('airport_names', $airport_array))
-					{
-						if(array_key_exists($this->current_language, $airport_array['airport_names']))
-						{
-							$airport = $airport_array['airport_names'][$this->current_language];
-						}
-					}
-
-					$title = sprintf(__('Charter Flights to %s', 'dynamicaviation'), $airport) . ' | ' . $this->site_name;
+			if (!empty($airport_array) && count($airport_array) > 0) {
+				// Country suffix (", Country") if localized name is present
+				$country = '';
+				if (
+					array_key_exists('country_names', $airport_array) &&
+					array_key_exists($this->current_language, $airport_array['country_names'])
+				) {
+					$country = sprintf(', %s', $airport_array['country_names'][$this->current_language]);
 				}
-				else
-				{
-					$title =  __('Destination Not Found', 'dynamicaviation') . ' | ' . $this->site_name;
-				}				
+
+				// Base airport label (either "Airport, City" or "Airport + country")
+				$airport = ($airport_array['airport'] !== $airport_array['city'])
+					? sprintf('%s, %s', $airport_array['airport'], $airport_array['city'])
+					: sprintf('%s%s', $airport_array['airport'], $country);
+
+				// Override with localized airport name if available
+				if (
+					array_key_exists('airport_names', $airport_array) &&
+					array_key_exists($this->current_language, $airport_array['airport_names'])
+				) {
+					$airport = $airport_array['airport_names'][$this->current_language];
+				}
+
+				$title = sprintf(
+					'%s | %s',
+					sprintf(__('Charter Flights to %s', 'dynamicaviation'), $airport),
+					$this->site_name
+				);
+			} else {
+				$title = sprintf(
+					'%s | %s',
+					__('Destination Not Found', 'dynamicaviation'),
+					$this->site_name
+				);
 			}
-			else
-			{
-				$title =  __('Destination Not Found', 'dynamicaviation') . ' | ' . $this->site_name;
-			}			
 		}
 
 		return $title;
@@ -157,40 +154,38 @@ class Dynamic_Aviation_Destinations {
 
 	public function modify_title($title)
 	{
-			if(in_the_loop() && get_query_var($this->pathname))
-			{
-				$airport_array = $this->utilities->airport_data();
-				
-				if(!empty($airport_array))
-				{
-					if(count($airport_array) > 0)
-					{
-						$airport = ($airport_array['airport'] !== $airport_array['city']) 
-							? $airport_array['airport'] . ', ' . $airport_array['city']
-							: $airport_array['airport'];
+		if (in_the_loop() && get_query_var($this->pathname)) {
+			$airport_array = $this->utilities->airport_data();
+			$not_found     = esc_html(__('Destination Not Found', 'dynamicaviation'));
 
-						if(array_key_exists('airport_names', $airport_array))
-						{
-							if(array_key_exists($this->current_language, $airport_array['airport_names']))
-							{
-								$airport = $airport_array['airport_names'][$this->current_language];
-							}
-						}							
+			if (!empty($airport_array) && count($airport_array) > 0) {
+				// Base airport label: "Airport, City" if different, else just "Airport"
+				$airport = ($airport_array['airport'] !== $airport_array['city'])
+					? sprintf('%s, %s', $airport_array['airport'], $airport_array['city'])
+					: $airport_array['airport'];
 
-						$title = __('Charter Flights to','dynamicaviation').' <span class="linkcolor">'.esc_html($airport).'</span>';						
-					}
-					else
-					{
-						$title = esc_html(__('Destination Not Found', 'dynamicaviation'));
-					}				
+				// Override with localized airport name if available
+				if (
+					array_key_exists('airport_names', $airport_array) &&
+					array_key_exists($this->current_language, $airport_array['airport_names'])
+				) {
+					$airport = $airport_array['airport_names'][$this->current_language];
 				}
-				else
-				{
-					$title = esc_html(__('Destination Not Found', 'dynamicaviation'));
-				}					
+
+				$title = sprintf(
+					'%s <span class="linkcolor">%s</span>',
+					__('Charter Flights to', 'dynamicaviation'), // intentionally unescaped (matches original)
+					esc_html($airport)                            // only the airport is escaped (matches original)
+				);
+			} else {
+				$title = $not_found;
 			}
+		}
+
 		return $title;
 	}
+
+
     
 	public function modify_content( $content ) {
 		// Fast exits
@@ -228,130 +223,130 @@ class Dynamic_Aviation_Destinations {
 	}
 
 
-    public function get_destination_content($iata)
-    {
-        $output = '';
-        $current_language = current_language();
-        $can_user_edit = (current_user_can('editor') || current_user_can('administrator')) ? true : false;
-        
-        $args = array(
-            'post_type' => 'destinations',
-            'posts_per_page' => 1,
-            'post_parent' => 0,
-            'lang' => $current_language,
-            'meta_key' => array(),
-            'meta_query' => array(
-                array(
-                    'key' => 'aircraft_base_iata',
-                    'value' => esc_html($iata),
-                    'compare' => '='
-                )
-            )
-        );
+	public function get_destination_content($iata)
+	{
+		$output            = '';
+		$current_language  = current_language();
+		$can_user_edit     = current_user_can('editor') || current_user_can('administrator');
 
-        $wp_query = new WP_Query( $args );
+		$args = array(
+			'post_type'      => 'destinations',
+			'posts_per_page' => 1,
+			'post_parent'    => 0,
+			'lang'           => $current_language,
+			'meta_key'       => array(), // kept as-is to preserve behavior
+			'meta_query'     => array(
+				array(
+					'key'     => 'aircraft_base_iata',
+					'value'   => esc_html($iata),
+					'compare' => '='
+				)
+			)
+		);
 
-        if ( $wp_query->have_posts() )
-        {
-            while ( $wp_query->have_posts() )
-            {
-                $wp_query->the_post();
-                
-                global $post;
+		$wp_query = new WP_Query($args);
 
-                $output .= '<div class="entry-content">'.do_blocks($post->post_content).'</div>';
+		if ($wp_query->have_posts()) {
+			while ($wp_query->have_posts()) {
+				$wp_query->the_post();
 
-                if( $can_user_edit )
-                {
-                    $output .= '<p><a class="pure-button" href="'.esc_url(get_edit_post_link($post->ID)).'"><span class="dashicons dashicons-edit"></span> '.esc_html(__('Edit Destination', 'dynamicaviation')).'</a></p>';
-                }
-            }
+				global $post; // preserved to keep do_blocks($post->post_content) behavior
 
-            wp_reset_postdata();
-        }
-        else
-        {
-            if($can_user_edit)
-            {
-                $output .= '<p><a class="pure-button" href="'.esc_url(admin_url('post-new.php?post_type=destinations&iata='.$iata)).'"><span class="dashicons dashicons-plus"></span> '.esc_html(__('Add Destination', 'dynamicaviation')).'</a></p>';
-            }
-        }
+				$output .= sprintf(
+					'<div class="entry-content">%s</div>',
+					do_blocks($post->post_content)
+				);
 
-        return $output;
+				if ($can_user_edit) {
+					$output .= sprintf(
+						'<p><a class="pure-button" href="%s"><span class="dashicons dashicons-edit"></span> %s</a></p>',
+						esc_url(get_edit_post_link($post->ID)),
+						esc_html(__('Edit Destination', 'dynamicaviation'))
+					);
+				}
+			}
 
-    }
+			wp_reset_postdata();
+		} else {
+			if ($can_user_edit) {
+				$output .= sprintf(
+					'<p><a class="pure-button" href="%s"><span class="dashicons dashicons-plus"></span> %s</a></p>',
+					esc_url(admin_url('post-new.php?post_type=destinations&iata=' . $iata)),
+					esc_html(__('Add Destination', 'dynamicaviation'))
+				);
+			}
+		}
 
-    public function template()
-    {
-
-        $airport_array = $this->utilities->airport_data();
-        $json = $airport_array;
-        $iata  = $json['iata'];
-        $icao = $json['icao'];
-        $city = $json['city'];
-        $utc = $json['utc'];
-        $_geoloc = $json['_geoloc'];
-        $airport = $json['airport'];
-        $country_name = $json['country_names'];
-        $static_map = $this->utilities->airport_img_url($json);
-        
-        if($iata != null && $icao != null)
-        {
-            $airport .= " ".__('Airport', 'dynamicaviation');
-        }
-        
-        if($this->current_language)
-        {
-            if(array_key_exists($this->current_language, $country_name))
-            {
-                $country_lang = $country_name[$this->current_language];
-            }
-            else
-            {
-                $country_lang = $country_name['en'];
-            }
-        }        
+		return $output;
+	}
 
 
-        ob_start(); 
-        ?>
+	public function template()
+	{
+		$airport_array = $this->utilities->airport_data();
+		$json          = $airport_array;
+
+		$iata      = $json['iata'];
+		$icao      = $json['icao'];
+		$city      = $json['city'];
+		$utc       = $json['utc'];
+		$_geoloc   = $json['_geoloc'];
+		$airport   = $json['airport'];
+		$country   = $json['country_names'];
+		$static_map = $this->utilities->airport_img_url($json);
+
+		if ($iata != null && $icao != null) {
+			$airport .= ' ' . __('Airport', 'dynamicaviation');
+		}
+
+		if ($this->current_language) {
+			if (array_key_exists($this->current_language, $country)) {
+				$country_lang = $country[$this->current_language];
+			} else {
+				$country_lang = $country['en'];
+			}
+		}
+
+		ob_start();
+		?>
 
 			<?php echo $this->get_destination_content($iata); ?>
 
-            <div class="pure-g gutters bottom-20">
+			<div class="pure-g gutters bottom-20">
 
-                <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
-                    <table class="airport_description pure-table pure-table-striped bottom-20 small width-100">
-                        <?php if($iata != null && $icao != null): ?>
-                            <?php if($iata != null): ?>
-                            <tr><td>IATA</td><td><?php echo esc_html($iata); ?></td></tr>
-                            <?php endif;?>
-                            <?php if($icao != null): ?>
-                            <tr><td>ICAO</td><td><?php echo esc_html($icao); ?></td></tr>
-                            <?php endif; ?>
-                        <?php endif; ?>	
-                        <tbody>
-                            <tr><td><?php echo (esc_html__('City', 'dynamicaviation')); ?></td><td><?php echo esc_html($city); ?></td></tr>
-                            <tr><td><?php echo (esc_html__('Country', 'dynamicaviation')); ?></td><td><?php echo esc_html($country_lang); ?></td></tr>	
-                            <tr><td><?php echo (esc_html__('Longitude', 'dynamicaviation')); ?></td> <td><?php echo esc_html(round($_geoloc['lng'], 4)); ?></td></tr>
-                            <tr><td><?php echo (esc_html__('Latitude', 'dynamicaviation')); ?></td> <td><?php echo esc_html(round($_geoloc['lat'], 4)); ?></td></tr>	
-                            <tr><td><?php echo (esc_html__('Timezone', 'dynamicaviation')); ?></td> <td><?php echo esc_html($utc).' (UTC)'; ?></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3">
-                        <img class="bottom-20" width="660" height="440" class="img-responsive" src="<?php echo esc_url($static_map); ?>" alt="<?php echo esc_html(sprintf(__('Charter Flights to %s', 'dynamicaviation'), $airport)).", ".esc_html($city); ?>" title="<?php esc_attr_e($airport); ?>"/> 
-                </div>
-            </div>
+				<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
+					<table class="airport_description pure-table pure-table-striped bottom-20 small width-100">
+						<?php if ($iata != null && $icao != null): ?>
+							<?php if ($iata != null): ?>
+							<tr><td>IATA</td><td><?php echo esc_html($iata); ?></td></tr>
+							<?php endif; ?>
+							<?php if ($icao != null): ?>
+							<tr><td>ICAO</td><td><?php echo esc_html($icao); ?></td></tr>
+							<?php endif; ?>
+						<?php endif; ?>
+						<tbody>
+							<tr><td><?php echo esc_html__('City', 'dynamicaviation'); ?></td><td><?php echo esc_html($city); ?></td></tr>
+							<tr><td><?php echo esc_html__('Country', 'dynamicaviation'); ?></td><td><?php echo esc_html($country_lang); ?></td></tr>
+							<tr><td><?php echo esc_html__('Longitude', 'dynamicaviation'); ?></td> <td><?php echo esc_html(round($_geoloc['lng'], 4)); ?></td></tr>
+							<tr><td><?php echo esc_html__('Latitude', 'dynamicaviation'); ?></td> <td><?php echo esc_html(round($_geoloc['lat'], 4)); ?></td></tr>
+							<tr><td><?php echo esc_html__('Timezone', 'dynamicaviation'); ?></td> <td><?php echo esc_html($utc) . ' (UTC)'; ?></td></tr>
+						</tbody>
+					</table>
+				</div>
 
+				<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-2-3">
+					<img class="bottom-20" width="660" height="440" class="img-responsive"
+						src="<?php echo esc_url($static_map); ?>"
+						alt="<?php echo esc_html(sprintf(__('Charter Flights to %s', 'dynamicaviation'), $airport)) . ', ' . esc_html($city); ?>"
+						title="<?php esc_attr_e($airport); ?>"/>
+				</div>
 
-        <?php
-        
-        $content = ob_get_contents();
-        ob_end_clean();	
-		
-		return $content;
-    }
+			</div>
+
+		<?php
+		return ob_get_clean();
+	}
+
 
 
 	public function meta_tags()
