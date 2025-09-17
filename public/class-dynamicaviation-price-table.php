@@ -255,7 +255,7 @@ class Dynamic_Aviation_Price_Table {
 					}
 
 					$html_row .= '<td>';
-					$html_row .= sprintf('<strong>%s</strong>', esc_html(wrapMoney($one_way_price)));
+					$html_row .= sprintf('<strong>%s</strong>', esc_html(wrap_money($one_way_price)));
 
 					if ($fees_per_person > 0) {
 						$html_row .= sprintf(

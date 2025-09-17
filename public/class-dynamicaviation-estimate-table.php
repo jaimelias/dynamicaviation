@@ -374,7 +374,7 @@ class Dynamic_Aviation_Estimate_Table {
         // Price column
         $price_col = sprintf(
             '<strong>%s</strong>',
-            esc_html(wrapMoney($price))
+            esc_html(wrap_money($price))
         );
 
         if ($fees_per_person > 0 || $base_fees > 0) {
