@@ -110,7 +110,7 @@ class Dynamic_Aviation_Destinations {
 	public function modify_wp_title($title)
 	{
 		if (get_query_var($this->pathname)) {
-			$airport_array = $this->utilities->airport_data();
+			$airport_array = $this->utilities->airport_data_by_slug();
 
 			if (!empty($airport_array) && count($airport_array) > 0) {
 				// Country suffix (", Country") if localized name is present
@@ -155,7 +155,7 @@ class Dynamic_Aviation_Destinations {
 	public function modify_title($title)
 	{
 		if (in_the_loop() && get_query_var($this->pathname)) {
-			$airport_array = $this->utilities->airport_data();
+			$airport_array = $this->utilities->airport_data_by_slug();
 			$not_found     = esc_html(__('Destination Not Found', 'dynamicaviation'));
 
 			if (!empty($airport_array) && count($airport_array) > 0) {
@@ -194,7 +194,7 @@ class Dynamic_Aviation_Destinations {
 		}
 
 		// Ensure we actually have airport data; otherwise keep original content
-		$airport_data = (array) $this->utilities->airport_data();
+		$airport_data = (array) $this->utilities->airport_data_by_slug();
 		if ( empty( $airport_data ) ) {
 			return $content;
 		}
@@ -283,7 +283,7 @@ class Dynamic_Aviation_Destinations {
 
 	public function template()
 	{
-		$airport_array = $this->utilities->airport_data();
+		$airport_array = $this->utilities->airport_data_by_slug();
 		$json          = $airport_array;
 
 		$iata      = $json['iata'];
@@ -325,11 +325,11 @@ class Dynamic_Aviation_Destinations {
 							<?php endif; ?>
 						<?php endif; ?>
 						<tbody>
-							<tr><td><?php echo esc_html__('City', 'dynamicaviation'); ?></td><td><?php echo esc_html($city); ?></td></tr>
-							<tr><td><?php echo esc_html__('Country', 'dynamicaviation'); ?></td><td><?php echo esc_html($country_lang); ?></td></tr>
-							<tr><td><?php echo esc_html__('Longitude', 'dynamicaviation'); ?></td> <td><?php echo esc_html(round($_geoloc['lng'], 4)); ?></td></tr>
-							<tr><td><?php echo esc_html__('Latitude', 'dynamicaviation'); ?></td> <td><?php echo esc_html(round($_geoloc['lat'], 4)); ?></td></tr>
-							<tr><td><?php echo esc_html__('Timezone', 'dynamicaviation'); ?></td> <td><?php echo esc_html($utc) . ' (UTC)'; ?></td></tr>
+							<tr><td><?php echo esc_html(__('City', 'dynamicaviation')); ?></td><td><?php echo esc_html($city); ?></td></tr>
+							<tr><td><?php echo esc_html(__('Country', 'dynamicaviation')); ?></td><td><?php echo esc_html($country_lang); ?></td></tr>
+							<tr><td><?php echo esc_html(__('Longitude', 'dynamicaviation')); ?></td> <td><?php echo esc_html(round($_geoloc['lng'], 4)); ?></td></tr>
+							<tr><td><?php echo esc_html(__('Latitude', 'dynamicaviation')); ?></td> <td><?php echo esc_html(round($_geoloc['lat'], 4)); ?></td></tr>
+							<tr><td><?php echo esc_html(__('Timezone', 'dynamicaviation')); ?></td> <td><?php echo esc_html($utc) . ' (UTC)'; ?></td></tr>
 						</tbody>
 					</table>
 				</div>
@@ -352,7 +352,7 @@ class Dynamic_Aviation_Destinations {
 	public function meta_tags()
 	{	if(get_query_var($this->pathname))
 		{
-			$airport_array = $this->utilities->airport_data();
+			$airport_array = $this->utilities->airport_data_by_slug();
 			
 			if(!empty($airport_array))
 			{
@@ -413,7 +413,7 @@ class Dynamic_Aviation_Destinations {
 	{
 		if(get_query_var($this->pathname))
 		{
-			$airport_array = $this->utilities->airport_data();
+			$airport_array = $this->utilities->airport_data_by_slug();
 
 			if(!empty($airport_array))
 			{

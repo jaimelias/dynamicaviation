@@ -83,7 +83,7 @@ class Dynamic_Aviation_Image {
 
         if($filename)
         {
-            $url = $this->utilities->airport_url_string($this->utilities->airport_data($filename));
+            $url = $this->utilities->airport_url_string($this->utilities->airport_data_by_slug($filename));
 
             $headers = array(
                 'Content-Type' => 'image/png'

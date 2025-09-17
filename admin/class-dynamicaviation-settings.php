@@ -23,7 +23,7 @@ class Dynamic_Aviation_Settings
 		?><div class="wrap">
 		<form action="options.php" method="post">
 			
-			<h2><?php echo (esc_html__('Dynamic Aviation', 'dynamicaviation')); ?></h2>	
+			<h2><?php echo esc_html(__('Dynamic Aviation', 'dynamicaviation')); ?></h2>	
 			<?php
 			settings_fields( 'aircraft_settings' );
 			do_settings_sections( 'aircraft_settings' );

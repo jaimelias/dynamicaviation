@@ -67,7 +67,7 @@ async function validateAviationEstimateRequest (token) {
 			
 	if(invalids.length === 0)
 	{
-		const findAmount = formToArray(thisForm).find(i => i.name === 'aircraft_price');
+		const findAmount = formToArray(thisForm).find(i => i.name === 'charter_price');
 		const amount = (findAmount) ? (findAmount.value) ? parseFloat(findAmount.value) : 0 : 0;
 
 		if(typeof fbq !== typeof undefined)
@@ -111,8 +111,8 @@ const formArrayToParams = () => {
 
 const getCheckoutEventArgs2 = formParams => {
 
-	const {aircraft_price, title, aircraft_flight, aircraft_origin, aircraft_destination} = formParams;
-	const amount = parseFloat(aircraft_price);	
+	const {charter_price, title, aircraft_flight, aircraft_origin, aircraft_destination} = formParams;
+	const amount = parseFloat(charter_price);	
 	const legs = parseFloat(aircraft_flight) + 1;
 
 	return {
@@ -146,8 +146,8 @@ const validate_instant_quote = () =>
 		}
 
 		const formParams = formArrayToParams();
-		const {aircraft_price} = formParams;
-		const amount = parseFloat(aircraft_price);
+		const {charter_price} = formParams;
+		const amount = parseFloat(charter_price);
 
 		if(typeof gtag !== 'undefined' && amount)
 		{

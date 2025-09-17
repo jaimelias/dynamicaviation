@@ -45,7 +45,7 @@ class Dynamic_Aviation_Estimate_Table {
 
                 if(in_array($k, $intval_params))
                 {
-                    $v = intval($v);
+                    $v = (int)  $v;
                 }
 
                 $this->get->$k = $v;
@@ -128,10 +128,10 @@ class Dynamic_Aviation_Estimate_Table {
             <table class="bottom-40 pure-table pure-table-bordered pure-table-striped text-center instant_quote_table small width-100">
                 <thead>
                     <tr>
-                        <th <?php echo (!$this->is_mobile) ? ' colspan="2" ' : '' ;?>><?php echo (esc_html__('Flights', 'dynamicaviation')); ?></th>
+                        <th <?php echo (!$this->is_mobile) ? ' colspan="2" ' : '' ;?>><?php echo esc_html(__('Flights', 'dynamicaviation')); ?></th>
         
                         <?php if(!$this->is_mobile): ?>
-                            <th><?php echo (esc_html__('Duration', 'dynamicaviation')); ?></th>
+                            <th><?php echo esc_html(__('Duration', 'dynamicaviation')); ?></th>
                         <?php endif; ?>
                         
                         <th colspan="2"><?php esc_html_e(($this->get->aircraft_flight === 0) ? __('One Way', 'dynamicaviation') : __('Round Trip', 'dynamicaviation'));?></th>
@@ -217,7 +217,7 @@ class Dynamic_Aviation_Estimate_Table {
     {
         $default = array(
             'price' => 0,
-            'fees' => 0
+            'fees_per_person' => 0
         );
 
         $output = $default;
@@ -279,7 +279,7 @@ class Dynamic_Aviation_Estimate_Table {
                 ? (2 * floatval($chart[$f][3]))
                 : floatval($chart[$f][3]);
 
-            $output['fees'] += ($this->get->aircraft_flight === 1)  ? 
+            $output['fees_per_person'] += ($this->get->aircraft_flight === 1)  ? 
                 (2 * floatval($chart[$f][4]))
                 : floatval($chart[$f][4]);
 
@@ -294,10 +294,10 @@ class Dynamic_Aviation_Estimate_Table {
         {
             if($i === $found_request_in_index)
             {
-                $output['duration'] = floatval($chart[$i][2]);
-                $output['stops'] = $chart[$i][5];
-                $output['seats'] = $chart[$i][6];
-                $output['weight_pounds'] = $chart[$i][7];
+                $output['duration'] = (float) $chart[$i][2];
+                $output['base_fees'] = (float) $chart[$i][5];
+                $output['seats'] = (float) $chart[$i][6];
+                $output['weight_pounds'] = (float) $chart[$i][7];
             }
         }
 
@@ -307,31 +307,32 @@ class Dynamic_Aviation_Estimate_Table {
     public function iterate_rows($post, $table_price)
     {
         $aircraft_url   = esc_url($this->home_lang . $post->post_type . '/' . $post->post_name);
-        $thumbnail      = get_the_post_thumbnail(
+        $thumbnail   = get_the_post_thumbnail(
             $post->ID,
             [100, 100],
             ['class' => 'img-responsive', 'alt' => esc_attr($post->post_title)]
         );
-        $large_attr     = $this->is_mobile ? '' : ' class="large"';
-        $align_left_attr= $this->is_mobile ? '' : ' class="text-left"';
 
-        $origin         = $this->get->aircraft_origin;
-        $destination    = $this->get->aircraft_destination;
-        $itinerary      = $this->get_routes($post->ID, $origin, $destination, $table_price);
+        $align_left_attr= $this->is_mobile ? '' : ' class="text-left"';
+        $origin   = $this->get->aircraft_origin;
+        $destination = $this->get->aircraft_destination;
+        $itinerary   = $this->get_routes($post->ID, $origin, $destination, $table_price);
+
 
         // Early exits for invalid itineraries
         if (!$itinerary || !isset($itinerary['price'], $itinerary['duration']) || $itinerary['price'] === 0 || $itinerary['duration'] === 0) {
             return '';
         }
 
-        $price          = (float) $itinerary['price'];
-        $fees           = (float) ($itinerary['fees'] ?? 0);
-        $duration       = (int)   $itinerary['duration'];
-        $seats          = (int)   $itinerary['seats'];
+        $price = (float) $itinerary['price'];
+        $fees_per_person  = (float) $itinerary['fees_per_person'];
+        $base_fees = (float)  $itinerary['base_fees'];
+        $duration_float = (float)   $itinerary['duration'];
+        $seats = (int)   $itinerary['seats'];
         $weight_pounds  = (float) $itinerary['weight_pounds'];
-        $weight_kg      = (int) round($weight_pounds * 0.453592);
-        $duration_text  = $this->utilities->convertNumberToTime($duration);
-        $aircraft_price = $price + ($fees * (int) $this->get->pax_num);
+        $weight_kg   = round($weight_pounds * 0.453592);
+        $duration_in_hours  = $this->utilities->convertNumberToTime($duration_float);
+        $charter_price = $price + $base_fees + ($fees_per_person * (int) $this->get->pax_num);
 
         // Translators: 1: weight in pounds, 2: weight in kilograms.
         $weight_allowed = sprintf(
@@ -342,12 +343,12 @@ class Dynamic_Aviation_Estimate_Table {
         );
 
         $flight_array = [
-            'aircraft_price'  => $aircraft_price,
-            'title'           => $post->post_title,
-            'post_id'         => $post->ID,
+            'charter_price'  => $charter_price,
+            'title'  => $post->post_title,
+            'post_id'   => $post->ID,
             'aircraft_seats'  => $seats,
             'aircraft_weight' => $weight_allowed,
-            'aircraft_url'    => $aircraft_url,
+            'aircraft_url' => $aircraft_url,
         ];
 
         // Aircraft column
@@ -361,38 +362,45 @@ class Dynamic_Aviation_Estimate_Table {
             '<a class="strong" href="%1$s">%2$s</a> - <small>%3$s</small><br/>' .
             '<strong>%4$s %5$s</strong><br/>' .
             '<small>%6$s %7$s</small>',
-            $aircraft_url,
+            esc_html($aircraft_url),
             esc_html($post->post_title),
             esc_html($aircraft_type),
             esc_html($seats),
-            esc_html__('passengers', 'dynamicaviation'),
-            esc_html__('Max', 'dynamicaviation'),
+            esc_html(__('passengers', 'dynamicaviation')),
+            esc_html(__('Max', 'dynamicaviation')),
             $weight_allowed
         );
 
         // Price column
         $price_col = sprintf(
-            '<small class="text-muted">USD</small><br/>' .
-            '<strong%1$s><span class="text-muted">$</span>%2$s</strong>',
-            $large_attr,
-            esc_html(money($price))
+            '<strong>%s</strong>',
+            esc_html(wrapMoney($price))
         );
 
-        if ($fees > 0) {
+        if ($fees_per_person > 0 || $base_fees > 0) {
+
             $price_col .= sprintf(
                 '<br/><span class="text-muted">%s $%s</span>',
-                esc_html__('Fees per pers.', 'dynamicaviation'),
-                esc_html(money($fees))
+                esc_html(__('Fees / pers.', 'dynamicaviation')),
+                esc_html(money($fees_per_person))
             );
         }
+
+        if ($base_fees > 0) {
+            $price_col .= sprintf(
+                '<br/><span class="text-muted">%s $%s</span>',
+                esc_html(__('Airport fees', 'dynamicaviation')),
+                esc_html(money($base_fees))
+            );
+        }
+
 
         if ($this->is_mobile) {
             $price_col .= sprintf(
                 '<hr style="margin-top:10px;margin-bottom:10px;"/>' .
                 '<small class="text-muted"><span class="dashicons dashicons-clock text-muted"></span></small><br/>' .
-                '<strong%1$s>%2$s</strong>',
-                $large_attr,
-                esc_html($duration_text)
+                '<strong>%2$s</strong>',
+                esc_html($duration_in_hours)
             );
         }
 
@@ -408,13 +416,11 @@ class Dynamic_Aviation_Estimate_Table {
         if (!$this->is_mobile) {
             $cells[] = sprintf(
                 '<td><span class="dashicons dashicons-clock"></span> %s</td>',
-                esc_html($duration_text)
+                esc_html($duration_in_hours)
             );
         }
 
         $cells[] = sprintf('<td>%s</td>', $price_col);
-
-        $quote_label = esc_html__('Quote', 'dynamicaviation');
 
         // Use wp_json_encode for safe JSON, then escape for attribute context.
         $data_aircraft = esc_attr(wp_json_encode($flight_array));
@@ -423,7 +429,7 @@ class Dynamic_Aviation_Estimate_Table {
             '<td><button class="strong small button-success pure-button" data-aircraft="%1$s">' .
             '<span class="dashicons dashicons-email"></span> %2$s</button></td>',
             $data_aircraft,
-            $quote_label
+            esc_html(__('Quote', 'dynamicaviation'))
         );
 
         return sprintf("<tr>%s</tr>", implode('', $cells));
@@ -440,20 +446,20 @@ class Dynamic_Aviation_Estimate_Table {
                 <form data-method="post" id="aircraft_booking_request" data-hash-params="<?php echo esc_attr(implode(',', $this->utilities->request_form_hash_param_names()));?>" data-nonce="slug" data-action="<?php echo esc_attr(base64_encode($this->home_lang.'request_submitted'));?>">
 
                     <div class="modal-header clearfix">
-                        <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php echo (esc_html__('Request a Quote', 'dynamicaviation')); ?></h3>
+                        <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php echo esc_html(__('Request a Quote', 'dynamicaviation')); ?></h3>
                         <span class="close pointer pull-right large"><span class="dashicons dashicons-no"></span></span>
                     </div>				
 
                     <div class="pure-g gutters">
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="first_name"><?php echo (esc_html__('Name', 'dynamicaviation')); ?></label>
+                                <label for="first_name"><?php echo esc_html(__('Name', 'dynamicaviation')); ?></label>
                                 <input type="text" name="first_name" />								
                             </div>
                         </div>
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="lastname"><?php echo (esc_html__('Last Name', 'dynamicaviation')); ?></label>
+                                <label for="lastname"><?php echo esc_html(__('Last Name', 'dynamicaviation')); ?></label>
                                 <input type="text" name="lastname" />			
                             </div>
                         </div>
@@ -461,13 +467,13 @@ class Dynamic_Aviation_Estimate_Table {
                     <div class="pure-g gutters">
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="email"><?php echo (esc_html__('Email', 'dynamicaviation')); ?></label>
+                                <label for="email"><?php echo esc_html(__('Email', 'dynamicaviation')); ?></label>
                                 <input type="email" name="email" />								
                             </div>
                         </div>
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="repeat_email"><?php echo (esc_html__('Repeat Email', 'dynamicaviation')); ?></label>
+                                <label for="repeat_email"><?php echo esc_html(__('Repeat Email', 'dynamicaviation')); ?></label>
                                 <input type="email" name="repeat_email" />								
                             </div>                           
                         </div>
@@ -476,7 +482,7 @@ class Dynamic_Aviation_Estimate_Table {
                     <div class="pure-g gutters">
                         <div class="pure-u-1 pure-u-md-1-2">
                             <div class="bottom-20">
-                                <label for="phone"><?php echo (esc_html__('Phone', 'dynamicaviation')); ?></label>
+                                <label for="phone"><?php echo esc_html(__('Phone', 'dynamicaviation')); ?></label>
                                 <div class="pure-g">
                                     <div class="pure-u-1-2">
                                             <select name="country_calling_code" class="countryCallingCode"><option>--</option></select>
@@ -535,34 +541,40 @@ class Dynamic_Aviation_Estimate_Table {
         if ($wp_query->have_posts())
         {
             $output .= $this->pax_template();
-            $output .= '<p class="large"><strong>'.esc_html(__('Departure', 'dynamicaviation')).':</strong> '.$this->start_itinerary().'</p>';
-            
-            if($this->get->aircraft_flight === 1)
-            {
-                $output .= '<p class="large"><strong>'.esc_html(__('Return', 'dynamicaviation')).':</strong> '.$this->end_itinerary().'</p>';
+            $output .= sprintf(
+                '<p class="large"><strong>%s:</strong> %s</p>',
+                esc_html(__('Departure', 'dynamicaviation')),
+                $this->start_itinerary()
+            );
+
+            if ((int) ($this->get->aircraft_flight ?? 0) === 1) {
+                $output .= sprintf(
+                    '<p class="large"><strong>%s:</strong> %s</p>',
+                    esc_html(__('Return', 'dynamicaviation')),
+                    $this->end_itinerary()
+                );
             }
-            
 
             while($wp_query->have_posts())
             {
                 $wp_query->the_post();
                 global $post;
+
+                $raw_table_price = (string) aviation_field('aircraft_rates', $post->ID);
+
+                if(empty($raw_table_price)) continue;
                
-                $table_price = json_decode(html_entity_decode(aviation_field('aircraft_rates', $post->ID)), true);
+                $table_price = json_decode(html_entity_decode($raw_table_price), true);
 
-                if(array_key_exists('aircraft_rates_table', $table_price))
-                {
-                    $aircraft_rates_table = $table_price['aircraft_rates_table'];
+                if(!is_array($table_price) || count($table_price) === 0) continue;
+                if(!array_key_exists('aircraft_rates_table', $table_price)) continue;
 
-                    if(is_array($aircraft_rates_table))
-                    {
-                        if(count($aircraft_rates_table) > 0)
-                        {
-                            $rows .= $this->iterate_rows($post, $aircraft_rates_table);
-                        }
-                    }
+                $aircraft_rates_table = $table_price['aircraft_rates_table'];
 
-                }
+                if(!is_array($aircraft_rates_table) || count($aircraft_rates_table) === 0) continue;
+                
+
+                $rows .= $this->iterate_rows($post, $aircraft_rates_table);
             }
 
             wp_reset_postdata();
@@ -716,17 +728,17 @@ class Dynamic_Aviation_Estimate_Table {
                 $wp_query->the_post();
 
                 global $post;
-                $duration = floatval(package_field('package_duration', $post->ID));
+                $duration_float = floatval(package_field('package_duration', $post->ID));
                 $duration_unit = intval(package_field('package_length_unit', $post->ID));
 
                 if($duration_unit === 0 )
                 {
-                    $duration = $duration / 60;
+                    $duration_float = $duration_float / 60;
                 }
 
                 $output .= '<tr>';
                 $output .= '<td><strong><a href="'.esc_url(get_the_permalink()).'">'.esc_html($post->post_title).'</a></strong></td>'; 
-                $output .= '<td><span class="dashicons dashicons-clock"></span> '.esc_html($this->utilities->convertNumberToTime($duration)).'</td>';
+                $output .= '<td><span class="dashicons dashicons-clock"></span> '.esc_html($this->utilities->convertNumberToTime($duration_float)).'</td>';
                 $output .= '</tr>';
             }
 
