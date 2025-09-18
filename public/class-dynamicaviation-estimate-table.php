@@ -397,11 +397,11 @@ class Dynamic_Aviation_Estimate_Table {
 
 
         if ($this->is_mobile) {
-            $price_col .= sprintf(
-                '<hr style="margin-top:10px;margin-bottom:10px;"/>' .
+
+            $price_col .= (
+                '<hr style="margin-top:10px;margin-bottom:10px;"/>' . 
                 '<small class="text-muted"><span class="dashicons dashicons-clock text-muted"></span></small><br/>' .
-                '<strong>%2$s</strong>',
-                esc_html($duration_in_hours)
+                "<strong>{$duration_in_hours}</strong>"
             );
         }
 
