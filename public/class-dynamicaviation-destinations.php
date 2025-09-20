@@ -496,7 +496,7 @@ class Dynamic_Aviation_Destinations {
 						'@context' => 'https://schema.org/',
 						'@type' => 'Product',
 						'brand' => array(
-							'@type' => 'Thing',
+							'@type' => 'Brand',
 							'name' => esc_html($this->site_name)
 						),
 						'category' => esc_html(__('Charter Flights', 'dynamicaviation')),
@@ -504,7 +504,7 @@ class Dynamic_Aviation_Destinations {
 						'description' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$address.'. '.__('Airplanes and helicopter rides in', 'dynamicaviation').' '.$airport.', '.$city),
 						'image' => esc_url($this->utilities->airport_img_url($airport_array)),
 						'sku' => md5($iata),
-						'gtin8' => substr(md5($iata), 0, 8)
+						'gtin8' => $this->iata_to_gtin8($iata)
 					);
 
 					$raw_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -561,6 +561,22 @@ class Dynamic_Aviation_Destinations {
             }
         }
     }
+
+	public function iata_to_gtin8($iata) {
+		$hex = substr(md5($iata), 0, 8);
+		$num = base_convert($hex, 16, 10);
+		$numeric = str_pad(substr($num, 0, 7), 7, "0", STR_PAD_LEFT);
+		
+		$sum = 0;
+		$len = strlen($numeric);
+		for ($i = 0; $i < $len; $i++) {
+			$n = (int) $numeric[$len - $i - 1];
+			$sum += ($i % 2 === 0) ? $n * 3 : $n;
+		}
+		$check = (10 - ($sum % 10)) % 10;
+		
+		return $numeric . $check;
+	}
 
 	public function pll_translation_url($url, $slug)
 	{
