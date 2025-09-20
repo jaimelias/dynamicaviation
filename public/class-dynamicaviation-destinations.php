@@ -492,6 +492,10 @@ class Dynamic_Aviation_Destinations {
 
 				if(count($prices) > 0)
 				{
+
+					$raw_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+
 					$arr = array(
 						'@context' => 'https://schema.org/',
 						'@type' => 'Product',
@@ -500,6 +504,7 @@ class Dynamic_Aviation_Destinations {
 							'name' => esc_html($this->site_name)
 						),
 						'category' => esc_html(__('Charter Flights', 'dynamicaviation')),
+						'url' => esc_url($raw_url),
 						'name' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$airport),
 						'description' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$address.'. '.__('Airplanes and helicopter rides in', 'dynamicaviation').' '.$airport.', '.$city),
 						'image' => esc_url($this->utilities->airport_img_url($airport_array)),
@@ -507,7 +512,6 @@ class Dynamic_Aviation_Destinations {
 						'gtin8' => $this->iata_to_gtin8($iata)
 					);
 
-					$raw_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
 					$offers = array(
 						'priceCurrency' => 'USD',
@@ -520,13 +524,13 @@ class Dynamic_Aviation_Destinations {
 					{
 						$offers['@type'] = 'Offer';
 						$offers['@type'] = 'Offer';
-						$offers['price'] = money($prices[0]);					
+						$offers['price'] = money($prices[0], '.', '');					
 					}
 					else
 					{
 						$offers['@type'] = 'AggregateOffer';
-						$offers['lowPrice'] = money(min($prices));
-						$offers['highPrice'] = money(max($prices));					
+						$offers['lowPrice'] = money(min($prices), '.', '');
+						$offers['highPrice'] = money(max($prices), '.', '');					
 					}
 					
 					$arr['offers'] = $offers;				
