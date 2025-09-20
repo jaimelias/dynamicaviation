@@ -494,7 +494,7 @@ class Dynamic_Aviation_Destinations {
 				{
 
 					$raw_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-
+					$image_url = esc_url($this->utilities->airport_img_url($airport_array));
 
 					$arr = array(
 						'@context' => 'https://schema.org/',
@@ -507,7 +507,13 @@ class Dynamic_Aviation_Destinations {
 						'url' => esc_url($raw_url),
 						'name' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$airport),
 						'description' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$address.'. '.__('Airplanes and helicopter rides in', 'dynamicaviation').' '.$airport.', '.$city),
-						'image' => esc_url($this->utilities->airport_img_url($airport_array)),
+						'image' => [[
+							'@type' => "ImageObject",
+							'url' => $image_url,
+							'contentUrl' => $image_url,
+							'width' => 660,
+							'height' => 440
+						]],
 						'sku' => md5($iata),
 						'gtin8' => $this->iata_to_gtin8($iata)
 					);
