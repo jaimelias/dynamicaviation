@@ -493,7 +493,7 @@ class Dynamic_Aviation_Destinations {
 				if(count($prices) > 0)
 				{
 					$arr = array(
-						'@context' => 'http://schema.org/',
+						'@context' => 'https://schema.org/',
 						'@type' => 'Product',
 						'brand' => array(
 							'@type' => 'Thing',
@@ -512,7 +512,7 @@ class Dynamic_Aviation_Destinations {
 					$offers = array(
 						'priceCurrency' => 'USD',
 						'priceValidUntil' => esc_html(date('Y-m-d', strtotime('+1 year'))),
-						'availability' => 'http://schema.org/InStock',
+						'availability' => 'https://schema.org/InStock',
 						'url' => esc_url($raw_url)
 					);
 					

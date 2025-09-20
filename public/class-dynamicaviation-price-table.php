@@ -303,7 +303,7 @@ class Dynamic_Aviation_Price_Table {
 					$label_destination .= ', ' . $destination['city'];
 				}
 
-				$table = '<div itemscope itemtype="http://schema.org/Table">';
+				$table = '<div itemscope itemtype="https://schema.org/Table">';
 				if (!$is_aircraft_page) {
 					$table .= sprintf(
 						'<h4 itemprop="about"><span class="light">%s</span> <span class="text-muted">%s</span> <span>%s</span></h4>',
