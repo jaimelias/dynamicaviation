@@ -523,7 +523,8 @@ class Dynamic_Aviation_Destinations {
 						'priceCurrency' => 'USD',
 						'priceValidUntil' => esc_html(date('Y-m-d', strtotime('+1 year'))),
 						'availability' => 'https://schema.org/InStock',
-						'url' => esc_url($raw_url)
+						'url' => esc_url($raw_url),
+						'offerCount' => count($prices)
 					);
 					
 					if(count($prices) == 1)
