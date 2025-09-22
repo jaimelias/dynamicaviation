@@ -7,8 +7,6 @@ class Dynamic_Aviation_Destinations {
     {
         $this->utilities = $utilities;
 		$this->plugin_name = $plugin_name;
-        $this->pathname = 'fly';
-		$this->post_type = 'destinations';
 
 		//init
         add_action('init', array(&$this, 'init'));
@@ -30,6 +28,9 @@ class Dynamic_Aviation_Destinations {
         //meta tags
         add_action('wp_head', array(&$this, 'meta_tags'));
 
+		//headers
+		add_filter('template_redirect', array(&$this, 'return_404'), 999);
+
         //minimalizr theme
         add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);
         add_filter('template_include', array(&$this, 'locate_template'), 100 );
@@ -49,11 +50,28 @@ class Dynamic_Aviation_Destinations {
         $this->home_lang = home_lang();
     }
 
+	public function return_404($headers) {
+
+		$slug = get_query_var( 'fly' );
+
+		if($slug) {
+
+			$airport_array = $this->utilities->airport_data_by_slug($slug);
+
+			if(!is_array($airport_array) || count($airport_array) === 0 ) {
+				status_header(404);
+				nocache_headers();
+			}
+		}
+
+		return $headers;
+	}
+
 	public function admin_enqueue_scripts()
 	{
 		global $typenow;
 
-		if($typenow === $this->post_type)
+		if($typenow === 'destinations')
 		{
 			$GLOBALS['dy_aviation_load_admin_scripts'] = true;
 		}
@@ -100,7 +118,7 @@ class Dynamic_Aviation_Destinations {
 
 	public function main_wp_query($query)
 	{
-		if(isset($query->query_vars[$this->pathname]) && $query->is_main_query())
+		if(isset($query->query_vars['fly']) && $query->is_main_query())
 		{				
 			$query->set('post_type', 'page');
 			$query->set( 'posts_per_page', 1 );
@@ -109,8 +127,11 @@ class Dynamic_Aviation_Destinations {
 
 	public function modify_wp_title($title)
 	{
-		if (get_query_var($this->pathname)) {
-			$airport_array = $this->utilities->airport_data_by_slug();
+		$slug = get_query_var( 'fly' );
+
+		if ($slug) {
+
+			$airport_array = $this->utilities->airport_data_by_slug($slug);
 
 			if (!empty($airport_array) && count($airport_array) > 0) {
 				// Country suffix (", Country") if localized name is present
@@ -154,9 +175,12 @@ class Dynamic_Aviation_Destinations {
 
 	public function modify_title($title)
 	{
-		if (in_the_loop() && get_query_var($this->pathname)) {
-			$airport_array = $this->utilities->airport_data_by_slug();
-			$not_found     = esc_html(__('Destination Not Found', 'dynamicaviation'));
+		$slug = get_query_var( 'fly' );
+
+		if (in_the_loop() && $slug) {
+
+			$airport_array = $this->utilities->airport_data_by_slug($slug);
+			$not_found = esc_html(__('Destination Not Found', 'dynamicaviation'));
 
 			if (!empty($airport_array) && count($airport_array) > 0) {
 				// Base airport label: "Airport, City" if different, else just "Airport"
@@ -189,12 +213,14 @@ class Dynamic_Aviation_Destinations {
     
 	public function modify_content( $content ) {
 		// Fast exits
-		if ( ! in_the_loop() || ! get_query_var( $this->pathname ) ) {
+		$slug = get_query_var( 'fly' );
+
+		if ( ! in_the_loop() || !$slug ) {
 			return $content;
 		}
 
 		// Ensure we actually have airport data; otherwise keep original content
-		$airport_data = (array) $this->utilities->airport_data_by_slug();
+		$airport_data = (array) $this->utilities->airport_data_by_slug($slug);
 		if ( empty( $airport_data ) ) {
 			return $content;
 		}
@@ -202,7 +228,7 @@ class Dynamic_Aviation_Destinations {
 		// Resolve dynamic pieces once
 		$search_form = apply_filters( 'dy_aviation_search_form', false );
 		$price_table = apply_filters( 'dy_aviation_price_table', '' );
-		$template    = $this->template();
+		$template = $this->template();
 
 		// Build the markup in one go (no repeated concatenation)
 		$output = sprintf(
@@ -225,20 +251,20 @@ class Dynamic_Aviation_Destinations {
 
 	public function get_destination_content($iata)
 	{
-		$output            = '';
-		$current_language  = current_language();
-		$can_user_edit     = current_user_can('editor') || current_user_can('administrator');
+		$output = '';
+		$current_language = current_language();
+		$can_user_edit = current_user_can('editor') || current_user_can('administrator');
 
 		$args = array(
-			'post_type'      => 'destinations',
+			'post_type' => 'destinations',
 			'posts_per_page' => 1,
-			'post_parent'    => 0,
-			'lang'           => $current_language,
-			'meta_key'       => array(), // kept as-is to preserve behavior
-			'meta_query'     => array(
+			'post_parent' => 0,
+			'lang' => $current_language,
+			'meta_key' => array(), // kept as-is to preserve behavior
+			'meta_query' => array(
 				array(
-					'key'     => 'aircraft_base_iata',
-					'value'   => esc_html($iata),
+					'key' => 'aircraft_base_iata',
+					'value' => esc_html($iata),
 					'compare' => '='
 				)
 			)
@@ -284,15 +310,14 @@ class Dynamic_Aviation_Destinations {
 	public function template()
 	{
 		$airport_array = $this->utilities->airport_data_by_slug();
-		$json          = $airport_array;
-
-		$iata      = $json['iata'];
-		$icao      = $json['icao'];
-		$city      = $json['city'];
-		$utc       = $json['utc'];
-		$_geoloc   = $json['_geoloc'];
-		$airport   = $json['airport'];
-		$country   = $json['country_names'];
+		$json = $airport_array;
+		$iata = $json['iata'];
+		$icao = $json['icao'];
+		$city = $json['city'];
+		$utc = $json['utc'];
+		$_geoloc = $json['_geoloc'];
+		$airport = $json['airport'];
+		$country = $json['country_names'];
 		$static_map = $this->utilities->airport_img_url($json);
 
 		if ($iata != null && $icao != null) {
@@ -350,70 +375,79 @@ class Dynamic_Aviation_Destinations {
 
 
 	public function meta_tags()
-	{	if(get_query_var($this->pathname))
-		{
-			$airport_array = $this->utilities->airport_data_by_slug();
-			
-			if(!empty($airport_array))
-			{
-				$output = "\r\n";
-				$addressArray = array();
-				$airport = $airport_array['airport'];
-				$iata  = $airport_array['iata'];
-				$icao = $airport_array['icao'];
-				$codes = '('.$iata.')';
-				$city = $airport_array['city'];
-				$country_name = $airport_array['country_names'];
+	{
+		$slug = get_query_var( 'fly' );
 
-				if(array_key_exists('airport_names', $airport_array))
-				{
-					if(array_key_exists($this->current_language, $airport_array['airport_names']))
-					{
-						$airport = $airport_array['airport_names'][$this->current_language];
-					}
-				}
+		if ($slug) {
+			$airport_array = $this->utilities->airport_data_by_slug($slug);
 
-
-				$addressArray[] = ($iata && $icao) ? $airport . ' ('.$iata.')' : $airport;
-
-				if($airport !== $city)
-				{
-					$addressArray[] = $city;
-				}
-
-				
-				if($this->current_language)
-				{
-					if(array_key_exists($this->current_language, $country_name))
-					{
-						$country_lang = $country_name[$this->current_language];
-					}
-					else
-					{
-						$country_lang = $country_name['en'];
-					}
-				}
-
-				$addressArray[] = $country_lang;
-				
-				$address = implode(', ', $addressArray);
-								
-				$output .= '<meta name="description" content="'.esc_attr(sprintf(__('Private charter flights to %s. Jets, planes and helicopter rental services in %s.', 'dynamicaviation'), $address, $airport)).'" />';
-				$output .= "\r\n";
-				$output .= '<link rel="canonical" href="'.esc_url($this->home_lang.'fly/'.$this->utilities->sanitize_pathname($airport_array['airport'])).'" />';
-				$output .= "\r\n";
-
-				echo $output;			
+			if(empty($airport_array)) {
+				echo "\r\n" . '<meta name="robots" content="noindex,nofollow" />' . "\r\n";
+				return;
 			}
+
+			$slug = $this->utilities->sanitize_pathname($slug);
+
+			$output = "\r\n";
+			$addressParts = [];
+
+			$airport_name = $airport_array['airport'] ?? '';
+			$iata = $airport_array['iata'] ?? '';
+			$icao = $airport_array['icao'] ?? '';
+			$city = $airport_array['city'] ?? '';
+			$country_names = $airport_array['country_names'] ?? [];
+			$country_lang = ''; // keep default empty to preserve original behavior when language not set
+
+			// Localized airport name (if available)
+			if (!empty($airport_array['airport_names'][$this->current_language])) {
+				$airport_name = $airport_array['airport_names'][$this->current_language];
+			}
+
+			// Address line
+			$addressParts[] = ($iata && $icao) ? sprintf('%s (%s)', $airport_name, $iata) : $airport_name;
+			if ($airport_name !== $city) {
+				$addressParts[] = $city;
+			}
+
+			// Localized country (matches original logic; empty if language not provided)
+			if ($this->current_language) {
+				$country_lang = $country_names[$this->current_language] ?? ($country_names['en'] ?? '');
+			}
+			$addressParts[] = $country_lang;
+
+			$address = implode(', ', $addressParts);
+
+			// Meta description
+			$output .= sprintf(
+				'<meta name="description" content="%s" />' . "\r\n",
+				esc_attr(sprintf(
+					__('Private charter flights to %s. Jets, planes and helicopter rental services in %s.', 'dynamicaviation'),
+					$address,
+					$airport_name
+				))
+			);
+
+			$home_lang = home_lang();
+
+			// Canonical
+			$output .= sprintf(
+				'<link rel="canonical" href="%s" />' . "\r\n",
+				esc_url($this->utilities->normalize_url("{$home_lang}/fly/{$slug}"))
+			);
+
+			echo $output;
+			return;
 		}
 	}
 
 
 	public function ld_json($arr)
 	{
-		if(get_query_var($this->pathname))
+		$slug = get_query_var( 'fly' );
+
+		if( $slug )
 		{
-			$airport_array = $this->utilities->airport_data_by_slug();
+			$airport_array = $this->utilities->airport_data_by_slug($slug);
 
 			if(!empty($airport_array))
 			{
@@ -465,26 +499,32 @@ class Dynamic_Aviation_Destinations {
 					while ( $wp_query->have_posts() )
 					{
 						$wp_query->the_post();
-						$table_price = html_entity_decode(aviation_field('aircraft_rates'));
+						$raw_table_price = aviation_field('aircraft_rates');
+
+						if(empty($raw_table_price)) continue;
+
+						$table_price = html_entity_decode($raw_table_price);
 						$table_price = json_decode($table_price, true);
 
-						if(is_array($table_price) && array_key_exists('aircraft_rates_table', $table_price))
-						{
+						if(!is_array($table_price) || !array_key_exists('aircraft_rates_table', $table_price)) continue;
+
 							$table_price = $table_price['aircraft_rates_table'];
 
-							if(is_array($table_price))
+							if(!is_array($table_price) || count($table_price) === 0) continue;
+
+							for($x = 0; $x < count($table_price); $x++)
 							{
-								for($x = 0; $x < count($table_price); $x++)
+								$row = (array) $table_price[$x];
+								$origin_iata = (string) $row[0];
+								$destination_iata = (string) $row[1];
+
+								if($origin_iata === '' || $destination_iata === '') continue;
+								
+								if(($iata == $origin_iata || $iata == $destination_iata))
 								{
-									$tp = $table_price[$x];
-									
-									if(($iata == $tp[0] || $iata == $tp[1]) && ($tp[0] != '' || $tp[1] != ''))
-									{
-										$prices[] = floatval($tp[3]);
-									}
-								}							
+									$prices[] = (float) $row[3];
+								}
 							}
-						}
 					}
 
 					wp_reset_postdata();				
@@ -514,8 +554,7 @@ class Dynamic_Aviation_Destinations {
 							'width' => 660,
 							'height' => 440
 						]],
-						'sku' => md5($iata),
-						'gtin8' => $this->iata_to_gtin8($iata)
+						'sku' => md5($iata)
 					);
 
 
@@ -550,7 +589,7 @@ class Dynamic_Aviation_Destinations {
 
 	public function locate_template($template)
 	{
-		if(get_query_var($this->pathname))
+		if(get_query_var( 'fly' ))
 		{
 			$new_template = locate_template( array( 'page.php' ) );
 			return $new_template;			
@@ -564,7 +603,7 @@ class Dynamic_Aviation_Destinations {
 
 		if(!isset($dy_aviation_load_algolia))
         {
-            if(get_query_var($this->pathname))
+            if(get_query_var( 'fly' ))
             {
                 $GLOBALS['dy_aviation_load_algolia'] = true;
 				$GLOBALS['dy_aviation_load_mapbox'] = true;
@@ -573,41 +612,27 @@ class Dynamic_Aviation_Destinations {
         }
     }
 
-	public function iata_to_gtin8($iata) {
-		$hex = substr(md5($iata), 0, 8);
-		$num = base_convert($hex, 16, 10);
-		$numeric = str_pad(substr($num, 0, 7), 7, "0", STR_PAD_LEFT);
-		
-		$sum = 0;
-		$len = strlen($numeric);
-		for ($i = 0; $i < $len; $i++) {
-			$n = (int) $numeric[$len - $i - 1];
-			$sum += ($i % 2 === 0) ? $n * 3 : $n;
-		}
-		$check = (10 - ($sum % 10)) % 10;
-		
-		return $numeric . $check;
-	}
+	public function pll_translation_url( $url, $slug ) {
 
-	public function pll_translation_url($url, $slug)
-	{
 		global $polylang;
 
-		if(isset($polylang) && get_query_var($this->pathname))
-		{
-			if($slug === default_language())
-			{
-				$url = home_url('fly/' . get_query_var($this->pathname));
-			}
-			else
-			{
-				
-				$url = home_url($slug . '/fly/' . get_query_var($this->pathname));
-			}
+		if(!isset($polylang)) return $url;
+
+		$path = get_query_var( 'fly' );
+		if ( empty( $path ) ) {
+			return $url;
 		}
 
+		// Build "fly/<path>" respecting WP's trailing slash setting
+		$base = 'fly/' . ltrim( $path, '/' );
+		$prefix = ( $slug === default_language() || $slug === '' ) ? '' : trailingslashit( $slug );
+		$built = $prefix . $base;
+		$built = user_trailingslashit( $built ); // match site permalink structure
+
+		$url = home_url( $built );
 		return $url;
 	}
+
 
 
 }
