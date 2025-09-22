@@ -70,11 +70,17 @@ class Dynamic_Aviation_Training_Data {
             $output = (object) [
                 'service_name' =>  $service_name,
                 'service_id' => $destination_airport['iata'],
+                'service_type' => 'transport',
                 'service_rates' => [],
                 'service_web_checkout' => 'available',
                 'service_links_by_language' => [],
-                'service_name_translations' => []
+                'service_name_translations' => [],
+                'service_enabled_days_of_the_week' => __('Everyday', 'dynamicaviation'),
+                'service_hidden_rules' => []
             ];
+
+            $starting_at = PHP_INT_MAX;
+            $starting_at_capacity = PHP_INT_MAX;
 
             if(isset($polylang))
             {
@@ -161,9 +167,24 @@ class Dynamic_Aviation_Training_Data {
                         $seats = (int) $route_row[6];
                         $max_weight = (float) $route_row[7];
 
-                        if(empty($origin_iata) || empty($destination_iata) || $origin_iata === $destination_iata || $duration_float === 0 || $seats === 0) {
+
+                        if(
+                            empty($origin_iata) 
+                            || empty($destination_iata) 
+                            || $origin_iata === $destination_iata 
+                            || !in_array($destination_airport['iata'], [$origin_iata, $destination_iata]) 
+                            || $duration_float === 0.0 
+                            || $one_way_price === 0.0 
+                            || $seats === 0) {
                             $has_invalid_cels = true;
                             continue;
+                        }
+
+
+                        if($one_way_price < $starting_at)
+                        {
+                            $starting_at = $one_way_price;
+                            $starting_at_capacity = $seats;
                         }
 
                         $origin_airport = (array_key_exists($origin_iata, $airports_data_map)) 
@@ -177,13 +198,26 @@ class Dynamic_Aviation_Training_Data {
                         if(!is_array($origin_airport) || count($origin_airport) === 0) continue;
                         if(!is_array($destination_airport) || count($destination_airport) === 0) continue;
 
-                        $output->service_rates['one_way'] = [
+                        $base_rate_arr = [
+                            'aircraft' => $aircraft_name,
                             'from' => $this->get_airport_name($origin_airport, $current_language),
                             'to' => $this->get_airport_name($destination_airport, $current_language),
-                            'price' => wrap_money_full($one_way_price),
-                            'duration' => $this->utilities->convertNumberToTime($duration_float),
-                            'duration_decimals' => $duration_float,
+                            'duration' => $this->utilities->convertNumberToTime($duration_float) . ' hrs.',
+                            'duration_decimal_hours' => $duration_float,
                         ];
+
+                        $one_way = $base_rate_arr;
+                        $round_trip = $base_rate_arr;
+                        $one_way['price'] = wrap_money_full($one_way_price);
+                        $round_trip['price'] = wrap_money_full($one_way_price * 2);
+
+                        $one_way['fees_per_person'] = ($fees_per_person > 0) ? wrap_money_full($fees_per_person): 'none';
+                        $round_trip['fees_per_person'] = ($fees_per_person > 0) ? wrap_money_full($fees_per_person * 2) : 'none';
+                        $one_way['airport_service_fee'] = ($base_fees > 0) ? wrap_money_full($base_fees): 'none';
+                        $round_trip['airport_service_fee'] = ($base_fees > 0) ? wrap_money_full($base_fees * 2) : 'none';
+
+                        $output->service_rates['one_way_charter_flight'][] = $one_way;
+                        $output->service_rates['round_trip_charter_flight'][] = $round_trip;
                     }
 
                     if($has_invalid_cels) continue;
@@ -192,6 +226,21 @@ class Dynamic_Aviation_Training_Data {
 
                 wp_reset_postdata();
             }
+
+            
+
+            $output->starting_at =  sprintf(
+                '%s one-way or %s round trip for up to %s passengers.', 
+                wrap_money_full($starting_at), wrap_money_full($starting_at*2),
+                $starting_at_capacity
+            );
+
+            $output->service_hidden_rules[] = 'SERVICE_RATES shows the total cost for the service, not the cost per person.';
+            $output->service_hidden_rules[] = 'If the client does not specify whether the transport is one-way or round trip, show prices for both (one-way and round-trip).';
+            $output->service_hidden_rules[] = 'If the client requests one-way transport, show only one-way prices.';
+            $output->service_hidden_rules[] = 'If the client requests round trip transport, show only round-trip prices.';
+            $output->service_hidden_rules[] = 'Always label prices clearly as one-way or round trip.';
+            $output->service_hidden_rules[] = 'Charter flight prices are calculated as a fixed total aircraft charter fee (price), plus mandatory airport service fees (charged per flight), plus per-person fees (charged for each passenger). One-way flights include the cost of a single charter segment, while round-trip flights include the cost of two segments (outbound and return). The total amount a customer pays will depend on the number of passengers, since per-person fees are multiplied by the passenger count and added to the base charter and airport fees.';
 
             //write_log($airports_data_map);
             
