@@ -161,11 +161,29 @@ class Dynamic_Aviation_Training_Data {
                         $seats = (int) $route_row[6];
                         $max_weight = (float) $route_row[7];
 
-                        if(empty($origin_iata) || empty($destination_iata) || $duration_float === 0 || $seats === 0) {
+                        if(empty($origin_iata) || empty($destination_iata) || $origin_iata === $destination_iata || $duration_float === 0 || $seats === 0) {
                             $has_invalid_cels = true;
                             continue;
                         }
 
+                        $origin_airport = (array_key_exists($origin_iata, $airports_data_map)) 
+                            ? $airports_data_map[$origin_iata]
+                            : $this->utilities->airport_data_by_iata($origin_iata);
+
+                        $destination_airport = (array_key_exists($destination_iata, $airports_data_map)) 
+                            ? $airports_data_map[$destination_iata]
+                            : $this->utilities->airport_data_by_iata($destination_iata);
+
+                        if(!is_array($origin_airport) || count($origin_airport) === 0) continue;
+                        if(!is_array($destination_airport) || count($destination_airport) === 0) continue;
+
+                        $output->service_rates['one_way'] = [
+                            'from' => $this->get_airport_name($origin_airport, $current_language),
+                            'to' => $this->get_airport_name($destination_airport, $current_language),
+                            'price' => wrap_money_full($one_way_price),
+                            'duration' => $this->utilities->convertNumberToTime($duration_float),
+                            'duration_decimals' => $duration_float,
+                        ];
                     }
 
                     if($has_invalid_cels) continue;
