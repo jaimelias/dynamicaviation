@@ -125,28 +125,19 @@ class Dynamic_Aviation_Utilities {
 		return $output;
 	}
 
-	public function airport_data_by_slug($query_var = '') {
+	public function airport_data_by_slug($slug = '') {
 		// Pull from query var if not provided explicitly (but don't clobber valid "0")
-		if (empty($query_var)) {
-			$fly = get_query_var('fly');
-			if (!empty($fly)) {
-				$query_var = $fly;
+
+		if (empty($slug)) {
+			$slug = get_query_var('fly');
+
+			if(empty($slug)) {
+				return null;
 			}
 		}
 
-		// Load once
-		$all_airports_data = $this->all_airports_data();
-
-		// If still no query, return the whole dataset (no second call)
-		if (empty($query_var)) {
-			return is_array($all_airports_data) ? $all_airports_data : [];
-		}
-
-		// Normalize the query to match how items are stored/compared
-		$normalized_query = $this->sanitize_pathname($query_var);
-
 		// Use a consistent, safe cache key (only in $GLOBALS)
-		$which_var = 'dy_airport_data_by_slug_' . $normalized_query;
+		$which_var = 'dy_airport_data_by_slug_' . $slug;
 		global $$which_var; 
 
 		if(isset($$which_var)) {
@@ -154,6 +145,8 @@ class Dynamic_Aviation_Utilities {
 		}
 
 		$output = [];
+		$all_airports_data = $this->all_airports_data();
+		if(!is_array($all_airports_data) || count($all_airports_data) === 0) return null;
 
 		if (!is_array($all_airports_data)) return [];
 
@@ -162,7 +155,7 @@ class Dynamic_Aviation_Utilities {
 			if (!isset($row['airport']) || !isset($row['iata'])) {
 				continue;
 			}
-			if ($normalized_query === $this->sanitize_pathname($row['airport'])) {
+			if ($slug === $this->sanitize_pathname($row['airport'])) {
 				$output = $row;
 				break; // stop on first match
 			}

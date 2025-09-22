@@ -432,7 +432,7 @@ class Dynamic_Aviation_Destinations {
 			// Canonical
 			$output .= sprintf(
 				'<link rel="canonical" href="%s" />' . "\r\n",
-				esc_url($this->utilities->normalize_url("{$home_lang}/fly/{$slug}"))
+				esc_url(normalize_url("{$home_lang}/fly/{$slug}"))
 			);
 
 			echo $output;

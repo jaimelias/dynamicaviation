@@ -221,6 +221,7 @@ class Dynamic_Aviation_Price_Table {
 							esc_html($aircraft_type)
 						);
 					} else {
+
 						$destination_url = $this->home_lang . 'fly/' . $this->utilities->sanitize_pathname($destination_slug);
 						$destination_link = sprintf(
 							'<a href="%s" title="%s">%s</a>',
@@ -239,8 +240,9 @@ class Dynamic_Aviation_Price_Table {
 
 					if (!$is_aircraft_page) {
 						$html_row .= sprintf(
-							'<td><strong><span class="dashicons dashicons-admin-users"></span> %s passengers</strong><br/><small>%s</small></td>',
+							'<td><strong><span class="dashicons dashicons-admin-users"></span> %s %s</strong><br/><small>%s</small></td>',
 							esc_html($seats),
+							esc_html(__('passengers', 'dynamicaviation')),
 							esc_html($weight_allowed)
 						);
 					}
