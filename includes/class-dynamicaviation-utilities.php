@@ -543,10 +543,6 @@ class Dynamic_Aviation_Utilities {
 
 		return $output;
 	}
-
-	public function normalize_url($url) {
-		return preg_replace('#(?<!:)/{2,}#', '/', $url);
-	}
 }
 
 

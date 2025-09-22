@@ -22,13 +22,16 @@ class Dynamic_Aviation_Price_Table {
 	{
 		$output = '';
 		$count = 0;
-		$airport_array = $this->utilities->airport_data_by_slug();
+		$slug = get_query_var('fly');
+		$airport_array = $this->utilities->airport_data_by_slug($slug);
 		$is_aircraft_page = is_singular('aircrafts');
-		$is_destination_page = get_query_var('fly');
-
+		
 		if (empty($input_iata) && !$is_aircraft_page && !empty($airport_array['iata'])) {
 			$input_iata = $airport_array['iata'];
 		}
+
+		$all_airports_data = $this->utilities->all_airports_data();
+		$current_language = current_language();
 
 		$args = array(
 			'post_type' => 'aircrafts',
@@ -51,8 +54,8 @@ class Dynamic_Aviation_Price_Table {
 
 		if ($wp_query->have_posts()) {
 			$routes = array();
-			$current_language = function_exists('current_language') ? current_language() : 'en';
-			$all_airports_data = $this->utilities->all_airports_data();
+			
+			
 
 			if (!is_array($all_airports_data)) {
 				return __('Database is not or invalid.', 'dynamicaviation');
@@ -90,19 +93,16 @@ class Dynamic_Aviation_Price_Table {
 
 				if(!is_array($table_price) || count($table_price) === 0) continue;
 
-				$aircraft_url = $this->home_lang . $post->post_type . '/' . $post->post_name;
-
 				foreach($table_price as $route_row) {
+
 					$html_row = '';
 					$destination_slug = '';
-
 					$origin_iata = $route_row[0] ?? '';
 					$destination_iata = $route_row[1] ?? '';
 					$duration_float = (float) $route_row[2];
 					$one_way_price = (float) $route_row[3];
 					$fees_per_person = (float) $route_row[4];
 					$base_fees = (float) $route_row[5];
-
 					$duration_in_hours = $this->utilities->convertNumberToTime($duration_float);
 
 					if ($input_iata) {
@@ -143,9 +143,7 @@ class Dynamic_Aviation_Price_Table {
 						);
 					}
 
-					$route_name = (!$is_destination_page)
-						? $origin_iata
-						: sprintf('%s_%s', $origin_iata, $destination_iata);
+					$route_name = (empty($slug)) ? $origin_iata : sprintf('%s_%s', $origin_iata, $destination_iata);
 
 					// Airport lookups (fast via index)
 					$dest        = isset($airports_by_iata[$destination_iata]) ? $airports_by_iata[$destination_iata] : array();
@@ -218,7 +216,7 @@ class Dynamic_Aviation_Price_Table {
 					if (!$is_aircraft_page) {
 						$html_row .= sprintf(
 							'<td><a class="strong" href="%s">%s</a><br/><small>%s</small></td>',
-							esc_url($aircraft_url),
+							esc_url(get_the_permalink()),
 							esc_html($post->post_title),
 							esc_html($aircraft_type)
 						);
