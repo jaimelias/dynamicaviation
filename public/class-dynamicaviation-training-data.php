@@ -93,7 +93,7 @@ class Dynamic_Aviation_Training_Data {
         $output = (object) [
             'service_name' =>  $service_name,
             'service_id' => $destination_airport['iata'],
-            'service_type' => 'transport',
+            'service_type' => 'charter-flight',
             'service_rates' => [],
             'service_web_checkout' => 'available',
             'service_links_by_language' => [],
