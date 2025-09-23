@@ -88,12 +88,12 @@ class Dynamic_Aviation_Training_Data {
 
         // Prefer localized name if available; otherwise fall back to "Airport, City" when different.
         $destination_airport_name = $this->get_airport_name($destination_airport, $current_language);
-        $service_name = sprintf(__('Charter Flights %s', 'dynamicaviation'), $destination_airport_name);
+        $service_name = sprintf(__('Flights %s', 'dynamicaviation'), $destination_airport_name);
 
         $output = (object) [
             'service_name' =>  $service_name,
             'service_id' => $destination_airport['iata'],
-            'service_type' => 'charter-flight',
+            'service_type' => 'transport',
             'service_rates' => [],
             'service_web_checkout' => 'available',
             'service_links_by_language' => [],
