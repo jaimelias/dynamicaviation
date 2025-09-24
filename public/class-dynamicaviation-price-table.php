@@ -31,6 +31,15 @@ class Dynamic_Aviation_Price_Table {
 		}
 
 		$all_airports_data = $this->utilities->all_airports_data();
+
+		// Build an index by IATA for O(1) lookups (replaces two O(n) scans per row)
+		$airports_by_iata = array();
+		foreach ($all_airports_data as $a) {
+			if (!empty($a['iata'])) {
+				$airports_by_iata[$a['iata']] = $a;
+			}
+		}
+
 		$current_language = current_language();
 
 		$args = array(
@@ -55,25 +64,22 @@ class Dynamic_Aviation_Price_Table {
 		if ($wp_query->have_posts()) {
 			$routes = array();
 			
-			
-
 			if (!is_array($all_airports_data)) {
-				return __('Database is not or invalid.', 'dynamicaviation');
-			}
-
-			// Build an index by IATA for O(1) lookups (replaces two O(n) scans per row)
-			$airports_by_iata = array();
-			foreach ($all_airports_data as $a) {
-				if (!empty($a['iata'])) {
-					$airports_by_iata[$a['iata']] = $a;
-				}
+				return __('Database is invalid.', 'dynamicaviation');
 			}
 
 			while ($wp_query->have_posts()) {
 				$wp_query->the_post();
 				global $post;
 
-				$base = aviation_field('aircraft_base_iata', $post->ID);
+				$base_iata = aviation_field('aircraft_base_iata', $post->ID);
+
+				if(empty($base_iata)) continue;
+
+				$base = isset($airports_by_iata[$base_iata]) ? $airports_by_iata[$base_iata] : array();
+
+				if(!is_array($base) || !array_key_exists('airport', $base)) continue;
+
 				$aircraft_type_slug = aviation_field('aircraft_type', $post->ID);
 				$aircraft_type = $this->utilities->aircraft_type($aircraft_type_slug);
 
@@ -96,7 +102,7 @@ class Dynamic_Aviation_Price_Table {
 				foreach($table_price as $route_row) {
 
 					$html_row = '';
-					$destination_slug = '';
+					$destination_airport_name = '';
 					$origin_iata = $route_row[0] ?? '';
 					$destination_iata = $route_row[1] ?? '';
 					$duration_float = (float) $route_row[2];
@@ -121,34 +127,13 @@ class Dynamic_Aviation_Price_Table {
 						continue;
 					}
 
-					// Build itinerary (same logic, simplified)
-					$request_routes = array($origin_iata, $destination_iata);
-					$diff = array_diff($request_routes, array($base)); // same as original array($base, $base)
-					$count_diff = count($diff);
-
-					if ($count_diff === 1) {
-						$itinerary = array(
-							array($origin_iata, $destination_iata),
-						);
-					} elseif ($count_diff === 2) {
-						$itinerary = array(
-							array($base, $origin_iata),
-							array($origin_iata, $destination_iata),
-							array($destination_iata, $base),
-						);
-					} else {
-						// Fallback keeps behavior predictable
-						$itinerary = array(
-							array($origin_iata, $destination_iata),
-						);
-					}
 
 					$route_name = (empty($slug)) ? $origin_iata : sprintf('%s_%s', $origin_iata, $destination_iata);
 
 					// Airport lookups (fast via index)
 					$dest        = isset($airports_by_iata[$destination_iata]) ? $airports_by_iata[$destination_iata] : array();
 					$orig        = isset($airports_by_iata[$origin_iata]) ? $airports_by_iata[$origin_iata] : array();
-					$destination_slug = isset($dest['airport']) ? $dest['airport'] : '';
+					$destination_airport_name = isset($dest['airport']) ? $dest['airport'] : '';
 					$destination_airport = isset($dest['airport']) ? $dest['airport'] : '';
 					if (!empty($dest['airport_names']) && is_array($dest['airport_names'])) {
 						$destination_airport = isset($dest['airport_names'][$current_language]) ? $dest['airport_names'][$current_language] : $destination_airport;
@@ -222,7 +207,7 @@ class Dynamic_Aviation_Price_Table {
 						);
 					} else {
 
-						$destination_url = $this->home_lang . 'fly/' . $this->utilities->sanitize_pathname($destination_slug);
+						$destination_url = $this->home_lang . 'fly/' . $this->utilities->sanitize_pathname($destination_airport_name);
 						$destination_link = sprintf(
 							'<a href="%s" title="%s">%s</a>',
 							esc_url($destination_url),
@@ -255,7 +240,23 @@ class Dynamic_Aviation_Price_Table {
 					}
 
 					$html_row .= '<td>';
-					$html_row .= sprintf('<strong>%s</strong>', esc_html(wrap_money($one_way_price)));
+
+					// simple reposition add-on (display-only)
+					$reposition_price = 0.0;
+
+					if (!empty($base_iata) && $base_iata !== $origin_iata && is_array($table_price)) {
+						foreach ($table_price as $r) {
+							if (($r[0] ?? '') === $base_iata && ($r[1] ?? '') === $origin_iata) {
+								$reposition_price = (float) ($r[3] ?? 0);
+								break;
+							}
+						}
+					}
+
+					$display_price = (float) $one_way_price + (float) $reposition_price;
+
+					$html_row .= sprintf('<strong>%s</strong>', esc_html(wrap_money($display_price)));
+
 
 					if ($fees_per_person > 0) {
 						$html_row .= sprintf(
