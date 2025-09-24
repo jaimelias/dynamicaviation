@@ -94,6 +94,7 @@ class Dynamic_Aviation_Training_Data {
             'service_name' =>  $service_name,
             'service_id' => $destination_airport['iata'],
             'service_type' => 'transport',
+            'service_categories' => ['Flights', 'Charter Flights', 'Private Jets', 'Helicopter Transfers'],
             'service_rates' => [],
             'service_web_checkout' => 'available',
             'service_links_by_language' => [],
@@ -228,6 +229,9 @@ class Dynamic_Aviation_Training_Data {
                         'to' => $this->get_airport_name($destination_airport, $current_language),
                         'duration' => $this->utilities->convertNumberToTime($duration_float) . ' hrs.',
                         'duration_decimal_hours' => $duration_float,
+                        'max_capacity' => ($max_weight > 0) 
+                            ? "{$seats} passengers or {$max_weight} pounds between passengers or luggage."
+                            : "{$seats} passengers."
                     ];
 
                     // Build both directions for one-way and round-trip
@@ -281,7 +285,8 @@ class Dynamic_Aviation_Training_Data {
         $output->service_hidden_rules[] = 'If the client requests one-way transport, show only one-way prices.';
         $output->service_hidden_rules[] = 'If the client requests round trip transport, show only round-trip prices.';
         $output->service_hidden_rules[] = 'Always label prices clearly as one-way or round trip.';
-        $output->service_hidden_rules[] = 'Charter flight prices are calculated as a fixed total aircraft charter fee (price), plus mandatory airport service fees (charged per flight), plus per-person fees (charged for each passenger). One-way flights include the cost of a single charter segment, while round-trip flights include the cost of two segments (outbound and return). The total amount a customer pays will depend on the number of passengers, since per-person fees are multiplied by the passenger count and added to the base charter and airport fees.';
+        $output->service_hidden_rules[] = 'Always include the capacity (number of passengers and weights) next to the price.';
+        $output->service_hidden_rules[] = 'Flight prices are calculated as a fixed total aircraft charter fee (price), plus mandatory airport service fees (charged per flight), plus per-person fees (charged for each passenger). One-way flights include the cost of a single charter segment, while round-trip flights include the cost of two segments (outbound and return). The total amount a customer pays will depend on the number of passengers, since per-person fees are multiplied by the passenger count and added to the base charter and airport fees.';
 
         //write_log($airports_data_map);
         
