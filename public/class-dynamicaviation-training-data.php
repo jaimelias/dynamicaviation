@@ -285,8 +285,7 @@ class Dynamic_Aviation_Training_Data {
         $output->service_hidden_rules[] = 'If the client requests one-way transport, show only one-way prices.';
         $output->service_hidden_rules[] = 'If the client requests round trip transport, show only round-trip prices.';
         $output->service_hidden_rules[] = 'Always label prices clearly as one-way or round trip.';
-        $output->service_hidden_rules[] = 'Always include the capacity (number of passengers and weights) next to the price.';
-        $output->service_hidden_rules[] = 'Always include the origin and the destination next to the name of the aircraft.';
+        $output->service_hidden_rules[] = 'Always include the origin, destination and capacity (number of passengers and weights) next to the price.';
         $output->service_hidden_rules[] = 'Flight prices are calculated as a fixed total aircraft charter fee (price), plus mandatory airport service fees (charged per flight), plus per-person fees (charged for each passenger). One-way flights include the cost of a single charter segment, while round-trip flights include the cost of two segments (outbound and return). The total amount a customer pays will depend on the number of passengers, since per-person fees are multiplied by the passenger count and added to the base charter and airport fees.';
 
         //write_log($airports_data_map);
