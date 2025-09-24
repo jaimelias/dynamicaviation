@@ -94,7 +94,7 @@ class Dynamic_Aviation_Training_Data {
             'service_name' =>  $service_name,
             'service_id' => $destination_airport['iata'],
             'service_type' => 'transport',
-            'service_categories' => ['Flights', 'Charter Flights', 'Private Jets', 'Helicopter Transfers'],
+            'service_categories' => ['Flights', 'Charter Flights', 'Private Jets', 'Helicopter Transfers', 'Air Ticket', 'Plane Ticket'],
             'service_rates' => [],
             'service_web_checkout' => 'available',
             'service_links_by_language' => [],
