@@ -95,6 +95,7 @@ class Dynamic_Aviation_Training_Data {
             'service_id' => $destination_airport['iata'],
             'service_type' => 'transport',
             'service_categories' => ['Flights', 'Charter Flights', 'Private Jets', 'Helicopter Transfers', 'Air Ticket', 'Plane Ticket'],
+            'service_aircrafts' => [],
             'service_rates' => [],
             'service_web_checkout' => 'available',
             'service_links_by_language' => [],
@@ -182,6 +183,15 @@ class Dynamic_Aviation_Training_Data {
 
                 $has_invalid_cels = false;
 
+                $aircraft_arr = [
+                    'aircraft_name' => $aircraft_name,
+                    'aircraft_base_id' => $aircraft_base_iata,
+                    'aircraft_type' => $aircraft_type
+                ];
+
+                $output->service_aircrafts[$aircraft_name] = $aircraft_arr;
+
+
                 foreach($table_price as $route_row) {
                     $origin_iata = (string) $route_row[0];
                     $destination_iata = (string) $route_row[1];
@@ -225,8 +235,10 @@ class Dynamic_Aviation_Training_Data {
 
                     $base_rate_arr = [
                         'aircraft' => $aircraft_name,
-                        'from' => $this->get_airport_name($origin_airport, $current_language),
-                        'to' => $this->get_airport_name($destination_airport, $current_language),
+                        'origin' => $this->get_airport_name($origin_airport, $current_language),
+                        'origin_id' => $origin_iata,
+                        'destination' => $this->get_airport_name($destination_airport, $current_language),
+                        'destination_id' => $destination_iata,
                         'duration' => $this->utilities->convertNumberToTime($duration_float) . ' hrs.',
                         'duration_decimal_hours' => $duration_float,
                         'max_capacity' => ($max_weight > 0) 
@@ -237,12 +249,12 @@ class Dynamic_Aviation_Training_Data {
                     // Build both directions for one-way and round-trip
                     $legs = [
                         // one-way
-                        ['bucket' => 'one_way_charter_flights',  'from' => $origin_iata, 'to' => $destination_iata, 'leg_count' => 1],
-                        ['bucket' => 'one_way_charter_flights',  'from' => $destination_iata, 'to' => $origin_iata, 'leg_count' => 1], // return of one-way
+                        ['bucket' => 'one_way_charter_flights',  'origin' => $origin_iata, 'destination' => $destination_iata, 'leg_count' => 1],
+                        ['bucket' => 'one_way_charter_flights',  'origin' => $destination_iata, 'destination' => $origin_iata, 'leg_count' => 1], // return of one-way
 
                         // round-trip
-                        ['bucket' => 'round_trip_charter_flights','from' => $origin_iata, 'to' => $destination_iata, 'leg_count' => 2],
-                        ['bucket' => 'round_trip_charter_flights','from' => $destination_iata, 'to' => $origin_iata, 'leg_count' => 2], // return of round-trip
+                        ['bucket' => 'round_trip_charter_flights','origin' => $origin_iata, 'destination' => $destination_iata, 'leg_count' => 2],
+                        ['bucket' => 'round_trip_charter_flights','origin' => $destination_iata, 'destination' => $origin_iata, 'leg_count' => 2], // return of round-trip
                     ];
 
                     foreach ($legs as $cfg) {
@@ -257,8 +269,8 @@ class Dynamic_Aviation_Training_Data {
 
                         // Nice label, e.g. "Cessna (SJO-PTY)" or "Cessna (SJO-PTY-SJO)"
                         $route = ($cfg['leg_count'] === 1)
-                            ? "{$cfg['from']}-{$cfg['to']}"
-                            : "{$cfg['from']}-{$cfg['to']}-{$cfg['from']}";
+                            ? "{$cfg['origin']}-{$cfg['destination']}"
+                            : "{$cfg['origin']}-{$cfg['destination']}-{$cfg['origin']}";
 
                         $output->service_rates[$cfg['bucket']]["{$aircraft_type} {$aircraft_name} ({$route})"] = $rate;
                     }

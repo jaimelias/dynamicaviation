@@ -610,13 +610,13 @@ msgstr "Precios por vuelo"
 
 #: public/class-dynamicaviation-destinations.php:548
 #: public/class-dynamicaviation-destinations.php:549
-msgid "Private Charter Flight"
+msgid "Charter Flight"
 msgstr "Vuelo charter privado"
 
 #: public/class-dynamicaviation-destinations.php:424
 #, php-format
 msgid ""
-"Private charter flights to %s. Jets, planes and helicopter rental services "
+"Charter Flights to %s. Jets, planes and helicopter rental services "
 "in %s."
 msgstr ""
 "Vuelos charter privados a %s. Servicio de alquiler de jets, avionetas y "

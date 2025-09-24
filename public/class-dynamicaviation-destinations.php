@@ -421,7 +421,7 @@ class Dynamic_Aviation_Destinations {
 			$output .= sprintf(
 				'<meta name="description" content="%s" />' . "\r\n",
 				esc_attr(sprintf(
-					__('Private charter flights to %s. Jets, planes and helicopter rental services in %s.', 'dynamicaviation'),
+					__('Charter Flights to %s. Jets, planes and helicopter rental services in %s.', 'dynamicaviation'),
 					$address,
 					$airport_name
 				))
@@ -545,8 +545,8 @@ class Dynamic_Aviation_Destinations {
 						),
 						'category' => esc_html(__('Charter Flights', 'dynamicaviation')),
 						'url' => esc_url($raw_url),
-						'name' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$airport),
-						'description' => esc_html(__('Private Charter Flight', 'dynamicaviation').' '.$address.'. '.__('Airplanes and helicopter rides in', 'dynamicaviation').' '.$airport.', '.$city),
+						'name' => esc_html(__('Charter Flight', 'dynamicaviation').' '.$airport),
+						'description' => esc_html(__('Charter Flight', 'dynamicaviation').' '.$address.'. '.__('Airplanes and helicopter rides in', 'dynamicaviation').' '.$airport.', '.$city),
 						'image' => [[
 							'@type' => "ImageObject",
 							'url' => $image_url,
