@@ -59,14 +59,38 @@ class Dynamic_Aviation_Destinations {
 			$airport_array = $this->utilities->airport_data_by_slug($slug);
 
 			if(!is_array($airport_array) || count($airport_array) === 0 ) {
+
+				// Evita que WP haga su redirección canónica en esta ruta
+				add_filter('redirect_canonical', '__return_false', 99);
+
+				global $wp_query;
+				if (method_exists($wp_query, 'set_404')) {
+					$wp_query->set_404();
+				}				
+
 				status_header(404);
 				nocache_headers();
+
+				// Cargar plantilla 404 y cortar
+				$template_404 = get_query_template('404');
+				if ($template_404) {
+					include $template_404;
+				}
+				exit;
 			}
 
-			write_log([
-				current_url_full(),
-				$slug
-			]);
+			$url = current_url_full();
+			$path = parse_url($url, PHP_URL_PATH);
+
+			if ($path !== '/' && substr($path, -1) === '/') {
+				$unslashed_url = normalize_url($url);
+
+				if($unslashed_url && $unslashed_url !== $url) {
+					wp_safe_redirect($unslashed_url, 301);
+					exit;
+				}
+				
+			}
 
 		}
 	}
