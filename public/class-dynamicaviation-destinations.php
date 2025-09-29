@@ -29,7 +29,7 @@ class Dynamic_Aviation_Destinations {
         add_action('wp_head', array(&$this, 'meta_tags'));
 
 		//headers
-		add_filter('template_redirect', array(&$this, 'return_404'), 999);
+		add_action('template_redirect', array(&$this, 'return_404'), 999);
 
         //minimalizr theme
         add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);
@@ -50,7 +50,7 @@ class Dynamic_Aviation_Destinations {
         $this->home_lang = home_lang();
     }
 
-	public function return_404($headers) {
+	public function return_404() {
 
 		$slug = get_query_var( 'fly' );
 
@@ -62,9 +62,13 @@ class Dynamic_Aviation_Destinations {
 				status_header(404);
 				nocache_headers();
 			}
-		}
 
-		return $headers;
+			write_log([
+				current_url_full(),
+				$slug
+			]);
+
+		}
 	}
 
 	public function admin_enqueue_scripts()
