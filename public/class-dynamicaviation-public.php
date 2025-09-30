@@ -82,7 +82,7 @@ class Dynamic_Aviation_Public {
 				{
 					$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$x]['airport']);
 					$url = '<url>';
-					$url .= '<loc>'.esc_url(home_url('fly/' .$airport_pathname)).'/</loc>';
+					$url .= '<loc>'.esc_url(normalize_url(home_url('fly/' .$airport_pathname))).'</loc>';
 					
 					if($image_pathname)
 					{
@@ -103,7 +103,7 @@ class Dynamic_Aviation_Public {
 					{
 						$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$y]['airport']);
 						$pll_url = '<url>';
-						$pll_url .= '<loc>'.esc_url(home_url($language_list[0] . '/fly/' . $airport_pathname)).'/</loc>';
+						$pll_url .= '<loc>'.esc_url(normalize_url(home_url($language_list[0] . '/fly/' . $airport_pathname))).'</loc>';
 						
 						if($image_pathname)
 						{
