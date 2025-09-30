@@ -932,15 +932,7 @@ if(!function_exists('dy_date'))
 
 if(!function_exists('normalize_url')) {
 	function normalize_url($url) {
-		// Collapse multiple slashes, but preserve ://
-		$url = preg_replace('#(?<!:)/{2,}#', '/', $url);
-
-		// Remove trailing slash if it exists (but not if it's just "http://domain/")
-		if (strlen($url) > 1 && substr($url, -1) === '/') {
-			$url = rtrim($url, '/');
-		}
-
-		return $url;
+		return preg_replace('#(?<!:)/{2,}#', '/', $url);
 	}
 }
 
