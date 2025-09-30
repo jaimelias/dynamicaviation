@@ -16,7 +16,7 @@ class Dynamic_Aviation_Public {
 		$this->plugin_dir_url = plugin_dir_url( __FILE__ );
 		$this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
 		add_action('init', array(&$this, 'init'));
-		add_filter('minimal_sitemap', array(&$this, 'sitemap'), 10);
+		add_filter('dy_sitemap', array(&$this, 'sitemap'), 10);
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
 		add_action('wp_head', array(&$this, 'plugin_public_args'));
