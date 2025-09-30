@@ -54,79 +54,75 @@ class Dynamic_Aviation_Public {
 
 	public function sitemap($sitemap)
 	{
-		if(isset($_GET['minimal-sitemap']))
+		if(!empty($sitemap)) return $sitemap;
+
+		global $polylang;
+
+		if(isset($polylang))
 		{
-			if($_GET['minimal-sitemap'] == 'airports')
+			$languages = $this->get_languages;
+			$language_list = array();
+			
+			for($x = 0; $x < count($languages); $x++)
 			{
-				global $polylang;
-
-				if(isset($polylang))
+				if($languages[$x] != default_language())
 				{
-					$languages = $this->get_languages;
-					$language_list = array();
-					
-					for($x = 0; $x < count($languages); $x++)
-					{
-						if($languages[$x] != default_language())
-						{
-							$language_list[] = $languages[$x];
-						}
-					}					
+					$language_list[] = $languages[$x];
 				}
-				
-				$urllist = null;
-				$all_airports = $this->utilities->all_airports_data();
-				$image_pathname = apply_filters('dy_aviation_image_pathname', '');
-				
-				for($x = 0; $x < count($all_airports); $x++)
-				{
-					$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$x]['airport']);
-					$url = '<url>';
-					$url .= '<loc>'.esc_url(normalize_url(home_url('fly/' .$airport_pathname))).'</loc>';
-					
-					if($image_pathname)
-					{
-						$url .= '<image:image>';
-						$url .= '<image:loc>'.esc_url(home_url($image_pathname . '/' . $airport_pathname)).'.png</image:loc>';
-						$url .= '</image:image>';
-					}
-
-					$url .= '<mobile:mobile/>';
-					$url .= '<changefreq>weekly</changefreq>';
-					$url .= '</url>';
-					$urllist .= $url;					
-				}
-				
-				if(count($language_list) > 0)
-				{
-					for($y = 0; $y < count($all_airports); $y++)
-					{
-						$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$y]['airport']);
-						$pll_url = '<url>';
-						$pll_url .= '<loc>'.esc_url(normalize_url(home_url($language_list[0] . '/fly/' . $airport_pathname))).'</loc>';
-						
-						if($image_pathname)
-						{
-							$pll_url .= '<image:image>';
-							$pll_url .= '<image:loc>'.esc_url(home_url($image_pathname . '/' . $airport_pathname)).'.png</image:loc>';
-							$pll_url .= '</image:image>';
-						}
-
-						$pll_url .= '<mobile:mobile/>';
-						$pll_url .= '<changefreq>weekly</changefreq>';
-						$pll_url .= '</url>';
-						$urllist .= $pll_url;					
-					}					
-				}
-				
-				$sitemap =  '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-				$sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-				xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
-				xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
-				$sitemap .= $urllist;
-				$sitemap .= '</urlset>';
 			}
 		}
+		
+		$urllist = null;
+		$all_airports = $this->utilities->all_airports_data();
+		$image_pathname = apply_filters('dy_aviation_image_pathname', '');
+		
+		for($x = 0; $x < count($all_airports); $x++)
+		{
+			$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$x]['airport']);
+			$url = '<url>';
+			$url .= '<loc>'.esc_url(normalize_url(home_url('fly/' .$airport_pathname))).'</loc>';
+			
+			if($image_pathname)
+			{
+				$url .= '<image:image>';
+				$url .= '<image:loc>'.esc_url(home_url($image_pathname . '/' . $airport_pathname)).'.png</image:loc>';
+				$url .= '</image:image>';
+			}
+
+			$url .= '<mobile:mobile/>';
+			$url .= '<changefreq>weekly</changefreq>';
+			$url .= '</url>';
+			$urllist .= $url;					
+		}
+		
+		if(count($language_list) > 0)
+		{
+			for($y = 0; $y < count($all_airports); $y++)
+			{
+				$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$y]['airport']);
+				$pll_url = '<url>';
+				$pll_url .= '<loc>'.esc_url(normalize_url(home_url($language_list[0] . '/fly/' . $airport_pathname))).'</loc>';
+				
+				if($image_pathname)
+				{
+					$pll_url .= '<image:image>';
+					$pll_url .= '<image:loc>'.esc_url(home_url($image_pathname . '/' . $airport_pathname)).'.png</image:loc>';
+					$pll_url .= '</image:image>';
+				}
+
+				$pll_url .= '<mobile:mobile/>';
+				$pll_url .= '<changefreq>weekly</changefreq>';
+				$pll_url .= '</url>';
+				$urllist .= $pll_url;					
+			}					
+		}
+		
+		$sitemap =  '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+		$sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+		xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
+		xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
+		$sitemap .= $urllist;
+		$sitemap .= '</urlset>';
 
 		return $sitemap;
 	}
