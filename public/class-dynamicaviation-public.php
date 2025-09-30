@@ -156,7 +156,7 @@ class Dynamic_Aviation_Public {
 
 		$dep = array('jquery', 'dy-core-utilities');
 		
-		if(isset($dy_aviation_load_algolia) && !isset($_GET['fl_builder']))
+		if(isset($dy_aviation_load_algolia) && empty(secure_get('fl_builder')))
 		{
 			array_push($dep, 'algolia', 'picker-date-js', 'picker-time-js');
 			wp_enqueue_script('algolia', $this->plugin_dir_url.'js/algoliasearch.min.js', array( 'jquery' ), '3.32.0', true );

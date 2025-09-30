@@ -32,10 +32,15 @@ class Dynamic_Aviation_Training_Data {
 
     public function  single_file_headers($headers)
     {
-        if(get_query_var( 'fly' ) && isset($_GET['training-data'])) {
 
-            if(isset($_GET['format']) && in_array($_GET['format'],  $this->alt_formats)) {
-                $this->format = sanitize_text_field($_GET['format']);
+
+        if(!empty(secure_get('fly')) && isset($_GET['training-data'])) {
+
+
+            $format = secure_get('format');
+
+            if(!empty($format) && in_array($format,  $this->alt_formats)) {
+                $this->format = $format;
                 $this->content_type = $this->all_content_types[$this->format];
                 $this->extension = $this->all_extensions[$this->format];
             }
