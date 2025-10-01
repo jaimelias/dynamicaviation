@@ -332,13 +332,13 @@ class Dynamic_Aviation_Utilities {
 			if(isset($_POST['hash']))
 			{
 				$str = '';
-				$hash_param = sanitize_text_field($_POST['hash']);
+				$hash_param = secure_post('hash');
 
 				for($x = 0; $x < count($param_names); $x++)
 				{
 					if(isset($_POST[$param_names[$x]]))
 					{
-						$str .= sanitize_text_field($_POST[$param_names[$x]]);
+						$str .= secure_post($param_names[$x]);
 					}
 					else
 					{
@@ -422,14 +422,10 @@ class Dynamic_Aviation_Utilities {
 		}
 		else
 		{
-			$not_set_params = array();
-			$invalid_params = array();
+			$not_set_params = [];
+			$invalid_params = [];
 
-			$round_trip = (isset($_POST['aircraft_flight'])) 
-				? (intval($_POST['aircraft_flight']) === 1)
-				? true
-				: false
-				: false;
+			$round_trip = secure_post('aircraft_flight', 0, 'absint') === 1;
 
 			for($x = 0; $x < count($param_names); $x++)
 			{
@@ -441,7 +437,7 @@ class Dynamic_Aviation_Utilities {
 				}
 				else
 				{
-					$value = sanitize_text_field($_POST[$param]);
+					$value = secure_post($param);
 
 					if($param === 'email')
 					{
@@ -452,7 +448,7 @@ class Dynamic_Aviation_Utilities {
 					}
 					else if($param === 'repeat_email')
 					{
-						if(!is_email($value) || $value !== sanitize_text_field($_POST['email']))
+						if(!is_email($value) || $value !== secure_post('email'))
 						{
 							$invalid_params[] = $param;
 						}
@@ -500,7 +496,7 @@ class Dynamic_Aviation_Utilities {
 					}
 					else
 					{
-						if(empty($_POST[$param]))
+						if(empty(secure_post($param)))
 						{
 							$invalid_params[] = $param;
 						}

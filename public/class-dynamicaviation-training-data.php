@@ -32,10 +32,7 @@ class Dynamic_Aviation_Training_Data {
 
     public function  single_file_headers($headers)
     {
-
-
         if(!empty(secure_get('fly')) && isset($_GET['training-data'])) {
-
 
             $format = secure_get('format');
 
