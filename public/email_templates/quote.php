@@ -1,7 +1,7 @@
 <?php
 
 $transport_title = __('Charter Flight', 'dynamicaviation');
-$this_id = sanitize_text_field($_POST['post_id']);
+$this_id = secure_post('aircraft_id', 0);
 $title = sanitize_text_field($_POST['title']);
 $aircraft_seats = sanitize_text_field($_POST['aircraft_seats']);
 $aircraft_weight = sanitize_text_field($_POST['aircraft_weight']);

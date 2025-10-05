@@ -346,7 +346,7 @@ class Dynamic_Aviation_Estimate_Table {
         $flight_array = [
             'charter_price'  => $charter_price,
             'title'  => $post->post_title,
-            'post_id'   => $post->ID,
+            'aircraft_id'   => $post->ID,
             'aircraft_seats'  => $seats,
             'aircraft_weight' => $weight_allowed,
             'aircraft_url' => $aircraft_url,

@@ -130,14 +130,22 @@ class Dynamic_Aviation_Estimate_Confirmation
 
 	public function subject($output)
 	{
-		if(!isset($_POST['post_id']))
+		if(post_has('aircraft_id'))
 		{
-			$output = sprintf(__('%s, Your request has been sent to our specialists at %s!', 'dynamicaviation'), sanitize_text_field($_POST['first_name']), $this->site_name);
-		}
-		else
-		{
-			$price = money(sanitize_text_field($_POST['charter_price']));
-			$output = sprintf(__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), sanitize_text_field($_POST['first_name']), $this->site_name, $price);
+
+			$price = money(secure_post('charter_price', 0));
+			$output = sprintf(
+				__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), 
+				secure_post('first_name'), $this->site_name, $price
+			);
+
+		} else {
+
+			$output = sprintf(
+				__('%s, Your request has been sent to our specialists at %s!', 'dynamicaviation'), 
+				secure_post('first_name'), $this->site_name
+			);
+
 		}
 
 		return $output;
@@ -156,20 +164,20 @@ class Dynamic_Aviation_Estimate_Confirmation
 				$data['lang'] = $this->current_language;
 				$notes = apply_filters('dy_aviation_estimate_notes', '');
 				$subject = apply_filters('dy_aviation_estimate_subject', '');
-				$price = isset($_POST['post_id']) 
-					? money(sanitize_text_field($_POST['charter_price']))
+				$price = (post_has('aircraft_id')) 
+					? money(secure_post('charter_price', 0))
 					: 0;
 				
-				if(!isset($_POST['post_id']))
-				{
-					require_once( $this->plugin_dir_path . 'public/email_templates/general.php');
-				}
-				else
+				if(post_has('aircraft_id'))
 				{
 					require_once($this->plugin_dir_path . 'public/email_templates/quote.php');
 				}
+				else
+				{
+					require_once( $this->plugin_dir_path . 'public/email_templates/general.php');
+				}
 
-				wp_mail(sanitize_email($_POST['email']), $subject, $email_template);
+				wp_mail(secure_post('email', '', 'sanitize_email'), $subject, $email_template);
 
 				$GLOBALS[$which_var] = true;
 			}
