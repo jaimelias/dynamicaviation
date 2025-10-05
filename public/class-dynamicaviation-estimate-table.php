@@ -307,7 +307,7 @@ class Dynamic_Aviation_Estimate_Table {
 
     public function iterate_rows($post, $table_price)
     {
-        $aircraft_url   = esc_url($this->home_lang . $post->post_type . '/' . $post->post_name);
+        $aircraft_url   = esc_url(normalize_url($this->home_lang .'/'. $post->post_type . '/' . $post->post_name));
         $thumbnail   = get_the_post_thumbnail(
             $post->ID,
             [100, 100],
@@ -444,7 +444,7 @@ class Dynamic_Aviation_Estimate_Table {
 
             <div id="aircraft_booking_container" class="<?php echo ($hide_contact_form) ? 'hidden' : ''; ?> animate-fade">
 
-                <form data-method="post" id="aircraft_booking_request" data-hash-params="<?php echo esc_attr(implode(',', $this->utilities->request_form_hash_param_names()));?>" data-nonce="slug" data-action="<?php echo esc_attr(base64_encode($this->home_lang.'request_submitted'));?>">
+                <form data-method="post" id="aircraft_booking_request" data-hash-params="<?php echo esc_attr(implode(',', $this->utilities->request_form_hash_param_names()));?>" data-nonce="slug" data-action="<?php echo esc_attr((normalize_url($this->home_lang.'/request_submitted')));?>">
 
                     <div class="modal-header clearfix">
                         <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php echo esc_html(__('Request a Quote', 'dynamicaviation')); ?></h3>

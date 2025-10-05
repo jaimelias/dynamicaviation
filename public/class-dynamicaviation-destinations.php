@@ -47,7 +47,6 @@ class Dynamic_Aviation_Destinations {
         $this->site_name = get_bloginfo('name');
 		$this->get_languages = get_languages();
         $this->current_language = current_language();		
-        $this->home_lang = home_lang();
     }
 
 	public function return_404() {

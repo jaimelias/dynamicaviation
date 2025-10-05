@@ -207,7 +207,7 @@ class Dynamic_Aviation_Price_Table {
 						);
 					} else {
 
-						$destination_url = $this->home_lang . 'fly/' . $this->utilities->sanitize_pathname($destination_airport_name);
+						$destination_url = normalize_url($this->home_lang . '/fly/' . $this->utilities->sanitize_pathname($destination_airport_name));
 						$destination_link = sprintf(
 							'<a href="%s" title="%s">%s</a>',
 							esc_url($destination_url),
