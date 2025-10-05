@@ -564,7 +564,7 @@ class Dynamic_Aviation_Destinations {
 					$raw_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 					$image_url = esc_url($this->utilities->airport_img_url($airport_array));
 
-					$arr = array(
+					$product = array(
 						'@context' => 'https://schema.org/',
 						'@type' => 'Product',
 						'brand' => array(
@@ -607,7 +607,8 @@ class Dynamic_Aviation_Destinations {
 						$offers['highPrice'] = money(max($prices), '.', '');					
 					}
 					
-					$arr['offers'] = $offers;				
+					$product['offers'] = $offers;
+					$arr[] = $product;	
 				}				
 			}
 		}
