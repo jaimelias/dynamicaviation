@@ -607,7 +607,7 @@ class Dynamic_Aviation_Destinations {
 					}
 					
 					$product['offers'] = $offers;
-					$arr[] = $product;	
+					$arr['flight'] = $product;	
 				}				
 			}
 		}
