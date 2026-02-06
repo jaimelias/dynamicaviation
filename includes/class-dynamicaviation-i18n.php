@@ -48,7 +48,10 @@ class Dynamic_Aviation_i18n {
 			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);
 
-		pll_register_string('charter_flights', 'Charter Flights %s', $this->domain);
+		if(function_exists('pll_register_string')) {
+			pll_register_string('charter_flights', 'Charter Flights %s', $this->domain);
+		}
+		
 	}
 
 	/**
