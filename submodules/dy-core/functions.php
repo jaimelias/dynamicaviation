@@ -383,7 +383,11 @@ if(!function_exists('validate_turnstile'))
 		}
 
 		$GLOBALS[$cache_key] = false;
-		
+
+		/*
+		 * Compatibility mode keeps the reCAPTCHA field name.
+		 * Change this to cf-turnstile-response only during Phase 2.
+		 */
 		$token = secure_post('cf-turnstile-response');
 
 		if(empty($token))
