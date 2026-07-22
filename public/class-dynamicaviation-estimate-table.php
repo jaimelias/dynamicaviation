@@ -503,10 +503,18 @@ class Dynamic_Aviation_Estimate_Table {
                     </div>
                     
                     <?php if(get_option('dy_cf_turnstile_site_key')): ?>
-                            <div 
+                            <div
+                                class="cf-turnstile"
                                 data-sitekey="<?php echo esc_attr(get_option('dy_cf_turnstile_site_key')); ?>"
-                                class="cf-turnstile" ></div>
-                            <button type="button" onClick="validateAviationEstimateRequest(); return false;" class="pure-button pure-button-primary" ><span class="dashicons dashicons-airplane"></span> <?php echo esc_html(__('Send Request', 'dynamicaviation'));?></button>	
+                                data-retry="auto"
+                                data-refresh-expired="auto">
+                            </div>
+                            <button 
+                                type="button" 
+                                onClick="validateAviationEstimateRequest(); return false;" 
+                                class="pure-button pure-button-primary" >
+                                <span class="dashicons dashicons-airplane"></span> <?php echo esc_html(__('Send Request', 'dynamicaviation'));?>
+                            </button>	
                     <?php endif; ?>
 
                 </form>

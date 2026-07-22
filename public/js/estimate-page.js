@@ -4,10 +4,22 @@ jQuery(() => {
 
 
 // leave all function for algolia
-async function validateAviationEstimateRequest (token) {
+const validateAviationEstimateRequest  = () => {
 	
 	let invalids = [];
 	const thisForm = jQuery('#aircraft_booking_request');
+
+	//Because the widget is inside #dy_package_request_form, Turnstile creates "cf-turnstile-response" field
+	const turnstileToken = thisForm
+		.find('[name="cf-turnstile-response"]')
+		.val();
+
+	if(!turnstileToken)
+	{
+		console.warn('Turnstile token is missing or expired.');
+		return false;
+	}
+
 	const inputs = jQuery(thisForm).find('input').add('select').add('textarea');
 	const isOneWay = (parseInt(jQuery(thisForm).find('input[name="aircraft_flight"]').val()) === 0) ? true : false;
 	const requiredOnRoundTrip = ['end_date', 'end_time', 'end_itinerary'];
