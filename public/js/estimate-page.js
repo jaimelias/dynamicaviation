@@ -89,7 +89,11 @@ async function validateAviationEstimateRequest (token) {
 	else
 	{
 		console.log({invalids});
-		grecaptcha.reset();
+
+		if(typeof turnstile !== 'undefined')
+		{
+			turnstile.reset();
+		}
 	}
 }
 

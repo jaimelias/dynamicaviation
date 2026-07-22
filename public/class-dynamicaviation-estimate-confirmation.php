@@ -44,7 +44,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 		$this->get_languages = get_languages();
 		$this->site_name = get_bloginfo('name');
 		$this->current_language = current_language();
-		$this->valid_recaptcha = validate_recaptcha();
+		$this->valid_turnstile = validate_turnstile();
     }	
 
 	public function add_rewrite_rule()
@@ -198,7 +198,7 @@ class Dynamic_Aviation_Estimate_Confirmation
 		{
 			if(get_query_var($this->pathname))
 			{
-				if($this->valid_recaptcha)
+				if($this->valid_turnstile)
 				{
 					$param_names = $this->utilities->request_form_hash_param_names();
 

@@ -502,8 +502,11 @@ class Dynamic_Aviation_Estimate_Table {
                         <?php echo $this->obj_to_inputs(); ?>
                     </div>
                     
-                    <?php if(get_option('dy_recaptcha_site_key')): ?>
-                            <button data-badge="bottomleft" data-callback="validateAviationEstimateRequest" class="g-recaptcha pure-button pure-button-primary" data-sitekey="<?php echo esc_attr(get_option('dy_recaptcha_site_key')); ?>" data-action='estimate'><span class="dashicons dashicons-airplane"></span> <?php echo esc_html(__('Send Request', 'dynamicaviation'));?></button>	
+                    <?php if(get_option('dy_cf_turnstile_site_key')): ?>
+                            <div 
+                                data-sitekey="<?php echo esc_attr(get_option('dy_cf_turnstile_site_key')); ?>"
+                                class="cf-turnstile" ></div>
+                            <button type="button" onClick="validateAviationEstimateRequest(); return false;" class="pure-button pure-button-primary" ><span class="dashicons dashicons-airplane"></span> <?php echo esc_html(__('Send Request', 'dynamicaviation'));?></button>	
                     <?php endif; ?>
 
                 </form>
