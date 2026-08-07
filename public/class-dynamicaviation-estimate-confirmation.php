@@ -177,7 +177,14 @@ class Dynamic_Aviation_Estimate_Confirmation
 					require_once( $this->plugin_dir_path . 'public/email_templates/general.php');
 				}
 
-				wp_mail(secure_post('email', '', 'sanitize_email'), $subject, $email_template);
+				$headers = array('Content-Type: text/html; charset=UTF-8');
+
+				wp_mail(
+					secure_post('email', '', 'sanitize_email'),
+					$subject,
+					$email_template,
+					$headers
+				);
 
 				$GLOBALS[$which_var] = true;
 			}
