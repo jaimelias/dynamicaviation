@@ -262,7 +262,12 @@ const algolia_execute = () => {
 
 					const localize = ['airport', 'city'];
 
-					let {country_names, country_code, _highlightResult, iata} = suggestion;
+					let {
+						country_names,
+						country_code,
+						_highlightResult,
+						iata
+					} = suggestion;
 
 					localize.forEach(k => {
 
@@ -282,83 +287,135 @@ const algolia_execute = () => {
 					});
 
 
-					const {airport, iata: _iata, city} = _highlightResult;
+					const {
+						airport,
+						iata: _iata,
+						city
+					} = _highlightResult;
 
-					const country = (country_names.hasOwnProperty(lang)) ? country_names[lang] : null;
-					let flag_url = String(jsonsrc() + "img/flags/" + country_code + '.svg').toLowerCase();
-					const result = jQuery('<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> <strong class="iata"></strong></div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>');
-					result.find('.sairport > .airport').html(airport.value);
+					const country = country_names?.hasOwnProperty(lang)
+						? country_names[lang]
+						: null;
+
+					const flag_url = String(
+						jsonsrc() + "img/flags/" + country_code + '.svg'
+					).toLowerCase();
+
+					const result = jQuery(
+						'<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> <strong class="iata"></strong></div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>'
+					);
+
+					result.find('.sairport > .airport').html(airport?.value || '');
 					
-					if(iata.length === 3)
+					if(iata?.length === 3)
 					{
-						result.find('.sairport > .iata').html(`(${_iata.value})`);
+						result.find('.sairport > .iata').html(`(${_iata?.value || iata})`);
 					}
 					
-					result.find('.slocation > .city').html(city.value);
-					result.find('.slocation > .country').html(country);
+					result.find('.slocation > .city').html(city?.value || '');
+					result.find('.slocation > .country').html(country || '');
 					result.find('.sflag > img').attr({
-						'src': flag_url
+						src: flag_url
 					});
+
 					return result.html();
 				}
 			}
 		}]).on('autocomplete:selected', function(event, suggestion) {
 			
+			let {
+				iata,
+				icao,
+				airport,
+				airport_names,
+				city,
+				city_names,
+				country_code,
+				_geoloc
+			} = suggestion;
 
-			let {iata, icao, airport, airport_names, city, country_code, _geoloc} = suggestion;
+			if(airport_names?.hasOwnProperty(lang))
+			{
+				airport = airport_names[lang];
+			}
 
-			airport = (typeof airport_names !== 'undefined')
-				? (airport_names.hasOwnProperty(lang)) 
-				? airport_names[lang] 
-				: airport
-				: airport;
+			if(city_names?.hasOwnProperty(lang))
+			{
+				city = city_names[lang];
+			}
+
+			const locationField = thisForm.find(
+				'#' + thisField.attr('id') + '_l'
+			);
 			
-			thisForm
-				.find('#'+thisField.attr('id')+'_l')
-				.val(`${airport}${icao || iata.length === 3 ? ' ('+ iata + ')':  ''}, ${city}, ${country_code}`);
+			locationField.val(
+				`${airport}${iata?.length === 3 ? ` (${iata})` : ''}, ${city}, ${country_code}`
+			);
 			
 			thisField.attr({
 				'data-iata': iata,
-				'data-lat': _geoloc.lat,
-				'data-lon': _geoloc.lng
-			}).addClass('aircraft_selected').val(iata);
+				'data-lat': _geoloc?.lat,
+				'data-lon': _geoloc?.lng
+			})
+			.addClass('aircraft_selected')
+			.val(iata);
 
-			thisField.blur(() => {
-				if (thisField.hasClass('aircraft_selected'))
-				{
-					thisField.val(iata);
-				}
-				else
-				{
+			/*
+			 * Prevent adding the handlers again after
+			 * every autocomplete selection.
+			 */
+			thisField
+				.off('blur.aircraft')
+				.on('blur.aircraft', () => {
+
+					if(thisField.hasClass('aircraft_selected'))
+					{
+						thisField.val(
+							thisField.attr('data-iata')
+						);
+					}
+					else
+					{
+						thisField.val('');
+						locationField.val('');
+
+						thisField
+							.removeClass('aircraft_selected')
+							.addClass('invalid_field')
+							.removeAttr('data-iata')
+							.removeAttr('data-lat')
+							.removeAttr('data-lon');
+					}
+				});
+
+			thisField
+				.off('focus.aircraft')
+				.on('focus.aircraft', () => {
+
 					thisField.val('');
-					thisField.removeClass('aircraft_selected');
-					thisField.addClass('invalid_field');
-					thisField.removeAttr('data-iata');
-					thisField.removeAttr('data-lat');
-					thisField.removeAttr('data-lon');						
-				}
-			});
-				
-			thisField.focus(() => {
-				thisField.val('');
-				thisField.removeClass('aircraft_selected');
-				thisField.removeClass('invalid_field');
-				thisField.removeAttr('data-iata');
-				thisField.removeAttr('data-lat');
-				thisField.removeAttr('data-lon');
-			});					
+					locationField.val('');
+
+					thisField
+						.removeClass('aircraft_selected invalid_field')
+						.removeAttr('data-iata')
+						.removeAttr('data-lat')
+						.removeAttr('data-lon');
+				});
+
+			const selected = thisForm.find('.aircraft_selected').length;
 					
-			if(thisForm.find('.aircraft_selected').length == 1)
+			if(selected === 1)
 			{
-				jQuery('.aircraft_list').not('.aircraft_selected').focus();
+				thisForm
+					.find('.aircraft_list')
+					.not('.aircraft_selected')
+					.focus();
 			}
-			if(thisForm.find('.aircraft_selected').length == 2)
+			else if(selected === 2)
 			{
-				thisForm.find('input[name="pax_num"]').focus();
-			}
-			else
-			{
-				thisField.blur();
+				thisForm
+					.find('input[name="pax_num"]')
+					.focus();
 			}
 			
 		}).on('autocomplete:closed', function(){
@@ -371,4 +428,4 @@ const algolia_execute = () => {
 		});
 	});
 
-}
+};
