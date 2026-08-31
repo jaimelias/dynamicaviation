@@ -22,14 +22,16 @@ const aircraft_datepicker = () =>	{
 
 	jQuery('form.aircraft_search_form').find('input.datepicker').each(function(){
 		
-		if(jQuery(this).attr('type') == 'text')
+		const thisField = jQuery(this);
+
+		if(thisField.attr('type') == 'text')
 		{
-			jQuery(this).pickadate(args);
+			thisField.pickadate(args);
 		}
-		else if(jQuery(this).attr('type') == 'date')
+		else if(thisField.attr('type') == 'date')
 		{
-			jQuery(this).attr({'type': 'text'});
-			jQuery(this).pickadate(args);
+			thisField.attr({'type': 'text'});
+			thisField.pickadate(args);
 		}	
 	});
 }
@@ -40,51 +42,51 @@ const validateAircraftSearch = () => {
 	jQuery('.aircraft_search_form').each(function(){
 		
 		const thisForm = jQuery(this);
-		const excludeArr = ['end_date', 'end_time'];
-		const button = jQuery(thisForm).find('#aircraft_search_button');
+		const requireReturn = ['end_date', 'end_time'];
+		const button = thisForm.find('#aircraft_search_button');
 
 		jQuery(button).click(async () => {
 			let invalid_field = [];
-			const formData = jQuery(thisForm).serializeArray();
+			const formData = thisForm.serializeArray();
 
 			formData.forEach(o => {
 				const {name, value} = o;
-				const thisField = jQuery(`[name="${name}"]`);
+				const thisField = thisForm.find(`[name="${name}"]`);
 
 				if(value === '')
 				{
-					if(jQuery('#aircraft_flight').val() == 0 && excludeArr.includes(name))
+					if(jQuery('#aircraft_flight').val() == 0 && requireReturn.includes(name))
 					{
-						jQuery(thisField).removeClass('invalid_field');
+						thisField.removeClass('invalid_field');
 					}
 					else if(name.endsWith('_submit'))
 					{
 						//fix date picke bug that adds end_date_submit and end_hour_submit
-						jQuery(thisField).removeClass('invalid_field');
+						thisField.removeClass('invalid_field');
 					}
 					else
 					{
 						invalid_field.push(name);
-						jQuery(thisField).addClass('invalid_field');
+						thisField.addClass('invalid_field');
 					}
 				}
 				else
 				{
-					if(jQuery(thisField).hasClass('aircraft_list'))
+					if(thisField.hasClass('aircraft_list'))
 					{
-						if(!jQuery(thisField).hasClass('aircraft_selected'))
+						if(!thisField.hasClass('aircraft_selected'))
 						{
 							invalid_field.push(name);
-							jQuery(thisField).addClass('invalid_field');
+							thisField.addClass('invalid_field');
 						}
 						else
 						{
-							jQuery(thisField).removeClass('invalid_field');
+							thisField.removeClass('invalid_field');
 						}
 					}
 					else
 					{
-						jQuery(thisField).removeClass('invalid_field');
+						thisField.removeClass('invalid_field');
 					}
 				}			
 
@@ -92,9 +94,6 @@ const validateAircraftSearch = () => {
 
 			if(invalid_field.length === 0)
 			{
-				let today = new Date();
-				today.setDate(today.getDate() - 2);
-				today = Date.parse(today);
 				
 				if(typeof gtag !== 'undefined')
 				{
