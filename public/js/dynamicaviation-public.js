@@ -8,7 +8,7 @@ jQuery(() => {
 });
 
 const aircraft_timepicker = () =>	{
-	jQuery('form.aircraft_search_form').find('input.timepicker').each(function(){
+	jQuery('#aircraft_search_form').find('input.timepicker').each(function(){
 		jQuery(this).pickatime();
 	});
 }
@@ -20,7 +20,7 @@ const aircraft_datepicker = () =>	{
 		min: true
 	};
 
-	jQuery('form.aircraft_search_form').find('input.datepicker').each(function(){
+	jQuery('#aircraft_search_form').find('input.datepicker').each(function(){
 		
 		const thisField = jQuery(this);
 
@@ -39,142 +39,218 @@ const aircraft_datepicker = () =>	{
 
 
 const validateAircraftSearch = () => {
-	jQuery('.aircraft_search_form').each(function(){
-		
-		const thisForm = jQuery(this);
-		const requireReturn = ['end_date', 'end_time'];
-		const button = thisForm.find('#aircraft_search_button');
 
-		jQuery(button).click(async () => {
-			let invalid_field = [];
-			const formData = thisForm.serializeArray();
+	const thisForm = jQuery('#aircraft_search_form');
 
-			formData.forEach(o => {
-				const {name, value} = o;
-				const thisField = thisForm.find(`[name="${name}"]`);
+	if(thisForm.length === 0) {
+		return;
+	}
 
-				if(value === '')
-				{
-					if(jQuery('#aircraft_flight').val() == 0 && requireReturn.includes(name))
-					{
-						thisField.removeClass('invalid_field');
-					}
-					else if(name.endsWith('_submit'))
-					{
-						//fix date picke bug that adds end_date_submit and end_hour_submit
-						thisField.removeClass('invalid_field');
-					}
-					else
-					{
-						invalid_field.push(name);
-						thisField.addClass('invalid_field');
-					}
-				}
-				else
-				{
-					if(thisField.hasClass('aircraft_list'))
-					{
-						if(!thisField.hasClass('aircraft_selected'))
-						{
-							invalid_field.push(name);
-							thisField.addClass('invalid_field');
-						}
-						else
-						{
-							thisField.removeClass('invalid_field');
-						}
-					}
-					else
-					{
-						thisField.removeClass('invalid_field');
-					}
-				}			
+	const optionalReturnFields = new Set([
+		'end_date',
+		'end_time',
+		'end_hour'
+	]);
 
-			});
+	const button = thisForm.find('#aircraft_search_button');
 
-			if(invalid_field.length === 0)
-			{
-				
-				if(typeof gtag !== 'undefined')
-				{
-					const origin = jQuery('#aircraft_origin').val();
-					const destination = jQuery('#aircraft_destination').val();
-					const paxNum = parseInt(jQuery('#pax_num').val());
-					const legs = parseInt(jQuery('#aircraft_flight').val()) + 1;
+	const getFieldsByName = name => {
+		return thisForm.find('[name]').filter((_, field) => field.name === name);
+	};
 
-					//send to analytics only
-					gtag('event', 'flight_pax_num', {
-						value: paxNum
-					});
+	const isEmpty = value => {
+		if(Array.isArray(value)) {
+			return value.length === 0;
+		}
 
-					gtag('event', 'flight_legs', {
-						value: legs
-					});
+		return value == null || String(value).trim() === '';
+	};
 
-					gtag('event', 'flight_origin', {
-						origin_name: origin
-					});
+	const validateAndSubmit = e => {
 
-					gtag('event', 'flight_destination', {
-						destination_name: destination
-					});
+		e.preventDefault();
 
-					gtag('event', 'flight_route', {
-						route_name: `${origin}_${destination}`
-					});
-				}
+		const invalidFields = new Set();
 
-				if(typeof fbq !== 'undefined')
-				{
-					fbq('track', 'Search');
-				}
+		thisForm.find('.invalid_field').removeClass('invalid_field');
 
-				createFormSubmit(thisForm);
+		const aircraftFlightField = thisForm.find('#aircraft_flight');
+		const aircraftFlightVal = Number.parseInt(aircraftFlightField.val(), 10);
+		const isOneWay = aircraftFlightVal === 0;
+
+		if(
+			aircraftFlightField.length === 0 ||
+			!Number.isInteger(aircraftFlightVal)
+		) {
+			invalidFields.add('aircraft_flight');
+			aircraftFlightField.addClass('invalid_field');
+		}
+
+		const formData = thisForm.serializeArray();
+
+		formData.forEach(({name, value}) => {
+
+			const thisField = getFieldsByName(name);
+
+			// Datepicker-generated shadow fields.
+			if(name.endsWith('_submit')) {
+				return;
 			}
-			else
-			{
-				console.log({invalid_field});
-				alert(JSON.stringify({invalid_field}));
+
+			// Return fields are optional for a one-way flight.
+			if(isOneWay && optionalReturnFields.has(name)) {
+				return;
+			}
+
+			if(isEmpty(value)) {
+				invalidFields.add(name);
+				thisField.addClass('invalid_field');
+				return;
+			}
+
+			if(
+				thisField.hasClass('aircraft_list') &&
+				!thisField.hasClass('aircraft_selected')
+			) {
+				invalidFields.add(name);
+				thisField.addClass('invalid_field');
 			}
 		});
 
+		/*
+		 * serializeArray() does not include unchecked checkbox/radio
+		 * controls, so explicitly validate required groups.
+		 */
+		thisForm.find(':input[required][name]').each((_, field) => {
 
-	});
-}
+			const thisField = jQuery(field);
+			const name = field.name;
+			const type = (field.type || '').toLowerCase();
+
+			if(name.endsWith('_submit')) {
+				return;
+			}
+
+			if(isOneWay && optionalReturnFields.has(name)) {
+				return;
+			}
+
+			if(type !== 'checkbox' && type !== 'radio') {
+				return;
+			}
+
+			const fields = getFieldsByName(name);
+
+			if(!fields.is(':checked')) {
+				invalidFields.add(name);
+				fields.addClass('invalid_field');
+			}
+		});
+
+		if(invalidFields.size > 0) {
+
+			const invalid_field = [...invalidFields];
+
+			console.log({invalid_field});
+
+			return;
+		}
+
+		if(typeof gtag !== 'undefined') {
+
+			const origin = thisForm.find('#aircraft_origin').val();
+			const destination = thisForm.find('#aircraft_destination').val();
+			const paxNum = Number.parseInt(
+				thisForm.find('#pax_num').val(),
+				10
+			);
+
+			const legs = aircraftFlightVal + 1;
+
+			gtag('event', 'flight_pax_num', {
+				value: paxNum
+			});
+
+			gtag('event', 'flight_legs', {
+				value: legs
+			});
+
+			gtag('event', 'flight_origin', {
+				origin_name: origin
+			});
+
+			gtag('event', 'flight_destination', {
+				destination_name: destination
+			});
+
+			gtag('event', 'flight_route', {
+				route_name: `${origin}_${destination}`
+			});
+		}
+
+		if(typeof fbq !== 'undefined') {
+			fbq('track', 'Search');
+		}
+
+		createFormSubmit(thisForm);
+	};
+
+	/*
+	 * Preserve support for type="button" while also catching native
+	 * form submission / Enter.
+	 */
+	button
+		.off('click.validateAircraftSearch')
+		.on('click.validateAircraftSearch', validateAndSubmit);
+
+	thisForm
+		.off('submit.validateAircraftSearch')
+		.on('submit.validateAircraftSearch', validateAndSubmit);
+};
 
 const handleLegs = () => {
-	if(jQuery('#aircraft_flight').val() == 1)
-	{
-		jQuery('.aircraft_return').removeClass('hidden');
+
+	const aircraft_flight = jQuery('#aircraft_flight');
+
+	if (aircraft_flight.length === 0) {
+		return;
 	}
-	jQuery('#aircraft_flight').change(function(){
-		if(jQuery(this).val() == 1)
-		{
+
+	const toggleReturnFields = (val) => {
+		const isRoundTrip = parseInt(val, 10) === 1;
+
+		if (isRoundTrip) {
 			jQuery('.aircraft_return').removeClass('hidden');
-		}
-		else
-		{
+		} else {
 			jQuery('.aircraft_return').addClass('hidden');
 			jQuery('#end_date').val('');
 			jQuery('#end_time').val('');
 		}
-	});		
-}
+	};
+
+	// Run once on load so state matches the current value
+	toggleReturnFields(aircraft_flight.val());
+
+	aircraft_flight.on('change', function () {
+		toggleReturnFields(jQuery(this).val());
+	});
+};
 
 const algolia_execute = () => {
 
-jQuery('.aircraft_search_form').each(function(){
+	const thisForm = jQuery('#aircraft_search_form');
+
+	if(thisForm.length === 0) {
+		return;
+	}
 
 	const {lang} = dyCoreArgs;
-	const thisForm = jQuery(this);
 
-	jQuery(this).find('.aircraft_list').each(function(){
+	thisForm.find('.aircraft_list').each(function(){
 		
 		const thisField = jQuery(this);
-		
 
-
-		jQuery(thisField).autocomplete({
+		thisField.autocomplete({
 			hint: false
 		},[{
 			source: jQuery.fn.autocomplete.sources.hits(algoliaIndex, {
@@ -237,63 +313,62 @@ jQuery('.aircraft_search_form').each(function(){
 				: airport
 				: airport;
 			
-			jQuery(thisForm)
-				.find('#'+jQuery(thisField).attr('id')+'_l')
+			thisForm
+				.find('#'+thisField.attr('id')+'_l')
 				.val(`${airport}${icao || iata.length === 3 ? ' ('+ iata + ')':  ''}, ${city}, ${country_code}`);
 			
-			jQuery(thisField).attr({
+			thisField.attr({
 				'data-iata': iata,
 				'data-lat': _geoloc.lat,
 				'data-lon': _geoloc.lng
 			}).addClass('aircraft_selected').val(iata);
 
-			jQuery(thisField).blur(() => {
-				if (jQuery(thisField).hasClass('aircraft_selected'))
+			thisField.blur(() => {
+				if (thisField.hasClass('aircraft_selected'))
 				{
-					jQuery(thisField).val(iata);
+					thisField.val(iata);
 				}
 				else
 				{
-					jQuery(thisField).val('');
-					jQuery(thisField).removeClass('aircraft_selected');
-					jQuery(thisField).addClass('invalid_field');
-					jQuery(thisField).removeAttr('data-iata');
-					jQuery(thisField).removeAttr('data-lat');
-					jQuery(thisField).removeAttr('data-lon');						
+					thisField.val('');
+					thisField.removeClass('aircraft_selected');
+					thisField.addClass('invalid_field');
+					thisField.removeAttr('data-iata');
+					thisField.removeAttr('data-lat');
+					thisField.removeAttr('data-lon');						
 				}
 			});
 				
-			jQuery(thisField).focus(() => {
-				jQuery(thisField).val('');
-				jQuery(thisField).removeClass('aircraft_selected');
-				jQuery(thisField).removeClass('invalid_field');
-				jQuery(thisField).removeAttr('data-iata');
-				jQuery(thisField).removeAttr('data-lat');
-				jQuery(thisField).removeAttr('data-lon');
+			thisField.focus(() => {
+				thisField.val('');
+				thisField.removeClass('aircraft_selected');
+				thisField.removeClass('invalid_field');
+				thisField.removeAttr('data-iata');
+				thisField.removeAttr('data-lat');
+				thisField.removeAttr('data-lon');
 			});					
 					
-			if(jQuery(thisForm).find('.aircraft_selected').length == 1)
+			if(thisForm.find('.aircraft_selected').length == 1)
 			{
 				jQuery('.aircraft_list').not('.aircraft_selected').focus();
 			}
-			if(jQuery(thisForm).find('.aircraft_selected').length == 2)
+			if(thisForm.find('.aircraft_selected').length == 2)
 			{
-				jQuery(thisForm).find('input[name="pax_num"]').focus();
+				thisForm.find('input[name="pax_num"]').focus();
 			}
 			else
 			{
-				jQuery(thisField).blur();
+				thisField.blur();
 			}
 			
 		}).on('autocomplete:closed', function(){
 
-			if(!jQuery(thisField).attr('data-iata'))
+			if(!thisField.attr('data-iata'))
 			{
-				jQuery(thisField).val('');
+				thisField.val('');
 			}
 
 		});
 	});
-});
 
 }

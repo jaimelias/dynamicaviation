@@ -56,12 +56,12 @@
 {
 	margin: 10px 0 0 0;
 }
- .aircraft_search_form
+ #aircraft_search_form
  {
 	font-weight: normal;
 	margin: 0 !important;
  }
- .aircraft_search_form input,  .aircraft_search_form select
+ #aircraft_search_form input,   #aircraft_search_form select
  {
 	font-size: .85em;
 	font-weight: 400;
