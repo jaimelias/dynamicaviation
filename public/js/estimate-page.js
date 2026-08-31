@@ -4,10 +4,14 @@ jQuery(() => {
 
 
 // leave all function for algolia
-const validateAviationEstimateRequest  = () => {
+const validateAviationEstimateRequest  = async () => {
 	
 	let invalids = [];
 	const thisForm = jQuery('#aircraft_booking_request');
+
+	if(thisForm.length === 0) {
+		return;
+	}
 
 	//Because the widget is inside #dy_package_request_form, Turnstile creates "cf-turnstile-response" field
 	const turnstileToken = thisForm
@@ -20,14 +24,15 @@ const validateAviationEstimateRequest  = () => {
 		return false;
 	}
 
-	const inputs = jQuery(thisForm).find('input').add('select').add('textarea');
-	const isOneWay = (parseInt(jQuery(thisForm).find('input[name="aircraft_flight"]').val()) === 0) ? true : false;
+	const inputs = thisForm.find('input').add('select').add('textarea');
+	const isOneWay = (parseInt(thisForm.find('input[name="aircraft_flight"]').val()) === 0) ? true : false;
 	const requiredOnRoundTrip = ['end_date', 'end_time', 'end_itinerary'];
 
-	jQuery(inputs).each(function(){	
+	inputs.each(function(){	
 		
-		const thisName = jQuery(this).attr('name');
-		const thisVal = jQuery(this).val();
+		const thisField = jQuery(this);
+		const thisName = thisField.attr('name');
+		const thisVal = thisField.val();
 
 		if(thisVal === '')
 		{
@@ -35,43 +40,43 @@ const validateAviationEstimateRequest  = () => {
 			{
 				if(requiredOnRoundTrip.includes(thisName))
 				{
-					jQuery(this).removeClass('invalid_field');
+					thisField.removeClass('invalid_field');
 				}
 				else
 				{
-					jQuery(this).addClass('invalid_field');
+					thisField.addClass('invalid_field');
 					invalids.push(thisName);
 				}				
 			}
 			else {
-				jQuery(this).addClass('invalid_field');
+				thisField.addClass('invalid_field');
 				invalids.push(thisName);				
 			}
 		}
 		else
 		{
-			if(jQuery(this).val() == '--')
+			if(thisField.val() == '--')
 			{
-				jQuery(this).addClass('invalid_field');
+				thisField.addClass('invalid_field');
 				invalids.push(thisName);
 			}
 			else
 			{
 				if(thisName === 'repeat_email')
 				{
-					if(thisVal !== jQuery(thisForm).find('input[name="email"]').val())
+					if(thisVal !== thisForm.find('input[name="email"]').val())
 					{
-						jQuery(this).addClass('invalid_field');
+						thisField.addClass('invalid_field');
 						invalids.push(thisName);
 					}
 					else
 					{
-						jQuery(this).removeClass('invalid_field');
+						thisField.removeClass('invalid_field');
 					}
 				}
 				else
 				{
-					jQuery(this).removeClass('invalid_field');
+					thisField.removeClass('invalid_field');
 				}
 			}
 		}
@@ -95,6 +100,14 @@ const validateAviationEstimateRequest  = () => {
 				currency: 'USD'
 			});
 		}
+
+		const {dy_nonce} = (await getNonce()) ?? {};
+		const action = atob(thisForm.attr('data-action'));
+		const newAction = new URL(action, window.location.origin);
+
+		newAction.pathname = `${newAction.pathname.replace(/\/$/, '')}/${dy_nonce}`;
+
+		thisForm.attr('data-action', btoa(newAction.href));
 
 		createFormSubmit(thisForm);
 	}

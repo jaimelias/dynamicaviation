@@ -66,7 +66,7 @@ const validateAircraftSearch = () => {
 		return value == null || String(value).trim() === '';
 	};
 
-	const validateAndSubmit = e => {
+	const validateAndSubmit = async (e) => {
 
 		e.preventDefault();
 
@@ -191,6 +191,14 @@ const validateAircraftSearch = () => {
 		if(typeof fbq !== 'undefined') {
 			fbq('track', 'Search');
 		}
+
+		const {dy_nonce} = (await getNonce()) ?? {};
+		const action = atob(thisForm.attr('data-action'));
+		const newAction = new URL(action, window.location.origin);
+
+		newAction.pathname = `${newAction.pathname.replace(/\/$/, '')}/${dy_nonce}`;
+
+		thisForm.attr('data-action', btoa(newAction.href));
 
 		createFormSubmit(thisForm);
 	};
