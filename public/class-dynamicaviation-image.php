@@ -5,18 +5,18 @@ class Dynamic_Aviation_Image {
 
     static $cache = [];
 
-	public function __construct( $plugin_name, $version, $utilities ) 
-	{
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-		$this->utilities = $utilities;
+    public function __construct( $plugin_name, $version, $utilities ) 
+    {
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
+        $this->utilities = $utilities;
         $this->pathname = 'cacheimg';
-		add_action('init', array(&$this, 'add_rewrite_rule'));
-		add_action('init', array(&$this, 'add_rewrite_tag'), 10, 0);
-        add_filter('query_vars', array(&$this, 'registering_custom_query_var'));
-        add_action( 'init', array(&$this, 'render_image'), 1000 );
-        add_filter('dy_aviation_image_pathname', array(&$this, 'set_pathname'));
-	}
+        add_action('init', [$this, 'add_rewrite_rule']);
+        add_action('init', [$this, 'add_rewrite_tag'], 10, 0);
+        add_filter('query_vars', [$this, 'registering_custom_query_var']);
+        add_action('init', [$this, 'render_image'], 1000);
+        add_filter('dy_aviation_image_pathname', [$this, 'set_pathname']);
+    }
 
     public function set_pathname()
     {
@@ -25,12 +25,17 @@ class Dynamic_Aviation_Image {
 
     public function add_rewrite_rule()
     {
-        add_rewrite_rule('^'.$this->pathname.'/([a-z0-9-]+)[.png]?$', 'index.php?'.$this->pathname.'=$matches[1]','top');
+        $pathname = preg_quote( $this->pathname, '#' );
+        add_rewrite_rule(
+            '^' . $pathname . '/([a-z0-9-]+)(?:\.png)?$',
+            'index.php?' . $this->pathname . '=$matches[1]',
+            'top'
+        );
     }
 
     public function add_rewrite_tag()
     {
-        add_rewrite_tag('%'.$this->pathname.'%', '([^&]+)');
+        add_rewrite_tag( '%' . $this->pathname . '%', '([a-z0-9-]+)' );
     }
 
 	public function registering_custom_query_var($query_vars)
