@@ -3,6 +3,9 @@
 #[AllowDynamicProperties]
 class Dynamic_Aviation_Estimate_Page
 {
+
+	static $cache = [];
+
     public function __construct($plugin_name, $version, $utilities)
     {
 		$this->plugin_name = $plugin_name;
@@ -11,9 +14,8 @@ class Dynamic_Aviation_Estimate_Page
         $this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
         $this->plugin_dir_url = plugin_dir_url( __DIR__ );
 		$this->pathname = 'instant_quote';
-
-		//sets OOP vars
-        add_action('init', array(&$this, 'init'), 1);
+		$this->get_languages = get_languages();
+		$this->site_name = get_bloginfo('name');
         
 		//filters custom wordpress outputs
         add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);
@@ -36,13 +38,6 @@ class Dynamic_Aviation_Estimate_Page
 		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
 		add_action( 'parse_query', array( &$this, 'load_recaptcha_scripts' ));
     }
-
-    public function init()
-    {
-		$this->get_languages = get_languages();
-		$this->site_name = get_bloginfo('name');
-		$this->current_language = current_language();
-    }	
 
 	public function add_rewrite_rule()
 	{
@@ -119,9 +114,12 @@ class Dynamic_Aviation_Estimate_Page
     {
 		if($this->validate_form_search())
 		{
-			$s1 = sanitize_text_field($_POST['aircraft_origin']);
-			$s2 = sanitize_text_field($_POST['aircraft_destination']);
-			$title = sprintf( __('Find an Aircraft %s - %s', 'dynamicaviation'), $s1,  $s2) .' | '.$this->site_name;
+			$title = sprintf( 
+				__('Find an Aircraft %s - %s | %s', 'dynamicaviation'), 
+				secure_post('aircraft_origin'),  
+				secure_post('aircraft_destination'),
+				$this->site_name
+			);
 		}
         
         return $title;
@@ -137,30 +135,25 @@ class Dynamic_Aviation_Estimate_Page
 
 	public function validate_form_search()
 	{
-		$output = false;
-		$cache_key = 'aviation_validate_form_search';
-		global $$cache_key;
+		$cache_key = 'validate_form_search';
 
-		if(isset($$cache_key))
+		if(array_key_exists($cache_key, self::$cache))
 		{
-			$output = $$cache_key;
-		}
-		else
-		{
-			if(get_query_var($this->pathname))
-			{
-				$param_names = $this->utilities->search_form_hash_param_names();
-
-				if($this->utilities->validate_params($param_names))
-				{
-					$output = true;
-				}
-			}
-
-			$GLOBALS[$cache_key] = $output;
+			return self::$cache[$cache_key];
 		}
 
-		return $output;
+		if(!get_query_var($this->pathname)) {
+			return self::$cache[$cache_key] = false;
+		}
+
+		$param_names = $this->utilities->search_form_hash_param_names();
+
+		if($this->utilities->validate_params($param_names))
+		{
+			$output = true;
+		}
+
+		return  self::$cache[$cache_key] = $output;
 	}
 
 
