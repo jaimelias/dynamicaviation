@@ -138,12 +138,12 @@ class Dynamic_Aviation_Estimate_Page
 	public function validate_form_search()
 	{
 		$output = false;
-		$which_var = 'aviation_validate_form_search';
-		global $$which_var;
+		$cache_key = 'aviation_validate_form_search';
+		global $$cache_key;
 
-		if(isset($$which_var))
+		if(isset($$cache_key))
 		{
-			$output = $$which_var;
+			$output = $$cache_key;
 		}
 		else
 		{
@@ -157,7 +157,7 @@ class Dynamic_Aviation_Estimate_Page
 				}
 			}
 
-			$GLOBALS[$which_var] = $output;
+			$GLOBALS[$cache_key] = $output;
 		}
 
 		return $output;

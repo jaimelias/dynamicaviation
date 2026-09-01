@@ -3,15 +3,15 @@
 #[AllowDynamicProperties]
 class Dynamic_Aviation_Estimate_Confirmation
 {
+	static $cache = [];
+
     public function __construct($plugin_name, $version, $utilities)
     {
 		$this->plugin_name = $plugin_name;
         $this->utilities = $utilities;
         $this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
 		$this->pathname = 'request_submitted';
-
-		//sets OOP vars
-        add_action('init', array(&$this, 'init'), 1);
+		$this->site_name = get_bloginfo('name');
         
 		//filters custom wordpress outputs
         add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);
@@ -39,33 +39,38 @@ class Dynamic_Aviation_Estimate_Confirmation
 		add_filter('dy_aviation_estimate_subject', array(&$this, 'subject'));
     }
 
-    public function init()
-    {
-		$this->get_languages = get_languages();
-		$this->site_name = get_bloginfo('name');
-		$this->current_language = current_language();
-		$this->valid_turnstile = validate_turnstile();
-    }	
-
 	public function add_rewrite_rule()
 	{
-		add_rewrite_rule('^'.$this->pathname.'/([^/]*)/?', 'index.php?'.$this->pathname.'=$matches[1]','top');
-		$languages = $this->get_languages;
-		$arr = array();
+		$pathname = preg_quote($this->pathname, '/');
 
-		for($x = 0; $x < count($languages); $x++)
+		add_rewrite_rule(
+			'^' . $pathname . '/([^/]+)/?$',
+			'index.php?' . $this->pathname . '=$matches[1]',
+			'top'
+		);
+
+		$default_language = default_language();
+
+		$languages = array_values(array_filter(
+			get_languages(),
+			fn($language) => $language !== $default_language
+		));
+
+		if (!empty($languages))
 		{
-			if($languages[$x] != default_language())
-			{
-				$arr[] = $languages[$x];
-			}
+			$languages = array_map(
+				fn($language) => preg_quote($language, '/'),
+				$languages
+			);
+
+			$languages = implode('|', $languages);
+
+			add_rewrite_rule(
+				'^(?:' . $languages . ')/' . $pathname . '/([^/]+)/?$',
+				'index.php?' . $this->pathname . '=$matches[1]',
+				'top'
+			);
 		}
-
-		if(count($arr) > 0)
-		{
-			$arr = implode('|', $arr);
-			add_rewrite_rule('('.$arr.')/'.$this->pathname.'/([^/]*)/?', 'index.php?'.$this->pathname.'=$matches[2]','top');
-		}		
 	}
 
 	public function add_rewrite_tag()
@@ -89,54 +94,43 @@ class Dynamic_Aviation_Estimate_Confirmation
     }
 
     public function locate_template($template)
-    {
-		if(get_query_var($this->pathname))
-		{
-			$template = locate_template( array( 'page.php' ) );	
-		}
-        
-        return $template;
+    {        
+        return get_query_var($this->pathname) 
+			? locate_template( array( 'page.php' ) ) 
+			: $template;
     }
 
     public function modify_content($content)
     {
-		if($this->validate_form_submit())
-		{
-			$content = '<p class="minimal_success">'.esc_html(__('Request received. Our sales team will be in touch with you soon.', 'dynamicaviation')).'</p>';
-		}
-
-        return $content;
+        return $this->validate_form_submit() 
+			? '<p class="minimal_success">'.esc_html(__('Request received. Our sales team will be in touch with you soon.', 'dynamicaviation')).'</p>' 
+			: $content;
     }
 
     public function modify_title($title)
-    {
-		if(in_the_loop() && $this->validate_form_submit())
-		{
-			$title = esc_html(__('Request Submitted', "dynamicaviation"));
-		}
-        
-        return $title;
+    {        
+        return in_the_loop() && $this->validate_form_submit() 
+			? esc_html(__('Request Submitted', "dynamicaviation")) 
+			: $title;
     }
 
     public function modify_wp_title($title)
     {
-		if($this->validate_form_submit())
-		{
-			$title =  __('Request Submitted', 'dynamicaviation').' | '.$this->site_name;
-		}
-        
-        return $title;
+        return $this->validate_form_submit() 
+			? __('Request Submitted', 'dynamicaviation').' | '.$this->site_name 
+			: $title;
     }
 
 	public function subject($output)
 	{
-		if(post_has('aircraft_id'))
-		{
 
-			$price = money(secure_post('charter_price', 0));
+		$price = secure_post('charter_price', 0, 'floatval');
+
+		if(post_has('aircraft_id') && $price > 0)
+		{
 			$output = sprintf(
 				__('%s, %s has sent you an estimate for $%s', 'dynamicaviation'), 
-				secure_post('first_name'), $this->site_name, $price
+				secure_post('first_name'), $this->site_name, money($price)
 			);
 
 		} else {
@@ -153,77 +147,78 @@ class Dynamic_Aviation_Estimate_Confirmation
 
 	public function form_submit($query)
 	{
-		$which_var = $this->plugin_name.'_'.$this->pathname . '_form_submit';
-		global $$which_var;
-
-		if(!isset($$which_var) && isset($query->query_vars[$this->pathname]))
+		$cache_key = 'form_submit';
+		
+		if(array_key_exists($cache_key, self::$cache))
 		{
-			if($this->validate_form_submit())
-			{
-				$data = $_POST;
-				$data['lang'] = $this->current_language;
-				$notes = apply_filters('dy_aviation_estimate_notes', '');
-				$subject = apply_filters('dy_aviation_estimate_subject', '');
-				$price = (post_has('aircraft_id')) 
-					? money(secure_post('charter_price', 0))
-					: 0;
-				
-				if(post_has('aircraft_id'))
-				{
-					require_once($this->plugin_dir_path . 'public/email_templates/quote.php');
-				}
-				else
-				{
-					require_once( $this->plugin_dir_path . 'public/email_templates/general.php');
-				}
-
-				$headers = array('Content-Type: text/html; charset=UTF-8');
-
-				wp_mail(
-					secure_post('email', '', 'sanitize_email'),
-					$subject,
-					$email_template,
-					$headers
-				);
-
-				$GLOBALS[$which_var] = true;
-			}
+			return self::$cache[$cache_key];
 		}
+
+		if(!isset($query->query_vars[$this->pathname]))
+		{
+			return self::$cache[$cache_key] = false;
+		}
+
+		if(!$this->validate_form_submit())
+		{
+			return self::$cache[$cache_key] = false;
+		}
+
+		$price = secure_post('charter_price', 0, 'floatval');
+		
+		if(post_has('aircraft_id') && $price > 0)
+		{
+			require_once($this->plugin_dir_path . 'public/email_templates/quote.php');
+		}
+		else
+		{
+			require_once( $this->plugin_dir_path . 'public/email_templates/general.php');
+		}
+
+		$email = secure_post('email', '', 'sanitize_email');
+		$headers = array('Content-Type: text/html; charset=UTF-8');
+		$subject = apply_filters('dy_aviation_estimate_subject', '');
+
+		wp_mail(
+			$email,
+			$subject,
+			$email_template,
+			$headers
+		);
+
+		return self::$cache[$cache_key] = true;
 	}
 
 	public function validate_form_submit()
 	{
-		$output = false;
-		$which_var = $this->plugin_name . '_' . $this->pathname . '_validate_form_submit';
-		global $$which_var;
-		
-		if(isset($$which_var))
-		{
-			$output = $$which_var;
-		}
-		else
-		{
-			if(get_query_var($this->pathname))
-			{
-				if($this->valid_turnstile)
-				{
-					$param_names = $this->utilities->request_form_hash_param_names();
 
-					if($this->utilities->validate_params($param_names))
-					{
-						$output = true;
-						$GLOBALS[$which_var] = $output;
-					}
-				}
-			}	
+		$cache_key = 'validate_form_submit';
+
+		if(array_key_exists($cache_key, self::$cache))
+		{
+			return self::$cache[$cache_key];
 		}
 
-		return $output;
+		if($_SERVER['REQUEST_METHOD'] !== 'POST') {
+			return self::$cache[$cache_key] = false;
+		}
+
+		if(!get_query_var($this->pathname)) {
+			
+			return self::$cache[$cache_key] = false;
+		}
+
+		$param_names = $this->utilities->request_form_hash_param_names();
+
+		return self::$cache[$cache_key] = (
+			$this->utilities->validate_params($param_names) 
+			&& validate_turnstile()
+		);
 	}
 
 	public function estimate_notes()
 	{
-		return get_option('dy_aviation_estimate_note_'.$this->current_language);
+		return get_option('dy_aviation_estimate_note_'.current_language());
 	}
 
 }

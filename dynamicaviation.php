@@ -81,17 +81,17 @@ function aviation_field($name, $this_id = null)
 		}
 	}
 	
-	$which_var = $name.'_'.$this_id;
-	global $$which_var; 
+	$cache_key = $name.'_'.$this_id;
+	global $$cache_key; 
 	
-	if(isset($$which_var))
+	if(isset($$cache_key))
 	{
-		return $$which_var;
+		return $$cache_key;
 	}
 	else
 	{
 		$package_field = (string) get_post_meta($this_id, $name, true);
-		$GLOBALS[$which_var] = $package_field;
+		$GLOBALS[$cache_key] = $package_field;
 		return $package_field;
 	}	
 }

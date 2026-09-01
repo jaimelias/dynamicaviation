@@ -1,5 +1,8 @@
 <?php
 
+$price = (post_has('aircraft_id')) 
+	? money(secure_post('charter_price', 0, 'floatval'))
+	: 0;
 $transport_title = __('Charter Flight', 'dynamicaviation');
 $this_id = secure_post('aircraft_id', 0);
 $title = sanitize_text_field($_POST['title']);
@@ -42,7 +45,7 @@ $itinerary_text = $title . ' || ' . $itinerary_text;
 
 
 $label_notes = __('Notes', 'dynamicaviation');
-$notes = nl2br($notes);
+$notes = nl2br(apply_filters('dy_aviation_estimate_notes', ''));
 $footer = $company_address;
 $whatsapp_url = esc_url('https://wa.me/' . get_option('dy_whatsapp') . '?text=' . urlencode($itinerary_text));
 $whatsapp = (get_option('dy_whatsapp')) ? '<a style="border: 16px solid #25d366; text-align: center; background-color: #25d366; color: #fff; font-size: 18px; line-height: 18px; display: block; width: 100%; box-sizing: border-box; text-decoration: none; font-weight: 900;" href="'.esc_url($whatsapp_url).'">'.__('Whatsapp Advisory', 'dynamicaviation').'</a>' : null;

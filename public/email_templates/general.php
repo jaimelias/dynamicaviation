@@ -1,5 +1,6 @@
 <?php
 
+$subject = apply_filters('dy_aviation_estimate_subject', '');
 $today = date_i18n(get_option('date_format'), strtotime('today UTC'));
 $label_doc = __('Estimate', 'dynamicaviation');
 $greeting = sprintf(__('Hello %s,', 'dynamicaviation'), sanitize_text_field($_POST['first_name']));
@@ -31,7 +32,7 @@ $itinerary_text .= ' || ' . __('Passengers', 'dynamicaviation') . ': ' . $passen
 
 
 $label_notes = __('Notes', 'dynamicaviation');
-$notes = nl2br($notes);
+$notes = nl2br(apply_filters('dy_aviation_estimate_notes', ''));
 $footer = $company_address;
 $whatsapp_url = esc_url('https://wa.me/' . get_option('dy_whatsapp') . '?text=' . urlencode($itinerary_text));
 $whatsapp = (get_option('dy_whatsapp')) ? '<a style="border: 16px solid #25d366; text-align: center; background-color: #25d366; color: #fff; font-size: 18px; line-height: 18px; display: block; width: 100%; box-sizing: border-box; text-decoration: none; font-weight: 900;" href="'.esc_url($whatsapp_url).'">'.__('Whatsapp Advisory', 'dynamicaviation').'</a>' : null;

@@ -98,11 +98,11 @@ class Dynamic_Aviation_Utilities {
 
 		$all_airports_data = $this->all_airports_data();
 
-		$which_var = 'dy_airport_data_by_iata_' . $iata;
-		global $$which_var; 
+		$cache_key = 'dy_airport_data_by_iata_' . $iata;
+		global $$cache_key; 
 
-		if(isset($$which_var)) {
-			return $$which_var;
+		if(isset($$cache_key)) {
+			return $$cache_key;
 		}
 
 		$output = [];
@@ -120,7 +120,7 @@ class Dynamic_Aviation_Utilities {
 			}
 		}
 
-		$GLOBALS[$which_var] = $output;
+		$GLOBALS[$cache_key] = $output;
 
 		return $output;
 	}
@@ -137,11 +137,11 @@ class Dynamic_Aviation_Utilities {
 		}
 
 		// Use a consistent, safe cache key (only in $GLOBALS)
-		$which_var = 'dy_airport_data_by_slug_' . $slug;
-		global $$which_var; 
+		$cache_key = 'dy_airport_data_by_slug_' . $slug;
+		global $$cache_key; 
 
-		if(isset($$which_var)) {
-			return $$which_var;
+		if(isset($$cache_key)) {
+			return $$cache_key;
 		}
 
 		$output = [];
@@ -161,7 +161,7 @@ class Dynamic_Aviation_Utilities {
 			}
 		}
 
-		$GLOBALS[$which_var] = $output;
+		$GLOBALS[$cache_key] = $output;
 
 		return $output;
 	}
@@ -320,12 +320,12 @@ class Dynamic_Aviation_Utilities {
 	public function validate_hash($param_names)
 	{
 		$output = true;
-		$which_var = 'dy_aviation_validate_hash';
-		global $$which_var;
+		$cache_key = 'dy_aviation_validate_hash';
+		global $$cache_key;
 
-		if(isset($$which_var))
+		if(isset($$cache_key))
 		{
-			$output = $$which_var;
+			$output = $$cache_key;
 		}
 		else
 		{
@@ -361,7 +361,7 @@ class Dynamic_Aviation_Utilities {
 				$GLOBALS['dy_request_invalids'] = $log;
 			}
 
-			$GLOBALS[$which_var] = $output;
+			$GLOBALS[$cache_key] = $output;
 		}
 
 		return $output;
@@ -370,12 +370,12 @@ class Dynamic_Aviation_Utilities {
 	public function validate_nonce($pathname)
 	{
 		$output = false;
-		$which_var = 'dy_aviation_validate_nonce';
-		global $$which_var;
+		$cache_key = 'dy_aviation_validate_nonce';
+		global $$cache_key;
 
-		if(isset($$which_var))
+		if(isset($$cache_key))
 		{
-			$output = $$which_var;
+			$output = $$cache_key;
 		}
 		else
 		{
@@ -399,7 +399,7 @@ class Dynamic_Aviation_Utilities {
 			}
 
 
-			$GLOBALS[$which_var] = $output;
+			$GLOBALS[$cache_key] = $output;
 		}
 
 		return $output;
@@ -413,12 +413,12 @@ class Dynamic_Aviation_Utilities {
 	public function validate_params($param_names)
 	{
 		$output = false;
-		$which_var = 'dy_aviation_validate_params';
-		global $$which_var;
+		$cache_key = 'dy_aviation_validate_params';
+		global $$cache_key;
 
-		if(isset($$which_var))
+		if(isset($$cache_key))
 		{
-			$output = $$which_var;
+			$output = $$cache_key;
 		}
 		else
 		{
@@ -527,7 +527,7 @@ class Dynamic_Aviation_Utilities {
 				$GLOBALS['dy_request_invalids'] = $log;
 			}
 
-			$GLOBALS[$which_var] = $output;
+			$GLOBALS[$cache_key] = $output;
 		}
 
 		return $output;

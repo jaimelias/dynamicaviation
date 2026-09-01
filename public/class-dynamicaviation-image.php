@@ -40,12 +40,12 @@ class Dynamic_Aviation_Image {
     public function get_image_pathname()
     {
         $output = '';
-        $which_var = $this->plugin_name . 'get_image_pathname';
-        global $$which_var;
+        $cache_key = $this->plugin_name . 'get_image_pathname';
+        global $$cache_key;
 
-        if(isset($$which_var))
+        if(isset($$cache_key))
         {
-            $output = $$which_var;
+            $output = $$cache_key;
         }
         else
         {
@@ -71,7 +71,7 @@ class Dynamic_Aviation_Image {
                 }
             }
 
-            $GLOBALS[$which_var] = $output;
+            $GLOBALS[$cache_key] = $output;
         }
 
 		return $output;       
