@@ -123,23 +123,23 @@ class Dynamic_Aviation_Image {
         exit;
 	}
 
-	public function airport_url_string($json)
-	{
+    public function airport_url_string($json)
+    {
+        if(!is_array($json) || !array_key_exists('_geoloc', $json))
+        {
+            return '';
+        }
 
-		if(is_array($json))
-		{
-			if(array_key_exists('_geoloc', $json))
-			{
-				$_geoloc = $json['_geoloc'];
-				$mapbox_token = get_option('mapbox_token');
-				$mapbox_marker = 'pin-l-airport+dd3333('.$_geoloc['lng'].','.$_geoloc['lat'].')';
-				$url = 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/660x440?access_token='.esc_html($mapbox_token);
-				return $url;
-			}
-		}
+        $_geoloc = $json['_geoloc'];
+        $mapbox_token = get_option('mapbox_token');
 
-        return '';
-	}
+        return sprintf(
+            'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-l-airport+dd3333(%1$s,%2$s)/%1$s,%2$s,8/660x440?access_token=%3$s',
+            esc_html($_geoloc['lng']),
+            esc_html($_geoloc['lat']),
+            esc_html($mapbox_token)
+        );
+    }
 
 }
 
