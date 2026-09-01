@@ -6,63 +6,90 @@ class Dynamic_Aviation_Estimate_Page
 
 	static $cache = [];
 
-    public function __construct($plugin_name, $version, $utilities)
-    {
+	public function __construct($plugin_name, $version, $utilities)
+	{
 		$this->plugin_name = $plugin_name;
-		$this->version =  $version;
-        $this->utilities = $utilities;
-        $this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
-        $this->plugin_dir_url = plugin_dir_url( __DIR__ );
+		$this->version = $version;
+		$this->utilities = $utilities;
+
+		$this->plugin_dir_path = plugin_dir_path(dirname(__FILE__));
+		$this->plugin_dir_url = plugin_dir_url(__DIR__);
+
 		$this->pathname = 'instant_quote';
 		$this->get_languages = get_languages();
+		$this->default_language = default_language();
 		$this->site_name = get_bloginfo('name');
-        
-		//filters custom wordpress outputs
-        add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);
-		add_filter('wp_title', array(&$this, 'modify_wp_title'), 100);
-        add_filter('the_title', array(&$this, 'modify_title'), 100);
-        add_filter('the_content', array(&$this, 'modify_content'), 100);
 
-		//changes the template to page.php in the theme
-        add_filter('template_include', array(&$this, 'locate_template'), 100 );
+		// Filters custom WordPress outputs.
+		add_filter('pre_get_document_title', [$this, 'modify_wp_title'], 100);
+		add_filter('wp_title', [$this, 'modify_wp_title'], 100);
+		add_filter('the_title', [$this, 'modify_title'], 100);
+		add_filter('the_content', [$this, 'modify_content'], 100);
 
-		//sets custom params to the post before wp_query
-        add_action('pre_get_posts', array(&$this, 'main_wp_query'), 100);
+		// Changes the template to page.php in the theme.
+		add_filter('template_include', [$this, 'locate_template'], 100);
 
-		//adds the query var
-		add_filter('query_vars', array(&$this, 'registering_custom_query_var'));
-		add_action('init', array(&$this, 'add_rewrite_rule'), 100);
-		add_action('init', array(&$this, 'add_rewrite_tag'), 100);
+		// Sets custom params to the post before WP_Query.
+		add_action('pre_get_posts', [$this, 'main_wp_query'], 100);
 
-		//enqueue scripts
-		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
-		add_action( 'parse_query', array( &$this, 'load_recaptcha_scripts' ));
-    }
+		// Adds the query var and rewrite rules.
+		add_filter('query_vars', [$this, 'registering_custom_query_var']);
+		add_action('init', [$this, 'add_rewrite_rule'], 100);
+		add_action('init', [$this, 'add_rewrite_tag'], 100);
+
+		// Enqueue scripts.
+		add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
+		add_action('parse_query', [$this, 'load_recaptcha_scripts']);
+	}
 
 	public function add_rewrite_rule()
 	{
-		add_rewrite_rule('^'.$this->pathname.'/([^/]*)/?', 'index.php?'.$this->pathname.'=$matches[1]','top');
-		$languages = $this->get_languages;
-		$arr = array();
+		$pathname = preg_quote($this->pathname, '#');
 
-		for($x = 0; $x < count($languages); $x++)
-		{
-			if($languages[$x] != default_language())
-			{
-				$arr[] = $languages[$x];
-			}
+		// /instant_quote/{value}
+		add_rewrite_rule(
+			'^' . $pathname . '/([^/]+)/?$',
+			'index.php?' . $this->pathname . '=$matches[1]',
+			'top'
+		);
+
+		$languages = array_values(
+			array_unique(
+				array_filter(
+					$this->get_languages,
+					fn($language) =>
+						is_string($language)
+						&& $language !== ''
+						&& $language !== $this->default_language
+				)
+			)
+		);
+
+		if (!$languages) {
+			return;
 		}
 
-		if(count($arr) > 0)
-		{
-			$arr = implode('|', $arr);
-			add_rewrite_rule('('.$arr.')/'.$this->pathname.'/([^/]*)/?', 'index.php?'.$this->pathname.'=$matches[2]','top');
-		}		
+		$languages = array_map(
+			fn($language) => preg_quote($language, '#'),
+			$languages
+		);
+
+		$language_pattern = implode('|', $languages);
+
+		// /{language}/instant_quote/{value}
+		add_rewrite_rule(
+			'^(?:' . $language_pattern . ')/' . $pathname . '/([^/]+)/?$',
+			'index.php?' . $this->pathname . '=$matches[1]',
+			'top'
+		);
 	}
 
 	public function add_rewrite_tag()
 	{
-		add_rewrite_tag('%'.$this->pathname.'%', '([^&]+)');
+		add_rewrite_tag(
+			'%' . $this->pathname . '%',
+			'([^&]+)'
+		);
 	}
 
 	public function registering_custom_query_var($query_vars)
@@ -82,54 +109,42 @@ class Dynamic_Aviation_Estimate_Page
 
     public function locate_template($template)
     {
-		if(get_query_var($this->pathname))
-		{
-			$template = locate_template( array( 'page.php' ) );	
-		}
-        
-        return $template;
+        return get_query_var($this->pathname) 
+			? locate_template(['page.php']) 
+			: $template;
     }
 
     public function modify_content($content)
     {
-		if($this->validate_form_search())
-		{
-			return apply_filters('dy_aviation_aircrafts_table', '');	
-		}
-
-        return $content;
+        return $this->validate_form_search() 
+			? (string) apply_filters('dy_aviation_aircrafts_table', '') 
+			: $content;
     }
 
     public function modify_title($title)
     {
-		if(in_the_loop() && $this->validate_form_search())
-		{
-			$title = esc_html(__('Find an Aircraft', 'dynamicaviation'));
-		}
-        
-        return $title;
+        return in_the_loop() && $this->validate_form_search() 
+			? esc_html(__('Find an Aircraft', 'dynamicaviation')) 
+			: $title;
     }
 
     public function modify_wp_title($title)
-    {
-		if($this->validate_form_search())
-		{
-			$title = sprintf( 
-				__('Find an Aircraft %s - %s | %s', 'dynamicaviation'), 
-				secure_post('aircraft_origin'),  
-				secure_post('aircraft_destination'),
-				$this->site_name
-			);
-		}
-        
-        return $title;
+    {        
+        return $this->validate_form_search() 
+			? sprintf( 
+					__('Find an Aircraft %s - %s | %s', 'dynamicaviation'), 
+					secure_post('aircraft_origin'),  
+					secure_post('aircraft_destination'),
+					$this->site_name
+				) 
+			: $title;
     }
 
 	public function enqueue_scripts()
 	{
 		if($this->validate_form_search())
 		{
-			wp_enqueue_script($this->plugin_name.'_'.$this->pathname, $this->plugin_dir_url . 'public/js/estimate-page.js', array('jquery', 'turnstile-compat', 'dy-core-utilities'), $this->version, true );
+			wp_enqueue_script($this->plugin_name.'_'.$this->pathname, $this->plugin_dir_url . 'public/js/estimate-page.js', ['jquery', 'turnstile-compat', 'dy-core-utilities'], $this->version, true );
 		}
 	}
 
@@ -146,6 +161,7 @@ class Dynamic_Aviation_Estimate_Page
 			return self::$cache[$cache_key] = false;
 		}
 
+		$output = false;
 		$param_names = $this->utilities->search_form_hash_param_names();
 
 		if($this->utilities->validate_params($param_names))

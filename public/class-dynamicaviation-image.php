@@ -3,6 +3,8 @@
 #[AllowDynamicProperties]
 class Dynamic_Aviation_Image {
 
+    static $cache = [];
+
 	public function __construct( $plugin_name, $version, $utilities ) 
 	{
 		$this->plugin_name = $plugin_name;
@@ -39,70 +41,104 @@ class Dynamic_Aviation_Image {
 
     public function get_image_pathname()
     {
+        $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $cache_key = 'get_image_pathname_' . $request_uri;
+
+        if(array_key_exists($cache_key, self::$cache))
+        {
+            return self::$cache[$cache_key];
+        }
+
+        $path = pathinfo($request_uri);
+
+        if(!array_key_exists('dirname', $path) || !array_key_exists('basename', $path) || !array_key_exists('filename', $path))
+        {
+            return self::$cache[$cache_key] = '';
+        }
+
         $output = '';
-        $cache_key = $this->plugin_name . 'get_image_pathname';
-        global $$cache_key;
+        $dirname = $path['dirname'];
+        $basename = $path['basename'];
+        $dirname_arr = array_values(
+            array_filter(
+                explode('/', $dirname), 
+                static fn($value) => $value !== ''
+            )
+        );
 
-        if(isset($$cache_key))
+        $filename = $path['filename'];
+
+        if(in_array($this->pathname, $dirname_arr, true) && str_ends_with($basename, '.png'))
         {
-            $output = $$cache_key;
-        }
-        else
-        {
-            $path = pathinfo($_SERVER['REQUEST_URI']);
-
-            if(array_key_exists('dirname', $path) && array_key_exists('basename', $path) && array_key_exists('filename', $path))
-            {
-                $dirname = $path['dirname'];
-                $basename = $path['basename'];
-                $dirname_arr = array_values(array_filter(explode('/', $dirname)));
-                $filename = $path['filename'];
-
-                if(is_array($dirname_arr))
-                {
-                    if(count($dirname_arr) > 0)
-                    {
-                        if(in_array($this->pathname, $dirname_arr) && str_ends_with($basename, '.png'))
-                        {
-
-                            $output = $filename;
-                        }
-                    }
-                }
-            }
-
-            $GLOBALS[$cache_key] = $output;
+            $output = $filename;
         }
 
-		return $output;       
+		return self::$cache[$cache_key] = $output;       
     }
 
 	public function render_image()
 	{
         $filename = $this->get_image_pathname();
 
-        if($filename)
+        if(!$filename)
         {
-            $url = $this->utilities->airport_url_string($this->utilities->airport_data_by_slug($filename));
-
-            $headers = array(
-                'Content-Type' => 'image/png'
-            );
-            
-            $resp = wp_remote_get($url, array(
-                'headers' => $headers
-            ));
-
-            if ( is_array( $resp ) && ! is_wp_error( $resp ) )
-            {
-                if($resp['response']['code'] === 200)
-                {
-                    header ('Content-Type: image/png'); 
-
-                    exit($resp['body']);
-                }
-            }
+            return;
         }
+
+        $airport_data = $this->utilities->airport_data_by_slug($filename);
+
+        if( !is_array($airport_data))
+        {
+            return;
+        }
+
+        $url = $this->airport_url_string($airport_data);
+
+        if(filter_var($url, FILTER_VALIDATE_URL) === false)
+        {
+            return;
+        }
+
+        $resp = wp_remote_get($url, [
+            'timeout' => 10
+        ]);
+
+        if(is_wp_error( $resp ) || wp_remote_retrieve_response_code($resp) !== 200)
+        {
+            return;
+        }
+
+        $body = wp_remote_retrieve_body($resp);
+
+
+        if($body === '')
+        {
+            return;
+        }
+        
+        header('Content-Type: image/png');
+        header('Cache-Control: public, max-age=86400');
+
+        echo $body;
+        exit;
+	}
+
+	public function airport_url_string($json)
+	{
+
+		if(is_array($json))
+		{
+			if(array_key_exists('_geoloc', $json))
+			{
+				$_geoloc = $json['_geoloc'];
+				$mapbox_token = get_option('mapbox_token');
+				$mapbox_marker = 'pin-l-airport+dd3333('.$_geoloc['lng'].','.$_geoloc['lat'].')';
+				$url = 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/660x440?access_token='.esc_html($mapbox_token);
+				return $url;
+			}
+		}
+
+        return '';
 	}
 
 }

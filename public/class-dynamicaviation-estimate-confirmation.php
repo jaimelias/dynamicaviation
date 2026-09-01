@@ -11,6 +11,7 @@ class Dynamic_Aviation_Estimate_Confirmation
         $this->utilities = $utilities;
         $this->plugin_dir_path = plugin_dir_path(dirname(__FILE__));
         $this->pathname = 'request_submitted';
+        $this->default_language = default_language();
         $this->site_name = get_bloginfo('name');
 
         // Filters custom WordPress outputs
@@ -48,12 +49,11 @@ class Dynamic_Aviation_Estimate_Confirmation
             'top'
         );
 
-        $default_language = default_language();
-
         $languages = array_values(array_filter(
             get_languages(),
-            fn($language) => $language !== $default_language
+            fn($language) => $language !== $this->default_language
         ));
+
 
         if (!empty($languages))
         {
@@ -182,7 +182,7 @@ class Dynamic_Aviation_Estimate_Confirmation
             'Content-Type: text/html; charset=UTF-8'
         ];
 
-        $subject = apply_filters('dy_aviation_estimate_subject', '');
+        $subject = (string) apply_filters('dy_aviation_estimate_subject', '');
 
         wp_mail(
             $email,

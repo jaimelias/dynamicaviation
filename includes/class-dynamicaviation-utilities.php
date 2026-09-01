@@ -166,26 +166,6 @@ class Dynamic_Aviation_Utilities {
 		return $output;
 	}
 
-
-	public function airport_url_string($json)
-	{
-
-		if(is_array($json))
-		{
-			if(array_key_exists('_geoloc', $json))
-			{
-				$_geoloc = $json['_geoloc'];
-				$mapbox_token = get_option('mapbox_token');
-				$mapbox_marker = 'pin-l-airport+dd3333('.$_geoloc['lng'].','.$_geoloc['lat'].')';
-				$url = 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/'.esc_html($mapbox_marker).'/'.esc_html($_geoloc['lng']).','.esc_html($_geoloc['lat']).',8/660x440?access_token='.esc_html($mapbox_token);				
-				
-				//write_log($url);
-
-				return $url;
-			}
-		}
-	}
-
 	public function sanitize_items_per_line($sanitize_func, $str, $max)
 	{
 		if(!$max)
@@ -360,44 +340,6 @@ class Dynamic_Aviation_Utilities {
 				write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
 				$GLOBALS['dy_request_invalids'] = $log;
 			}
-
-			$GLOBALS[$cache_key] = $output;
-		}
-
-		return $output;
-	}
-
-	public function validate_nonce($pathname)
-	{
-		$output = false;
-		$cache_key = 'dy_aviation_validate_nonce';
-		global $$cache_key;
-
-		if(isset($$cache_key))
-		{
-			$output = $$cache_key;
-		}
-		else
-		{
-			if(!is_user_logged_in())
-			{
-				if(wp_verify_nonce(get_query_var($pathname), 'dy_nonce'))
-				{
-					$output = true;
-				}
-				else
-				{
-					$log = array(__('invalid_nonce', 'dynamicpackages'));
-					write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
-					$GLOBALS['dy_request_invalids'] = $log;
-					$output = false;
-				}
-			}
-			else
-			{
-				$output = true;
-			}
-
 
 			$GLOBALS[$cache_key] = $output;
 		}
