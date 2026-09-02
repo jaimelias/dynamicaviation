@@ -213,12 +213,55 @@ class Dynamic_Aviation_Estimate_Confirmation
             return self::$cache[$cache_key] = false;
         }
 
-        $param_names = $this->utilities->request_form_hash_param_names();
+        $output = true;
 
-        return self::$cache[$cache_key] = (
-            $this->utilities->validate_params($param_names)
-            && validate_turnstile()
-        );
+        $required_params = [
+			'aircraft_origin' => function($name) { return !empty(secure_post($name)); },
+			'aircraft_destination' => function($name) { return !empty(secure_post('aircraft_destination')); },
+			'pax_num' => function($name) { return secure_post($name, 0, 'absint') > 0; },
+			'aircraft_flight' => function($name) { return in_array(secure_post($name, 0, 'absint'), [0, 1]);  },
+			'start_date' => function($name) { return is_valid_date(secure_post($name)); },
+			'start_time' => function($name) { return is_valid_time(secure_post($name)); },
+			'end_date' => function($name) { return ((secure_post('aircraft_flight', 0, 'absint') === 0 && secure_post($name) === '') || (secure_post('aircraft_flight', 0, 'absint') === 1 && is_valid_date(secure_post($name)))); },
+			'end_time' => function($name) { return ((secure_post('aircraft_flight', 0, 'absint') === 0 && secure_post($name) === '') || (secure_post('aircraft_flight', 0, 'absint') === 1 && is_valid_time(secure_post($name)))); },
+            'first_name' => function($name) { return !empty(secure_post($name)); }, 
+            'lastname' => function($name) { return !empty(secure_post($name)); },
+            'email' => function($name) { return is_email(secure_post($name)); },
+            'repeat_email' => function($name) { return is_email(secure_post($name)) && secure_post($name) === secure_post('email'); },
+            'phone' => function($name) { return secure_post($name, 0, 'absint') > 0; },
+            'country_calling_code' => function($name) { return secure_post($name, 0, 'absint') > 0; },
+            'aircraft_id' => function($name) { 
+                $aircraft_id = secure_post($name, 0, 'absint');
+
+                if($aircraft_id === 0)
+                {
+                    return false;
+                }
+
+                $post = get_post($aircraft_id);
+                return $post instanceof WP_Post && $post->post_type === 'aircrafts';
+            },
+		];
+
+		$invalids = [];
+
+		foreach($required_params as $param_name => $validation_callback)
+		{
+			if(!$validation_callback($param_name))
+			{
+				$invalids[] = sprintf(__('The required parameter "%s" is missing or invalid.', 'dynamicaviation'), $param_name);
+			}
+		}
+
+		if(count($invalids) > 0)
+		{
+			$output = false;
+			dy_errors::add($invalids, 400);
+		}
+
+
+
+		return self::$cache[$cache_key] = $output;
     }
 
     public function estimate_notes()

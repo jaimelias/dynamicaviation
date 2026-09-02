@@ -287,66 +287,6 @@ class Dynamic_Aviation_Utilities {
         }
     }
 
-	public function search_form_hash_param_names()
-	{
-		return array('aircraft_origin', 'aircraft_destination', 'pax_num', 'aircraft_flight', 'start_date', 'start_time', 'end_date', 'end_time');
-	}
-
-	public function request_form_hash_param_names()
-	{
-		return array_merge(array('first_name', 'lastname', 'email', 'repeat_email', 'phone', 'country_calling_code'), $this->search_form_hash_param_names());
-	}
-
-	public function validate_hash($param_names)
-	{
-		$output = true;
-		$cache_key = 'dy_aviation_validate_hash';
-		global $$cache_key;
-
-		if(isset($$cache_key))
-		{
-			$output = $$cache_key;
-		}
-		else
-		{
-			if(isset($_POST['hash']))
-			{
-				$str = '';
-				$hash_param = secure_post('hash');
-
-				for($x = 0; $x < count($param_names); $x++)
-				{
-					if(isset($_POST[$param_names[$x]]))
-					{
-						$str .= secure_post($param_names[$x]);
-					}
-					else
-					{
-						$output = false;
-					}
-				}
-
-				$hash = hash('sha512', $str);
-
-				if($hash !== $hash_param)
-				{
-					$output = false;
-				}
-			}
-
-			if(!$output)
-			{
-				$log = array(__('invalid_hash', 'dynamicpackages'));
-				write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
-				$GLOBALS['dy_request_invalids'] = $log;
-			}
-
-			$GLOBALS[$cache_key] = $output;
-		}
-
-		return $output;
-	}
-
 	public function validate_legs($value)
 	{
 		return in_array(intval($value), array(0,1));

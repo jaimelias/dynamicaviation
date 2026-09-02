@@ -133,8 +133,8 @@ class Dynamic_Aviation_Estimate_Page
         return $this->validate_form_search() 
 			? sprintf( 
 					__('Find an Aircraft %s - %s | %s', 'dynamicaviation'), 
-					secure_post('aircraft_origin'),  
-					secure_post('aircraft_destination'),
+					secure_get('aircraft_origin'),  
+					secure_get('aircraft_destination'),
 					$this->site_name
 				) 
 			: $title;
@@ -157,19 +157,46 @@ class Dynamic_Aviation_Estimate_Page
 			return self::$cache[$cache_key];
 		}
 
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET')
+        {
+            return self::$cache[$cache_key] = false;
+        }
+
 		if(!get_query_var($this->pathname)) {
 			return self::$cache[$cache_key] = false;
 		}
 
-		$output = false;
-		$param_names = $this->utilities->search_form_hash_param_names();
+		$output = true;
+		$required_params = [
+			'aircraft_origin' => function($name) { return !empty(secure_get($name)); },
+			'aircraft_destination' => function($name) { return !empty(secure_get('aircraft_destination')); },
+			'pax_num' => function($name) { return secure_get($name, 0, 'absint') > 0; },
+			'aircraft_flight' => function($name) { return in_array(secure_get($name, 0, 'absint'), [0, 1]);  },
+			'start_date' => function($name) { return is_valid_date(secure_get($name)); },
+			'start_time' => function($name) { return is_valid_time(secure_get($name)); },
+			'end_date' => function($name) { return ((secure_get('aircraft_flight', 0, 'absint') === 0 && secure_get($name) === '') || (secure_get('aircraft_flight', 0, 'absint') === 1 && is_valid_date(secure_get($name)))); },
+			'end_time' => function($name) { return ((secure_get('aircraft_flight', 0, 'absint') === 0 && secure_get($name) === '') || (secure_get('aircraft_flight', 0, 'absint') === 1 && is_valid_time(secure_get($name)))); }
+		];
 
-		if($this->utilities->validate_params($param_names))
+		$invalids = [];
+
+		foreach($required_params as $param_name => $validation_callback)
 		{
-			$output = true;
+			if(!$validation_callback($param_name))
+			{
+				$invalids[] = sprintf(__('The required parameter "%s" is missing or invalid.', 'dynamicaviation'), $param_name);
+			}
 		}
 
-		return  self::$cache[$cache_key] = $output;
+		if(count($invalids) > 0)
+		{
+			$output = false;
+			dy_errors::add($invalids, 400);
+		}
+
+
+
+		return self::$cache[$cache_key] = $output;
 	}
 
 
