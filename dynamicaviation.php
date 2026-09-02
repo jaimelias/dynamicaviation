@@ -71,27 +71,32 @@ run_dynamicaviation();
 
 function aviation_field($name, $this_id = null)
 {
-	if($this_id == null)
-	{		
-		global $post;
-		
-		if(isset($post))
-		{
-			$this_id = $post->ID;
-		}
-	}
-	
-	$cache_key = $name.'_'.$this_id;
-	global $$cache_key; 
-	
-	if(isset($$cache_key))
-	{
-		return $$cache_key;
-	}
-	else
-	{
-		$package_field = (string) get_post_meta($this_id, $name, true);
-		$GLOBALS[$cache_key] = $package_field;
-		return $package_field;
-	}	
+    static $cache = [];
+
+    if (!is_int($this_id) || intval($this_id) <= 0) {
+
+        global $post;
+
+        if (isset($post) && $post instanceof WP_Post && $post->post_type === 'aircrafts') {
+            $this_id = $post->ID;
+        }
+    }
+
+    if (!$this_id) {
+        return '';
+    }
+
+    $cache_key = $this_id . ':' . $name; // delimiter avoids collisions
+
+    if (array_key_exists($cache_key, $cache)) {
+        return $cache[$cache_key];
+    }
+
+    $value = get_post_meta($this_id, $name, true);
+
+    if (is_array($value)) {
+        return $cache[$cache_key] = $value; // don't force-cast arrays to string
+    }
+
+    return $cache[$cache_key] = (string) $value;
 }
