@@ -10,37 +10,31 @@ class Dynamic_Aviation_Image {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->utilities = $utilities;
-        $this->pathname = 'cacheimg';
         add_action('init', [$this, 'add_rewrite_rule']);
         add_action('init', [$this, 'add_rewrite_tag'], 10, 0);
         add_filter('query_vars', [$this, 'registering_custom_query_var']);
         add_action('init', [$this, 'render_image'], 1000);
-        add_filter('dy_aviation_image_pathname', [$this, 'set_pathname']);
     }
 
-    public function set_pathname()
-    {
-        return $this->pathname;
-    }
 
     public function add_rewrite_rule()
     {
-        $pathname = preg_quote( $this->pathname, '#' );
+        $pathname = preg_quote( DY_AVIATION_IMAGE_PATHNAME, '#' );
         add_rewrite_rule(
             '^' . $pathname . '/([a-z0-9-]+)(?:\.png)?$',
-            'index.php?' . $this->pathname . '=$matches[1]',
+            'index.php?' . DY_AVIATION_IMAGE_PATHNAME . '=$matches[1]',
             'top'
         );
     }
 
     public function add_rewrite_tag()
     {
-        add_rewrite_tag( '%' . $this->pathname . '%', '([a-z0-9-]+)' );
+        add_rewrite_tag( '%' . DY_AVIATION_IMAGE_PATHNAME . '%', '([a-z0-9-]+)' );
     }
 
 	public function registering_custom_query_var($query_vars)
 	{
-		$query_vars[] = $this->pathname;
+		$query_vars[] = DY_AVIATION_IMAGE_PATHNAME;
 		return $query_vars;
 	}
 
@@ -73,7 +67,7 @@ class Dynamic_Aviation_Image {
 
         $filename = $path['filename'];
 
-        if(in_array($this->pathname, $dirname_arr, true) && str_ends_with($basename, '.png'))
+        if(in_array(DY_AVIATION_IMAGE_PATHNAME, $dirname_arr, true) && str_ends_with($basename, '.png'))
         {
             $output = $filename;
         }

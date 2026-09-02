@@ -24,7 +24,7 @@ class Dynamic_Aviation_Utilities {
 		{
 			if(array_key_exists('airport', $json))
 			{
-				return home_url(apply_filters('dy_aviation_image_pathname', '') . '/' .$this->sanitize_pathname($json['airport']).'.png');
+				return normalize_url(home_url(DY_AVIATION_IMAGE_PATHNAME . '/' .$this->sanitize_pathname($json['airport']).'.png'));
 			}
 		}
 	}

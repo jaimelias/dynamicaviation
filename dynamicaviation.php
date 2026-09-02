@@ -62,6 +62,8 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-dynamicaviation.php';
 
 function run_dynamicaviation() {
 
+	define('DY_AVIATION_IMAGE_PATHNAME', 'cacheimg');
+	
 	$plugin = new Dynamic_Aviation();
 	$plugin->run();
 

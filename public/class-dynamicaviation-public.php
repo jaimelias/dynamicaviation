@@ -15,11 +15,11 @@ class Dynamic_Aviation_Public {
 		$this->utilities =  $utilities;
 		$this->plugin_dir_url = plugin_dir_url( __FILE__ );
 		$this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
-		add_action('init', array(&$this, 'init'));
-		add_filter('dy_sitemap', array(&$this, 'sitemap'), 10);
-		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
-		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
-		add_action('wp_head', array(&$this, 'plugin_public_args'));
+		add_action('init', [$this, 'init']);
+		add_filter('dy_sitemap', [$this, 'sitemap'], 10);
+		add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
+		add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
+		add_action('wp_head', [$this, 'plugin_public_args']);
 	}
 
 	public function init()
@@ -39,14 +39,14 @@ class Dynamic_Aviation_Public {
 
 		if($dy_aviation_load_mapbox)
 		{
-			$mapbox_vars = array(
+			$mapbox_vars = [
 				'mapbox_token' => esc_html(get_option('mapbox_token')),
 				'mapbox_map_id' => esc_html(get_option('mapbox_map_id')),
-				'mapbox_map_zoom' => intval(get_option('mapbox_map_zoom')),
-				'mapbox_base_lat' => floatval(get_option('mapbox_base_lat')),
-				'mapbox_base_lon' => floatval(get_option('mapbox_base_lon')),
+				'mapbox_map_zoom' => (int) get_option('mapbox_map_zoom'),
+				'mapbox_base_lat' => (float) get_option('mapbox_base_lat'),
+				'mapbox_base_lon' => (float) get_option('mapbox_base_lon'), 
 				'home_url' => $this->home_lang,
-			);
+			];
 
 			return 'function mapbox_vars(){return '.json_encode($mapbox_vars).';}';
 		}
@@ -54,77 +54,79 @@ class Dynamic_Aviation_Public {
 
 	public function sitemap($sitemap)
 	{
-		if(!empty($sitemap)) return $sitemap;
+		if(!empty($sitemap))
+		{
+			return $sitemap;
+		}
 
 		global $polylang;
 
+		$language_list = [];
+
 		if(isset($polylang))
 		{
-			$languages = $this->get_languages;
-			$language_list = array();
-			
-			for($x = 0; $x < count($languages); $x++)
-			{
-				if($languages[$x] != default_language())
-				{
-					$language_list[] = $languages[$x];
-				}
-			}
+			$default_language = default_language();
+
+			$language_list = array_values(
+				array_filter(
+					$this->get_languages,
+					fn($language) => $language !== $default_language
+				)
+			);
 		}
-		
-		$urllist = null;
+
+		$urllist = '';
 		$all_airports = $this->utilities->all_airports_data();
-		$image_pathname = apply_filters('dy_aviation_image_pathname', '');
-		
-		for($x = 0; $x < count($all_airports); $x++)
+
+		foreach($all_airports as $airport)
 		{
-			$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$x]['airport']);
-			$url = '<url>';
-			$url .= '<loc>'.esc_url(normalize_url(home_url('fly/' .$airport_pathname))).'</loc>';
-			
-			if($image_pathname)
+			$airport_pathname = $this->utilities->sanitize_pathname($airport['airport']);
+
+			$image_url = sprintf(
+				'%s.png',
+				esc_url(
+					normalize_url(
+						home_url(
+							sprintf(
+								'%s/%s',
+								DY_AVIATION_IMAGE_PATHNAME,
+								$airport_pathname
+							)
+						)
+					)
+				)
+			);
+
+			$urls = [
+				home_url(sprintf('fly/%s', $airport_pathname))
+			];
+
+			foreach($language_list as $language)
 			{
-				$url .= '<image:image>';
-				$url .= '<image:loc>'.esc_url(home_url($image_pathname . '/' . $airport_pathname)).'.png</image:loc>';
-				$url .= '</image:image>';
+				$urls[] = home_url(
+					sprintf(
+						'%s/fly/%s',
+						$language,
+						$airport_pathname
+					)
+				);
 			}
 
-			$url .= '<mobile:mobile/>';
-			$url .= '<changefreq>weekly</changefreq>';
-			$url .= '</url>';
-			$urllist .= $url;					
-		}
-		
-		if(count($language_list) > 0)
-		{
-			for($y = 0; $y < count($all_airports); $y++)
+			foreach($urls as $url)
 			{
-				$airport_pathname = $this->utilities->sanitize_pathname($all_airports[$y]['airport']);
-				$pll_url = '<url>';
-				$pll_url .= '<loc>'.esc_url(normalize_url(home_url($language_list[0] . '/fly/' . $airport_pathname))).'</loc>';
-				
-				if($image_pathname)
-				{
-					$pll_url .= '<image:image>';
-					$pll_url .= '<image:loc>'.esc_url(home_url($image_pathname . '/' . $airport_pathname)).'.png</image:loc>';
-					$pll_url .= '</image:image>';
-				}
-
-				$pll_url .= '<mobile:mobile/>';
-				$pll_url .= '<changefreq>weekly</changefreq>';
-				$pll_url .= '</url>';
-				$urllist .= $pll_url;					
-			}					
+				$urllist .= sprintf(
+					'<url><loc>%s</loc><image:image><image:loc>%s</image:loc></image:image><mobile:mobile/><changefreq>weekly</changefreq></url>',
+					esc_url(normalize_url($url)),
+					$image_url
+				);
+			}
 		}
-		
-		$sitemap =  '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-		$sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-		xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
-		xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
-		$sitemap .= $urllist;
-		$sitemap .= '</urlset>';
 
-		return $sitemap;
+		return sprintf(
+			'<?xml version="1.0" encoding="UTF-8"?>%1$s<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">%1$s%2$s</urlset>',
+			"\n",
+			$urllist
+		);
 	}
 
 
