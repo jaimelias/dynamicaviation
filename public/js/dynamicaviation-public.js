@@ -156,10 +156,12 @@ const validateAircraftSearch = () => {
 			return;
 		}
 
+		const origin = thisForm.find('#aircraft_origin').val();
+		const destination = thisForm.find('#aircraft_destination').val();
+
 		if(typeof gtag !== 'undefined') {
 
-			const origin = thisForm.find('#aircraft_origin').val();
-			const destination = thisForm.find('#aircraft_destination').val();
+
 			const paxNum = Number.parseInt(
 				thisForm.find('#pax_num').val(),
 				10
@@ -192,11 +194,11 @@ const validateAircraftSearch = () => {
 			fbq('track', 'Search');
 		}
 
-		const {dy_nonce} = (await getNonce()) ?? {};
+		const route = `${origin}-${destination}`;
 		const action = atob(thisForm.attr('data-action'));
 		const newAction = new URL(action, window.location.origin);
 
-		newAction.pathname = `${newAction.pathname.replace(/\/$/, '')}/${dy_nonce}`;
+		newAction.pathname = `${newAction.pathname.replace(/\/$/, '')}/${route}`;
 
 		thisForm.attr('data-action', btoa(newAction.href));
 
