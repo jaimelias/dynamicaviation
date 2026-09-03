@@ -75,7 +75,7 @@ class Dynamic_Aviation {
 
 		new Dynamic_Aviation_Price_Table($utilities);
 
-		new Dynamic_Aviation_Shortcodes($utilities);		
+		new Dynamic_Aviation_Shortcodes();		
 		
 		new Dynamic_Aviation_Aircrafts($this->get_plugin_name(), $this->get_version(), $utilities);
 
@@ -100,10 +100,6 @@ class Dynamic_Aviation {
 
 	public function get_plugin_name() {
 		return $this->plugin_name;
-	}
-
-	public function get_loader() {
-		return $this->loader;
 	}
 
 	public function get_version() {

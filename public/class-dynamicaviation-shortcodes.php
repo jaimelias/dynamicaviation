@@ -4,7 +4,7 @@
 class Dynamic_Aviation_Shortcodes {
     
     
-    public function __construct($utilities)
+    public function __construct()
     {
         $this->init();
     }
@@ -62,8 +62,6 @@ class Dynamic_Aviation_Shortcodes {
 
 	public function load_scripts()
 	{
-        global $dy_aviation_load_mapbox;
-        global $dy_aviation_load_algolia;
 		global $post;
 
 		if(isset($post))

@@ -230,7 +230,7 @@ class Dynamic_Aviation_Meta_Box
 		if ( isset( $_POST['aircraft_price_per_hour'] ) )
 			update_post_meta( $post_id, 'aircraft_price_per_hour', esc_attr( $_POST['aircraft_price_per_hour'] ) );			
 		if ( isset( $_POST['aircraft_connected_packages'] ) )
-			update_post_meta( $post_id, 'aircraft_connected_packages', esc_textarea($this->utilities->sanitize_items_per_line('intval',  $_POST['aircraft_connected_packages'], 20 )) );				
+			update_post_meta( $post_id, 'aircraft_connected_packages', esc_textarea(dy_sanitize_per_line('intval',  $_POST['aircraft_connected_packages'], 20 )) );				
 
 	}
 }

@@ -346,8 +346,6 @@ class Dynamic_Aviation_Aircrafts {
 
     public function load_scripts($query)
     {
-        global $dy_aviation_load_algolia;
-
         if(isset($query->query_vars[$this->pathname]))
         {
             $GLOBALS['dy_aviation_load_algolia'] = true;

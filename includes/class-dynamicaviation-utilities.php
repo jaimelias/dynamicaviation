@@ -4,155 +4,209 @@
 class Dynamic_Aviation_Utilities {
 
 
-	public function __construct()
-	{	
+	static $cache = [];
+
+	public function __construct(){	
 		$this->plugin_dir_url = plugin_dir_url( __DIR__ );
-		add_action('init', array(&$this, 'init'), 1);
+		$this->ip = get_ip_address();
+		add_action('init', [$this, 'init'], 1);
 	}
 
-	public function init()
-	{
+	public function init() : void {
 		$this->algolia_token = get_option('algolia_token');
 		$this->algolia_index = get_option('algolia_index');
 		$this->algolia_id = get_option('algolia_id');
-		$this->ip = get_ip_address();
 	}
 
-	public function airport_img_url($json)
-	{
-		if(is_array($json))
-		{
-			if(array_key_exists('airport', $json))
-			{
-				return normalize_url(home_url(DY_AVIATION_IMAGE_PATHNAME . '/' .$this->sanitize_pathname($json['airport']).'.png'));
-			}
-		}
+	public function airport_img_url($airport_data) : string {
+
+		return is_array($airport_data) && array_key_exists('airport', $airport_data) 
+			?  normalize_url(home_url(DY_AVIATION_IMAGE_PATHNAME . '/' .$this->sanitize_pathname($airport_data['airport']).'.png'))
+			: '';
+
 	}
 
-	public function plugin_public_args()
-	{
+	public function plugin_public_args() : string {
 		return 'const jsonsrc = () => { return "'.esc_url($this->plugin_dir_url.'public/').'";}';
 	}
     
-	public function algoliasearch_after()
+	public function algoliasearch_after(): string
 	{
-		$output = '';
-
-		if($this->algolia_token && $this->algolia_index && $this->algolia_id)
+		if(!$this->algolia_token || !$this->algolia_index || !$this->algolia_id)
 		{
-			$output .= 'const algoliaClient = algoliasearch("'.esc_html($this->algolia_id).'", "'.esc_html($this->algolia_token).'");';
-			$output .= 'const algoliaIndex = algoliaClient.initIndex("'.esc_html($this->algolia_index).'");';
+			return '';
 		}
 
-		return $output;
+		return sprintf(
+			'const algoliaClient = algoliasearch("%s", "%s"); const algoliaIndex = algoliaClient.initIndex("%s");',
+			esc_js($this->algolia_id),
+			esc_js($this->algolia_token),
+			esc_js($this->algolia_index)
+		);
 	}
   
-	  public function convertNumberToTime($dec)
-	  {
-		$dec = (empty($dec)) ? 1 : $dec;
-		$seconds = ($dec * 3600);
-		$hours = floor($dec);
-		$seconds -= $hours * 3600;
-		$minutes = floor($seconds / 60);
-		return $this->lz($hours).":".$this->lz($minutes);
-	  }
-  
-	  public function lz($num)
-	  {
-		  return (strlen($num) < 2) ? "0{$num}" : $num;
-	  }
-
-		public function aircraft_type($type)
+	public function convertNumberToTime(float|int|null $dec): string
+	{
+		if($dec === null || $dec < 0)
 		{
-			$types = [
-				0 => __('Turbo Prop', 'dynamicaviation'),
-				1 => __('Light Jet', 'dynamicaviation'),
-				2 => __('Mid-size Jet', 'dynamicaviation'),
-				3 => __('Heavy Jet', 'dynamicaviation'),
-				4 => __('Airliner', 'dynamicaviation'),
-				5 => __('Helicopter', 'dynamicaviation'),
-				6 => __('Light Aircraft', 'dynamicaviation'),
-			];
-
-			$type = (int) $type;
-
-			return $types[$type] ?? '';
+			return '';
 		}
 
-	  public function sanitize_pathname($url)
-	  {
-		  $url = strtolower($url);
-		  $unwanted_array = array('Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E','Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss', 'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
-		  $url = strtr( $url, $unwanted_array);
-		  $url = preg_replace("/[^a-z0-9\s\-]/i", "", $url);
-		  $url = preg_replace("/\s\s+/", " ", $url);
-		  $url = preg_replace("/\s/", "-", $url);
-		  $url = preg_replace("/\-\-+/", "-", $url);
-		  $url = trim($url, "-");
-  
-		  return $url;
-	  }
+		$hours = (int) floor($dec);
+		$minutes = (int) round(($dec - $hours) * 60);
 
-	public function airport_data_by_iata ($iata = '') {
-		if(empty($iata)) return [];
+		if($minutes === 60)
+		{
+			$hours++;
+			$minutes = 0;
+		}
+
+		return sprintf('%02d:%02d', $hours, $minutes);
+	}
+
+	public function aircraft_type(int|string|null $type): string
+	{
+		if(!is_numeric($type))
+		{
+			return '';
+		}
+
+		return match((int) $type)
+		{
+			0 => __('Turbo Prop', 'dynamicaviation'),
+			1 => __('Light Jet', 'dynamicaviation'),
+			2 => __('Mid-size Jet', 'dynamicaviation'),
+			3 => __('Heavy Jet', 'dynamicaviation'),
+			4 => __('Airliner', 'dynamicaviation'),
+			5 => __('Helicopter', 'dynamicaviation'),
+			6 => __('Light Aircraft', 'dynamicaviation'),
+			default => '',
+		};
+	}
+
+	public function all_airports_data() : array {
+		
+		$cache_key = 'dynamicaviation_all_airports_data_v2';
+
+		if(array_key_exists($cache_key, self::$cache)){
+			return self::$cache[$cache_key];
+		}
+
+		// Try from cache first
+		$cached = get_transient($cache_key);
+
+		if (is_array($cached)) {
+
+			return self::$cache[$cache_key] = $cached;
+		}
+
+		$url = sprintf(
+			'https://%s-dsn.algolia.net/1/indexes/%s/browse?cursor=',
+			$this->algolia_id,
+			$this->algolia_index
+		);
+
+		$headers = [
+			'X-Algolia-API-Key' => $this->algolia_token,
+			'X-Algolia-Application-Id' => $this->algolia_id,
+			'Content-Type' => 'application/json'
+		];
+
+		$output = [];
+
+		$resp = wp_remote_get($url, ['headers' => $headers]);
+
+		if (is_wp_error($resp)) {
+			return self::$cache[$cache_key] = [];
+		}
+
+		if (wp_remote_retrieve_response_code($resp) !== 200) {
+			return self::$cache[$cache_key] = [];
+		}
+		
+		$body = json_decode(wp_remote_retrieve_body($resp), true);
+
+		if (is_array($body) && array_key_exists('hits', $body) && is_array($body['hits'])) {
+
+			$output = $body['hits'];
+
+			set_transient($cache_key, $output, 21600);
+		}
+
+		return self::$cache[$cache_key] = $output;
+	}
+
+	public function airport_data_by_iata ($iata = '') : array {
+
+
+		$iata = strtoupper(trim($iata));
+
+		if ($iata === '') return [];
+
+		$cache_key = 'dy_airport_data_by_iata_v2_' . $iata;
+
+		if(array_key_exists($cache_key, self::$cache)){
+			return self::$cache[$cache_key];
+		}
 
 		$all_airports_data = $this->all_airports_data();
 
-		$cache_key = 'dy_airport_data_by_iata_' . $iata;
-		global $$cache_key; 
-
-		if(isset($$cache_key)) {
-			return $$cache_key;
+		if (empty($all_airports_data)) {
+			return [];
 		}
 
 		$output = [];
 
-		if (!is_array($all_airports_data)) return [];
-
 		foreach ($all_airports_data as $row) {
 			// Be defensive about missing keys
-			if (!isset($row['airport']) || !isset($row['iata'])) {
+			if (!isset($row['iata'])) {
 				continue;
 			}
-			if ($iata === $row['iata']) {
+			if ($iata === strtoupper($row['iata'])) {
 				$output = $row;
 				break; // stop on first match
 			}
 		}
 
-		$GLOBALS[$cache_key] = $output;
-
-		return $output;
+		return self::$cache[$cache_key] = $output;
 	}
 
-	public function airport_data_by_slug($slug = '') {
-		// Pull from query var if not provided explicitly (but don't clobber valid "0")
+	public function airport_data_by_slug(string $slug = '') : array {
 
-		if (empty($slug)) {
-			$slug = get_query_var('fly');
-
-			if(empty($slug)) {
-				return null;
-			}
+		if ($slug === '') {
+			$slug = (string) get_query_var('fly');
 		}
 
-		// Use a consistent, safe cache key (only in $GLOBALS)
-		$cache_key = 'dy_airport_data_by_slug_' . $slug;
-		global $$cache_key; 
+		if ($slug === '') {
+			return [];
+		}
 
-		if(isset($$cache_key)) {
-			return $$cache_key;
+		$slug = $this->sanitize_pathname($slug);
+
+		if ($slug === '') {
+			return [];
+		}
+
+		$slug = $this->sanitize_pathname($slug);
+
+		$cache_key = 'dy_airport_data_by_slug_v2_' . $slug;
+
+		if(array_key_exists($cache_key, self::$cache)){
+			return self::$cache[$cache_key];
+		}
+
+		
+		$all_airports_data = $this->all_airports_data();
+
+		if (empty($all_airports_data)) {
+			return [];
 		}
 
 		$output = [];
-		$all_airports_data = $this->all_airports_data();
-		if(!is_array($all_airports_data) || count($all_airports_data) === 0) return null;
-
-		if (!is_array($all_airports_data)) return [];
 
 		foreach ($all_airports_data as $row) {
 			// Be defensive about missing keys
-			if (!isset($row['airport']) || !isset($row['iata'])) {
+			if (!isset($row['airport'])) {
 				continue;
 			}
 			if ($slug === $this->sanitize_pathname($row['airport'])) {
@@ -161,9 +215,7 @@ class Dynamic_Aviation_Utilities {
 			}
 		}
 
-		$GLOBALS[$cache_key] = $output;
-
-		return $output;
+		return self::$cache[$cache_key] = $output;
 	}
 
 	public function sanitize_items_per_line($sanitize_func, $str, $max)
@@ -185,44 +237,6 @@ class Dynamic_Aviation_Utilities {
 		return explode("\r\n", html_entity_decode($str));
 	}
 
-	public function all_airports_data()
-	{
-		$output = array();
-		$transient_key = 'dynamicaviation_all_airports_data';
-
-		// Try from cache first
-		$cached = get_transient($transient_key);
-
-		if ($cached !== false) {
-			return $cached;
-		}
-
-		$query_param = 'browse?cursor=';
-		$url = 'https://' . $this->algolia_id . '-dsn.algolia.net/1/indexes/' . $this->algolia_index . '/' . $query_param;
-
-		$headers = array(
-			'X-Algolia-API-Key' => $this->algolia_token,
-			'X-Algolia-Application-Id' => $this->algolia_id,
-			'Content-Type' => 'application/json'
-		);
-
-		$resp = wp_remote_get($url, array('headers' => $headers));
-
-		if (is_array($resp) && !is_wp_error($resp)) {
-			if ($resp['response']['code'] === 200) {
-				$body = json_decode($resp['body'], true);
-
-				if (!empty($body['hits'])) {
-					$output = $body['hits'];
-
-					// Store in cache for 6 hours (21600 seconds)
-					set_transient($transient_key, $output, 21600);
-				}
-			}
-		}
-
-		return $output;
-	}
 
 
 
@@ -283,137 +297,55 @@ class Dynamic_Aviation_Utilities {
         }
         else
         {
-            return array();
+            return [];
         }
     }
 
-	public function validate_legs($value)
+	public function sanitize_pathname(string $url): string
 	{
-		return in_array(intval($value), array(0,1));
+		$url = strtr(mb_strtolower($url, 'UTF-8'), [
+			'š' => 's',
+			'ž' => 'z',
+			'à' => 'a',
+			'á' => 'a',
+			'â' => 'a',
+			'ã' => 'a',
+			'ä' => 'a',
+			'å' => 'a',
+			'æ' => 'ae',
+			'ç' => 'c',
+			'è' => 'e',
+			'é' => 'e',
+			'ê' => 'e',
+			'ë' => 'e',
+			'ì' => 'i',
+			'í' => 'i',
+			'î' => 'i',
+			'ï' => 'i',
+			'ð' => 'o',
+			'ñ' => 'n',
+			'ò' => 'o',
+			'ó' => 'o',
+			'ô' => 'o',
+			'õ' => 'o',
+			'ö' => 'o',
+			'ø' => 'o',
+			'ù' => 'u',
+			'ú' => 'u',
+			'û' => 'u',
+			'ü' => 'u',
+			'ý' => 'y',
+			'þ' => 'b',
+			'ÿ' => 'y',
+			'ß' => 'ss',
+		]);
+
+		return trim(
+			preg_replace('/[^a-z0-9]+/', '-', $url),
+			'-'
+		);
 	}
 
-	public function validate_params($param_names)
-	{
-		$output = false;
-		$cache_key = 'dy_aviation_validate_params';
-		global $$cache_key;
-
-		if(isset($$cache_key))
-		{
-			$output = $$cache_key;
-		}
-		else
-		{
-			$not_set_params = [];
-			$invalid_params = [];
-
-			$round_trip = secure_post('aircraft_flight', 0, 'absint') === 1;
-
-			for($x = 0; $x < count($param_names); $x++)
-			{
-				$param = $param_names[$x];
-
-				if(!isset($_POST[$param]))
-				{
-					$not_set_params[] = $param;
-				}
-				else
-				{
-					$value = secure_post($param);
-
-					if($param === 'email')
-					{
-						if(!is_email($value))
-						{
-							$invalid_params[] = $param;
-						}
-					}
-					else if($param === 'repeat_email')
-					{
-						if(!is_email($value) || $value !== secure_post('email'))
-						{
-							$invalid_params[] = $param;
-						}
-					}
-					else if($param === 'aircraft_flight')
-					{
-						if(!$this->validate_legs($value))
-						{
-							$invalid_params[] = $param;
-						}
-					}
-					else if($param === 'start_date')
-					{
-						if(!is_valid_date($value))
-						{
-							$invalid_params[] = $param;
-						}
-					}
-					else if($param === 'start_time')
-					{
-						if(!is_valid_time($value))
-						{
-							$invalid_params[] = $param;
-						}
-					}
-					else if($param === 'end_date')
-					{
-						if($round_trip)
-						{
-							if(!is_valid_date($value))
-							{
-								$invalid_params[] = $param;
-							}
-						}
-					}
-					else if($param === 'end_time')
-					{
-						if($round_trip)
-						{
-							if(!is_valid_time($value))
-							{
-								$invalid_params[] = $param;
-							}
-						}
-					}
-					else
-					{
-						if(empty(secure_post($param)))
-						{
-							$invalid_params[] = $param;
-						}
-					}
-				}
-			}
-
-			if(empty($not_set_params))
-			{
-				if(empty($invalid_params))
-				{
-					$output = true;
-				}
-				else
-				{
-					$log = array('invalid_params' => $invalid_params);
-					$GLOBALS['dy_request_invalids'] = $log;
-					//write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
-
-					//block ip
-					cloudflare_ban_ip_address();
-				}
-			}
-			else
-			{
-				$log = array('not_set_params' => $not_set_params);
-				//write_log(array_merge($log, array('ip' => $this->ip, '_POST' => $_POST)));
-				$GLOBALS['dy_request_invalids'] = $log;
-			}
-
-			$GLOBALS[$cache_key] = $output;
-		}
-
-		return $output;
-	}
 }
 
 
