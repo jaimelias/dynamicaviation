@@ -16,30 +16,25 @@ perform_git_actions() {
     git push origin master
 }
 
-# Main script
 
-# Root directory
-perform_git_actions
+# Gets to /wp-content/plugins/dynamicpackages
+cd ../
 
-# Move to parent directory
-cd ..
+# Delete and redo /wp-content/plugins/dynamicaviation/submodules/dy-core
+rm -rf ../dynamicaviation/submodules/dy-core
+mkdir -p ../dynamicaviation/submodules
+cp -r dy-core ../dynamicaviation/submodules
 
-# Parent directory
-perform_git_actions
-
-# Move to dynamicaviation directory
-cd ../dynamicaviation || exit
-./submodules.sh
-
-# Dynamicaviation directory
-perform_git_actions
-
-# Move to themes/minimalizr directory
-cd ../../themes/minimalizr || exit
-./submodules.sh
-
-# Minimalizr directory
-perform_git_actions
+# Delete and redo /wp-content/themes/minimalizr/submodules/dy-core
+rm -rf ../../themes/minimalizr/submodules/dy-core
+mkdir -p ../../themes/minimalizr/submodules
+cp -r dy-core ../../themes/minimalizr/submodules
 
 # Return to the original directory
 cd -
+cd ../
+perform_git_actions
+cd ../dynamicaviation
+perform_git_actions
+cd ./../themes/minimalizr
+perform_git_actions
