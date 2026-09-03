@@ -269,7 +269,7 @@ msgstr "Oscuro"
 
 #: public/class-dynamicaviation-price-table.php:68
 msgid "Database is invalid."
-msgstr ""
+msgstr "La base de datos no es válida."
 
 #: public/class-dynamicaviation-estimate-table.php:547
 #: public/class-dynamicaviation-search-form.php:74
@@ -337,7 +337,7 @@ msgstr "Notas de cotización en el idioma %s"
 
 #: public/class-dynamicaviation-training-data.php:103
 msgid "Everyday"
-msgstr ""
+msgstr "Todos los días"
 
 #: public/class-dynamicaviation-estimate-table.php:385
 #: public/class-dynamicaviation-price-table.php:264
@@ -376,7 +376,7 @@ msgstr "Vuelos"
 #: public/class-dynamicaviation-training-data.php:91
 #, php-format
 msgid "Flights %s"
-msgstr ""
+msgstr "Vuelos %s"
 
 #: public/class-dynamicaviation-price-table.php:215
 #, php-format

@@ -54,7 +54,22 @@ class Dynamic_Aviation_Search_Form {
                 <div <?php echo ($is_two_cols) ? 'class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2"' : ''; ?>>
                     <div class="bottom-20">
                         <label><span class="dashicons linkcolor dashicons-admin-users"></span> <?php echo esc_html(__('Passengers', 'dynamicaviation')); ?></label>
-                    <input type="number" min="1" name="pax_num" id="pax_num" />
+                        <select type="number" name="pax_num" id="pax_num">
+                            <?php
+
+                                for($x = 1; $x <= 20; $x++){
+                                    echo sprintf(
+                                        '<option value="%s">%s</option>',
+                                        $x,
+                                        sprintf(
+                                            _n('%s passenger', '%s passengers', $x, 'dynamicaviation'),
+                                            $x
+                                        )
+                                    );
+                                }
+
+                                ?>
+                        </select>
                     </div>
                 </div>
                 <div <?php echo ($is_two_cols) ? 'class="pure-u-1 pure-u-sm-1-2 pure-u-md-1-2"' : ''; ?>>
