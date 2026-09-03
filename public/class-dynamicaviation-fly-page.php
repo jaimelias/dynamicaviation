@@ -93,16 +93,6 @@ class Dynamic_Aviation_Fly_Page {
 		}
 	}
 
-	public function admin_enqueue_scripts()
-	{
-		global $typenow;
-
-		if($typenow === 'destinations')
-		{
-			$GLOBALS['dy_aviation_load_admin_scripts'] = true;
-		}
-	}
-
 	public function add_rewrite_rule()
 	{
 		add_rewrite_rule('^fly/([a-z0-9-]+)[/]?$', 'index.php?fly=$matches[1]','top');
