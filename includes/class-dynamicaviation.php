@@ -42,7 +42,7 @@ class Dynamic_Aviation {
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-price-table.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-aircrafts.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-table.php';
-		require_once $plugin_dir_path . 'public/class-dynamicaviation-destinations.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-fly-page.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-page.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-confirmation.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-image.php';
@@ -81,7 +81,7 @@ class Dynamic_Aviation {
 
 		new Dynamic_Aviation_Estimate_Table($utilities);
 
-		new Dynamic_Aviation_Destinations($this->get_plugin_name(), $this->get_version(), $utilities);
+		new Dynamic_Aviation_Fly_Page($this->get_plugin_name(), $this->get_version(), $utilities);
 
 		new Dynamic_Aviation_Estimate_Confirmation($this->get_plugin_name(), $this->get_version(), $utilities);
 		

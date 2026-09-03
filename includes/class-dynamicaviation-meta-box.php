@@ -21,15 +21,6 @@ class Dynamic_Aviation_Meta_Box
 			'default'
 		);
 
-		add_meta_box(
-			'destination_settings',
-			__( 'Flights', 'dynamicaviation' ),
-			array(&$this, 'destination_fields'),
-			'destinations',
-			'normal',
-			'default'
-		);
-
 	}
 
 	public function base_field()
@@ -45,31 +36,6 @@ class Dynamic_Aviation_Meta_Box
 	public function echo_nonce()
 	{
 		wp_nonce_field( '_aviation_nonce', 'aviation_nonce' );
-	}
-
-	public function destination_fields($post)
-	{
-		$this->echo_nonce();
-		$this->base_field();
-		$this->connected_packages_field();
-	}
-
-	public function connected_packages_field()
-	{
-		?>
-
-		<p><label for="aircraft_connected_packages"><?php echo esc_html(__('Connected Package IDs', 'dynamicaviation' )); ?></label>
-		
-			<br/>
-
-			<textarea rows="10" cols="20" name="aircraft_connected_packages" id="aircraft_connected_packages"><?php echo esc_textarea(dy_sanitize_per_line('intval', aviation_field('aircraft_connected_packages'), 20)); ?></textarea>
-
-
-			<br/>
-			<?php echo esc_html(__('One ID per line', 'dynamicaviation')); ?>
-		</p>
-
-		<?php
 	}
 
     public function select_number($name, $min = 1, $max = 50)
@@ -227,9 +193,7 @@ class Dynamic_Aviation_Meta_Box
 		if ( isset( $_POST['aircraft_year_of_construction'] ) )
 			update_post_meta( $post_id, 'aircraft_year_of_construction', esc_attr( $_POST['aircraft_year_of_construction'] ) );
 		if ( isset( $_POST['aircraft_price_per_hour'] ) )
-			update_post_meta( $post_id, 'aircraft_price_per_hour', esc_attr( $_POST['aircraft_price_per_hour'] ) );			
-		if ( isset( $_POST['aircraft_connected_packages'] ) )
-			update_post_meta( $post_id, 'aircraft_connected_packages', esc_textarea(dy_sanitize_per_line('intval',  $_POST['aircraft_connected_packages'], 20 )) );				
+			update_post_meta( $post_id, 'aircraft_price_per_hour', esc_attr( $_POST['aircraft_price_per_hour'] ) );
 
 	}
 }

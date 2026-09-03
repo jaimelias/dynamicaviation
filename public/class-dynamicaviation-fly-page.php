@@ -1,7 +1,7 @@
 <?php 
 
 #[AllowDynamicProperties]
-class Dynamic_Aviation_Destinations {
+class Dynamic_Aviation_Fly_Page {
     
     public function __construct($plugin_name, $version, $utilities)
     {
@@ -10,7 +10,6 @@ class Dynamic_Aviation_Destinations {
 
 		//init
         add_action('init', array(&$this, 'init'));
-        add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'), 1);
 
 		//admin query vars
 		add_action('init', array(&$this, 'add_rewrite_rule'));
@@ -276,64 +275,6 @@ class Dynamic_Aviation_Destinations {
 	}
 
 
-	public function get_destination_content($iata)
-	{
-		$output = '';
-		$current_language = current_language();
-		$can_user_edit = current_user_can('editor') || current_user_can('administrator');
-
-		$args = array(
-			'post_type' => 'destinations',
-			'posts_per_page' => 1,
-			'post_parent' => 0,
-			'lang' => $current_language,
-			'meta_key' => array(), // kept as-is to preserve behavior
-			'meta_query' => array(
-				array(
-					'key' => 'aircraft_base_iata',
-					'value' => esc_html($iata),
-					'compare' => '='
-				)
-			)
-		);
-
-		$wp_query = new WP_Query($args);
-
-		if ($wp_query->have_posts()) {
-			while ($wp_query->have_posts()) {
-				$wp_query->the_post();
-
-				global $post; // preserved to keep do_blocks($post->post_content) behavior
-
-				$output .= sprintf(
-					'<div class="entry-content">%s</div>',
-					do_blocks($post->post_content)
-				);
-
-				if ($can_user_edit) {
-					$output .= sprintf(
-						'<p><a class="pure-button" href="%s"><span class="dashicons dashicons-edit"></span> %s</a></p>',
-						esc_url(get_edit_post_link($post->ID)),
-						esc_html(__('Edit Destination', 'dynamicaviation'))
-					);
-				}
-			}
-
-			wp_reset_postdata();
-		} else {
-			if ($can_user_edit) {
-				$output .= sprintf(
-					'<p><a class="pure-button" href="%s"><span class="dashicons dashicons-plus"></span> %s</a></p>',
-					esc_url(admin_url('post-new.php?post_type=destinations&iata=' . $iata)),
-					esc_html(__('Add Destination', 'dynamicaviation'))
-				);
-			}
-		}
-
-		return $output;
-	}
-
-
 	public function template()
 	{
 		$airport_array = $this->utilities->airport_data_by_slug();
@@ -361,8 +302,6 @@ class Dynamic_Aviation_Destinations {
 
 		ob_start();
 		?>
-
-			<?php echo $this->get_destination_content($iata); ?>
 
 			<div class="pure-g gutters bottom-20">
 
