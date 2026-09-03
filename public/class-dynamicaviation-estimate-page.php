@@ -169,8 +169,16 @@ class Dynamic_Aviation_Estimate_Page
 		$output = true;
 		$required_params = [
 			'aircraft_origin' => function($name) { return !empty(secure_get($name)); },
-			'aircraft_destination' => function($name) { return !empty(secure_get('aircraft_destination')); },
-			'pax_num' => function($name) { return secure_get($name, 0, 'absint') > 0; },
+			'aircraft_destination' => function($name) { 
+
+				$aircraft_destination = secure_get('aircraft_destination');
+				$aircraft_origin = secure_get('aircraft_origin');
+				return !empty(secure_get('aircraft_destination')) && $aircraft_destination !== $aircraft_origin;
+			 },
+			'pax_num' => function($name) { 
+				$pax_num = secure_get($name, 0, 'absint');
+				return $pax_num >= 1 && $pax_num <= 20;
+			 },
 			'aircraft_flight' => function($name) { return in_array(secure_get($name, 0, 'absint'), [0, 1]);  },
 			'start_date' => function($name) { return is_valid_date(secure_get($name)); },
 			'start_time' => function($name) { return is_valid_time(secure_get($name)); },

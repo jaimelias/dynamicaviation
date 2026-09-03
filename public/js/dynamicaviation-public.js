@@ -246,196 +246,573 @@ const handleLegs = () => {
 	});
 };
 
+
 const algolia_execute = () => {
 
 	const thisForm = jQuery('#aircraft_search_form');
 
-	if(thisForm.length === 0) {
+	if(thisForm.length !== 1) {
+		return;
+	}
+
+	const originField = thisForm.find('#aircraft_origin');
+	const destinationField = thisForm.find('#aircraft_destination');
+	const airportFields = thisForm.find('.aircraft_list');
+	const paxField = thisForm.find('#pax_num');
+	const searchButton = thisForm.find('#aircraft_search_button');
+
+	if(
+		originField.length !== 1 ||
+		destinationField.length !== 1 ||
+		searchButton.length !== 1
+	) {
 		return;
 	}
 
 	const {lang} = dyCoreArgs;
 
-	thisForm.find('.aircraft_list').each(function(){
-		
-		const thisField = jQuery(this);
+	/*
+	 * Normalize an IATA value into the only format accepted
+	 * by this form.
+	 */
+	const normalizeIata = value => String(value || '')
+		.trim()
+		.toUpperCase();
 
-		thisField.autocomplete({
-			hint: false
-		},[{
-			source: jQuery.fn.autocomplete.sources.hits(algoliaIndex, {
-				hitsPerPage: 4
-			}),
-			displayKey: 'airport',
-			templates: {
-				suggestion: suggestion => {
+	const isValidIata = value => /^[A-Z]{3}$/.test(
+		normalizeIata(value)
+	);
 
-					const localize = ['airport', 'city'];
+	/*
+	 * data-iata is the authoritative evidence that the value
+	 * came from autocomplete:selected.
+	 *
+	 * The visible input value is never trusted.
+	 */
+	const getSelectedIata = field => {
 
-					let {
-						country_names,
-						country_code,
-						_highlightResult,
-						iata
-					} = suggestion;
+		const iata = normalizeIata(
+			field.attr('data-iata')
+		);
 
-					localize.forEach(k => {
+		return (
+			field.hasClass('aircraft_selected') &&
+			isValidIata(iata)
+		) ? iata : '';
+	};
 
-						if(_highlightResult.hasOwnProperty(k))
-						{
-							const localizedKey = `${k}_names`;
-							const loc = _highlightResult[localizedKey];
+	const isSelectedAirport = field => (
+		getSelectedIata(field) !== ''
+	);
 
-							if(loc)
-							{
-								if(loc.hasOwnProperty(lang))
-								{
-									_highlightResult[k] = loc[lang];
-								}
-							}
-						}
-					});
+	/*
+	 * Remove autocomplete selection state without necessarily
+	 * clearing what the user is currently typing.
+	 */
+	const clearAirportSelection = field => {
 
+		field
+			.removeClass('aircraft_selected')
+			.removeAttr('data-iata')
+			.removeAttr('data-lat')
+			.removeAttr('data-lon');
+	};
 
-					const {
-						airport,
-						iata: _iata,
-						city
-					} = _highlightResult;
+	/*
+	 * A rejected airport has no residual autocomplete state.
+	 */
+	const invalidateAirport = field => {
 
-					const country = country_names?.hasOwnProperty(lang)
-						? country_names[lang]
-						: null;
+		clearAirportSelection(field);
 
-					const flag_url = String(
-						jsonsrc() + "img/flags/" + country_code + '.svg'
-					).toLowerCase();
+		field
+			.val('')
+			.addClass('invalid_field');
+	};
 
-					const result = jQuery(
-						'<div class="algolia_airport clearfix"><div class="sflag pull-left"><img width="45" height="33.75" /></div><div class="sdata"><div class="sairport"><span class="airport"></span> <strong class="iata"></strong></div><div class="slocation"><span class="city"></span>, <span class="country"></span></div></div></div>'
-					);
+	/*
+	 * Store one autocomplete selection.
+	 */
+	const selectAirport = (field, suggestion) => {
 
-					result.find('.sairport > .airport').html(airport?.value || '');
-					
-					if(iata?.length === 3)
-					{
-						result.find('.sairport > .iata').html(`(${_iata?.value || iata})`);
-					}
-					
-					result.find('.slocation > .city').html(city?.value || '');
-					result.find('.slocation > .country').html(country || '');
-					result.find('.sflag > img').attr({
-						src: flag_url
-					});
+		const iata = normalizeIata(
+			suggestion?.iata
+		);
 
-					return result.html();
-				}
-			}
-		}]).on('autocomplete:selected', function(event, suggestion) {
-			
-			let {
-				iata,
-				icao,
-				airport,
-				airport_names,
-				city,
-				city_names,
-				country_code,
-				_geoloc
-			} = suggestion;
+		if(!isValidIata(iata))
+		{
+			invalidateAirport(field);
+			return false;
+		}
 
-			if(airport_names?.hasOwnProperty(lang))
-			{
-				airport = airport_names[lang];
-			}
+		const lat = Number(
+			suggestion?._geoloc?.lat
+		);
 
-			if(city_names?.hasOwnProperty(lang))
-			{
-				city = city_names[lang];
-			}
+		const lon = Number(
+			suggestion?._geoloc?.lng
+		);
 
-			const locationField = thisForm.find(
-				'#' + thisField.attr('id') + '_l'
-			);
-			
-			locationField.val(
-				`${airport}${iata?.length === 3 ? ` (${iata})` : ''}, ${city}, ${country_code}`
-			);
-			
-			thisField.attr({
-				'data-iata': iata,
-				'data-lat': _geoloc?.lat,
-				'data-lon': _geoloc?.lng
-			})
+		const attrs = {
+			'data-iata': iata
+		};
+
+		if(Number.isFinite(lat))
+		{
+			attrs['data-lat'] = lat;
+		}
+
+		if(Number.isFinite(lon))
+		{
+			attrs['data-lon'] = lon;
+		}
+
+		field
+			.attr(attrs)
+			.removeClass('invalid_field')
 			.addClass('aircraft_selected')
 			.val(iata);
 
-			/*
-			 * Prevent adding the handlers again after
-			 * every autocomplete selection.
-			 */
-			thisField
-				.off('blur.aircraft')
-				.on('blur.aircraft', () => {
+		return true;
+	};
 
-					if(thisField.hasClass('aircraft_selected'))
+	const airportsAreEqual = () => {
+
+		const origin = getSelectedIata(
+			originField
+		);
+
+		const destination = getSelectedIata(
+			destinationField
+		);
+
+		return (
+			origin !== '' &&
+			destination !== '' &&
+			origin === destination
+		);
+	};
+
+	/*
+	 * Destination owns the duplicate-route error.
+	 *
+	 * This remains true even when origin was the airport most
+	 * recently changed.
+	 */
+	const rejectDuplicateRoute = () => {
+
+		if(!airportsAreEqual())
+		{
+			return false;
+		}
+
+		invalidateAirport(
+			destinationField
+		);
+
+		destinationField.trigger('focus');
+
+		return true;
+	};
+
+	/*
+	 * Final route validation.
+	 *
+	 * Do not use field.val() here. A user can manually type
+	 * PTY, MIA, etc. Only data-iata + aircraft_selected count.
+	 */
+	const validateAirports = () => {
+
+		if(!isSelectedAirport(originField))
+		{
+			invalidateAirport(originField);
+			originField.trigger('focus');
+
+			return false;
+		}
+
+		if(!isSelectedAirport(destinationField))
+		{
+			invalidateAirport(destinationField);
+			destinationField.trigger('focus');
+
+			return false;
+		}
+
+		if(airportsAreEqual())
+		{
+			invalidateAirport(destinationField);
+			destinationField.trigger('focus');
+
+			return false;
+		}
+
+		return true;
+	};
+
+	/*
+	 * Decide what should receive focus after a successful
+	 * autocomplete selection.
+	 */
+	const focusNextField = () => {
+
+		if(!isSelectedAirport(originField))
+		{
+			originField.trigger('focus');
+			return;
+		}
+
+		if(!isSelectedAirport(destinationField))
+		{
+			destinationField.trigger('focus');
+			return;
+		}
+
+		paxField.trigger('focus');
+	};
+
+	/*
+	 * Read localized Algolia highlight data without mutating
+	 * suggestion._highlightResult.
+	 *
+	 * The original code modified the hit object in place.
+	 */
+	const getLocalizedHighlight = (
+		highlightResult,
+		key
+	) => {
+
+		const localized = highlightResult?.[
+			`${key}_names`
+		]?.[lang];
+
+		return (
+			localized ||
+			highlightResult?.[key] ||
+			null
+		);
+	};
+
+	const renderSuggestion = suggestion => {
+
+		const {
+			country_names,
+			country_code,
+			_highlightResult,
+			iata
+		} = suggestion;
+
+		const airport = getLocalizedHighlight(
+			_highlightResult,
+			'airport'
+		);
+
+		const city = getLocalizedHighlight(
+			_highlightResult,
+			'city'
+		);
+
+		const highlightedIata =
+			_highlightResult?.iata;
+
+		const country =
+			country_names?.[lang] ||
+			country_names?.en ||
+			country_code ||
+			'';
+
+		const result = jQuery(
+			'<div class="algolia_airport clearfix">' +
+				'<div class="sflag pull-left">' +
+					'<img width="45" height="33.75" alt="" />' +
+				'</div>' +
+				'<div class="sdata">' +
+					'<div class="sairport">' +
+						'<span class="airport"></span> ' +
+						'<strong class="iata"></strong>' +
+					'</div>' +
+					'<div class="slocation">' +
+						'<span class="city"></span>, ' +
+						'<span class="country"></span>' +
+					'</div>' +
+				'</div>' +
+			'</div>'
+		);
+
+		/*
+		 * Algolia highlight values intentionally contain its
+		 * highlighting markup, so .html() is retained here.
+		 */
+		result
+			.find('.sairport > .airport')
+			.html(
+				airport?.value || ''
+			);
+
+		if(isValidIata(iata))
+		{
+			result
+				.find('.sairport > .iata')
+				.html(
+					`(${highlightedIata?.value || normalizeIata(iata)})`
+				);
+		}
+
+		result
+			.find('.slocation > .city')
+			.html(
+				city?.value || ''
+			);
+
+		/*
+		 * Country is raw record data, not Algolia highlight
+		 * markup, so use .text().
+		 */
+		result
+			.find('.slocation > .country')
+			.text(country);
+
+		const normalizedCountryCode = String(
+			country_code || ''
+		)
+			.trim()
+			.toLowerCase();
+
+		if(/^[a-z]{2}$/.test(normalizedCountryCode))
+		{
+			result
+				.find('.sflag > img')
+				.attr(
+					'src',
+					`${jsonsrc()}img/flags/${normalizedCountryCode}.svg`
+				);
+		}
+		else
+		{
+			result
+				.find('.sflag')
+				.remove();
+		}
+
+		return result.html();
+	};
+
+	const autocompleteOptions = [{
+		source: jQuery.fn.autocomplete.sources.hits(
+			algoliaIndex,
+			{
+				hitsPerPage: 4
+			}
+		),
+		displayKey: 'airport',
+		templates: {
+			suggestion: renderSuggestion
+		}
+	}];
+
+	airportFields.each(function(){
+
+		const thisField = jQuery(this);
+
+		/*
+		 * Editing a selected airport destroys the selection
+		 * token, but does not immediately erase what the user
+		 * is typing.
+		 *
+		 * FOCUS IS NOT ENOUGH TO INVALIDATE A SELECTION.
+		 */
+		thisField
+			.off('input.aircraft')
+			.on('input.aircraft', () => {
+
+				if(
+					thisField.hasClass('aircraft_selected') ||
+					thisField.attr('data-iata')
+				)
+				{
+					clearAirportSelection(
+						thisField
+					);
+				}
+
+				thisField.removeClass(
+					'invalid_field'
+				);
+			});
+
+		/*
+		 * Blur validation is deferred one event-loop turn.
+		 *
+		 * This avoids clearing the input during the mouse
+		 * sequence used to select an autocomplete suggestion.
+		 */
+		thisField
+			.off('blur.aircraft')
+			.on('blur.aircraft', () => {
+
+				window.setTimeout(() => {
+
+					if(isSelectedAirport(thisField))
 					{
 						thisField.val(
-							thisField.attr('data-iata')
+							getSelectedIata(
+								thisField
+							)
+						);
+
+						return;
+					}
+
+					invalidateAirport(
+						thisField
+					);
+
+				}, 0);
+			});
+
+		/*
+		 * algolia_execute() may run more than once.
+		 *
+		 * Do not initialize the autocomplete plugin repeatedly
+		 * on the same DOM node.
+		 */
+		if(
+			!thisField.data(
+				'aircraft-autocomplete-initialized'
+			)
+		)
+		{
+			thisField.autocomplete(
+				{
+					hint: false
+				},
+				autocompleteOptions
+			);
+
+			thisField.data(
+				'aircraft-autocomplete-initialized',
+				true
+			);
+		}
+
+		/*
+		 * Our custom handlers are namespaced so they can be
+		 * replaced safely if algolia_execute() runs again.
+		 */
+		thisField
+			.off(
+				'autocomplete:selected.aircraft ' +
+				'autocomplete:closed.aircraft'
+			)
+			.on(
+				'autocomplete:selected.aircraft',
+				(event, suggestion) => {
+
+					if(
+						!selectAirport(
+							thisField,
+							suggestion
+						)
+					)
+					{
+						return;
+					}
+
+					/*
+					 * Check the complete pair after EVERY
+					 * selection, not just destination.
+					 *
+					 * This catches:
+					 *
+					 * PTY -> MIA -> change origin to MIA
+					 */
+					if(rejectDuplicateRoute())
+					{
+						return;
+					}
+
+					focusNextField();
+				}
+			)
+			.on(
+				'autocomplete:closed.aircraft',
+				() => {
+
+					/*
+					 * Any text remaining without a valid
+					 * autocomplete token is manual input.
+					 */
+					if(!isSelectedAirport(thisField))
+					{
+						invalidateAirport(
+							thisField
 						);
 					}
-					else
-					{
-						thisField.val('');
-						locationField.val('');
-
-						thisField
-							.removeClass('aircraft_selected')
-							.addClass('invalid_field')
-							.removeAttr('data-iata')
-							.removeAttr('data-lat')
-							.removeAttr('data-lon');
-					}
-				});
-
-			thisField
-				.off('focus.aircraft')
-				.on('focus.aircraft', () => {
-
-					thisField.val('');
-					locationField.val('');
-
-					thisField
-						.removeClass('aircraft_selected invalid_field')
-						.removeAttr('data-iata')
-						.removeAttr('data-lat')
-						.removeAttr('data-lon');
-				});
-
-			const selected = thisForm.find('.aircraft_selected').length;
-					
-			if(selected === 1)
-			{
-				thisForm
-					.find('.aircraft_list')
-					.not('.aircraft_selected')
-					.focus();
-			}
-			else if(selected === 2)
-			{
-				thisForm
-					.find('input[name="pax_num"]')
-					.focus();
-			}
-			
-		}).on('autocomplete:closed', function(){
-
-			if(!thisField.attr('data-iata'))
-			{
-				thisField.val('');
-			}
-
-		});
+				}
+			);
 	});
 
+	/*
+	 * The actual HTML uses:
+	 *
+	 * <button type="button" id="aircraft_search_button">
+	 *
+	 * Therefore form submit validation alone would not protect
+	 * the aircraft search.
+	 *
+	 * Use a capturing listener so invalid airport data is
+	 * rejected BEFORE another click handler attached directly
+	 * to the search button can execute.
+	 */
+	const formElement = thisForm.get(0);
+
+	const previousGuard = thisForm.data(
+		'aircraft-search-validation-guard'
+	);
+
+	if(previousGuard)
+	{
+		formElement.removeEventListener(
+			'click',
+			previousGuard,
+			true
+		);
+	}
+
+	const searchValidationGuard = event => {
+
+		const target = jQuery(
+			event.target
+		).closest(
+			'#aircraft_search_button'
+		);
+
+		if(
+			target.length === 0 ||
+			!formElement.contains(target.get(0))
+		)
+		{
+			return;
+		}
+
+		if(validateAirports())
+		{
+			return;
+		}
+
+		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+	};
+
+	formElement.addEventListener(
+		'click',
+		searchValidationGuard,
+		true
+	);
+
+	thisForm.data(
+		'aircraft-search-validation-guard',
+		searchValidationGuard
+	);
 };
