@@ -4,11 +4,10 @@
 class Dynamic_Aviation_Meta_Box
 {
 
-	public function __construct($utilities)
+	public function __construct()
 	{
-		$this->utilities = $utilities;
-		add_action( 'save_post', array(&$this, 'save') );
-		add_action( 'add_meta_boxes', array(&$this, 'add_meta_box') );
+		add_action( 'save_post', [$this, 'save'] );
+		add_action( 'add_meta_boxes', [$this, 'add_meta_box'] );
 	}
 
 	public function add_meta_box() {
@@ -63,7 +62,7 @@ class Dynamic_Aviation_Meta_Box
 		
 			<br/>
 
-			<textarea rows="10" cols="20" name="aircraft_connected_packages" id="aircraft_connected_packages"><?php echo esc_textarea($this->utilities->sanitize_items_per_line('intval', aviation_field('aircraft_connected_packages'), 20)); ?></textarea>
+			<textarea rows="10" cols="20" name="aircraft_connected_packages" id="aircraft_connected_packages"><?php echo esc_textarea(dy_sanitize_per_line('intval', aviation_field('aircraft_connected_packages'), 20)); ?></textarea>
 
 
 			<br/>

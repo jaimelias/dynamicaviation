@@ -581,7 +581,11 @@ class Dynamic_Aviation_Estimate_Table {
 
                 if($base_iata)
                 {
-                    $connected_ids = $this->utilities->items_per_line_to_array(aviation_field('aircraft_connected_packages', $post->ID));
+                    $connected_ids = str_row_to_array(
+                        aviation_field('aircraft_connected_packages', $post->ID),
+                        20,
+                        'absint'
+                    );
 
                     for($x = 0; $x < count($connected_ids); $x++ )
                     {

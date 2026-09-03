@@ -218,32 +218,10 @@ class Dynamic_Aviation_Utilities {
 		return self::$cache[$cache_key] = $output;
 	}
 
-	public function sanitize_items_per_line($sanitize_func, $str, $max)
-	{
-		if(!$max)
-		{
-			$max = 20;
-		}
-
-		$row = explode("\r\n", html_entity_decode($str));
-		
-		$arr = array_slice(array_unique(array_filter(array_map($sanitize_func, $row))), 0, $max) ;
-
-		return implode("\r\n", $arr);
-	}
-
-	public function items_per_line_to_array($str)
-	{
-		return explode("\r\n", html_entity_decode($str));
-	}
-
-
-
-
     public function get_rates_from_itinerary($routes, $table_price)
     {
-        $output = array();
-        $rows = array();
+        $output = [];
+        $rows = [];
         $count_routes = count($routes);
 
         for($r = 0; $r < $count_routes; $r++)
@@ -254,11 +232,11 @@ class Dynamic_Aviation_Utilities {
             $row = array_filter($table_price, function($i) use($o, $d){
 
                 //table
-                $a1 = array($i[0], $i[1]);
+                $a1 = [$i[0], $i[1]];
                 sort($a1);
 
                 //route
-                $a2 = array($o, $d);
+                $a2 = [$o, $d];
                 sort($a2);
 
 
