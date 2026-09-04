@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Panama Jet Hub\n"
 "POT-Creation-Date: 2020-09-29 04:29+0000\n"
-"PO-Revision-Date: 2026-09-03 21:42+0000\n"
+"PO-Revision-Date: 2026-09-03 22:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish (Spain)\n"
 "Language: es_ES\n"
@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-SearchPath-0: .\n"
 "Report-Msgid-Bugs-To: \n"
-"X-Loco-Version: 2.6.2; wp-6.0.2"
+"X-Loco-Version: 2.8.8; wp-7.1; php-8.2.0"
 
 #. %1$s: pounds, %2$s: kilograms
 #: public/class-dynamicaviation-estimate-table.php:272
@@ -119,8 +119,7 @@ msgstr "Algolia Api Key"
 
 #: admin/class-dynamicaviation-settings.php:201
 msgid "Algolia Index Name"
-msgstr ""
-"Algolia Index Name\n"
+msgstr "Algolia Index Name"
 
 #: includes/class-dynamicaviation-post-type.php:20
 msgid "All Aircrafts"
