@@ -5,7 +5,7 @@ class Dynamic_Aviation_Estimate_Table {
 
     public function __construct($utilities) {
         $this->utilities = $utilities;
-        $this->set_params();
+        $this->get = (object) [];
         add_action('init', array(&$this, 'init'));
 	}
 
@@ -39,12 +39,26 @@ class Dynamic_Aviation_Estimate_Table {
         {
             $k = $this->param_names[$x];
 
+            if(
+                in_array($k, ['aircraft_origin', 'aircraft_destination'], true)
+            ) {
+                continue;
+            }
+
             if(get_has($k))
             {
-                $this->get->$k = in_array($k, $intval_params) 
+                $this->get->$k = in_array($k, $intval_params, true)
                 ? secure_get($k, 0, 'absint') 
                 : secure_get($k);
             }
+        }
+
+
+        $route = Dynamic_Aviation_Utilities::resolve_route();
+
+        if($route !== null) {
+            $this->get->aircraft_origin = $route->aircraft_origin;
+            $this->get->aircraft_destination = $route->aircraft_destination;
         }
     }
     
@@ -460,6 +474,8 @@ class Dynamic_Aviation_Estimate_Table {
 
     public function template()
     {
+        $this->set_params();
+
         $output = '';
         $rows = '';
 

@@ -18,6 +18,29 @@ class Dynamic_Aviation_Utilities {
 		$this->algolia_id = get_option('algolia_id');
 	}
 
+	/**
+	 * Resolve the instant quote route into its airport codes.
+	 */
+	public static function resolve_route() : ?object {
+		$route = get_query_var('instant_quote');
+
+		if(
+			!is_string($route)
+			|| preg_match(
+				'/^([a-z0-9]{1,12})-([a-z0-9]{1,12})$/D',
+				$route,
+				$matches
+			) !== 1
+		) {
+			return null;
+		}
+
+		return (object) [
+			'aircraft_origin' => strtoupper($matches[1]),
+			'aircraft_destination' => strtoupper($matches[2]),
+		];
+	}
+
 	public function airport_img_url($airport_data) : string {
 
 		return is_array($airport_data) && array_key_exists('airport', $airport_data) 

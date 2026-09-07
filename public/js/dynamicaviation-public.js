@@ -77,6 +77,14 @@ const validateAircraftSearch = () => {
 		const aircraftFlightField = thisForm.find('#aircraft_flight');
 		const aircraftFlightVal = Number.parseInt(aircraftFlightField.val(), 10);
 		const isOneWay = aircraftFlightVal === 0;
+		const originField = thisForm.find('#aircraft_origin');
+		const destinationField = thisForm.find('#aircraft_destination');
+		const normalizeRoutePart = field => String(
+			field.attr('data-iata') || ''
+		).trim().toUpperCase();
+		const isValidRoutePart = value => /^[A-Z0-9]{1,12}$/.test(value);
+		const origin = normalizeRoutePart(originField);
+		const destination = normalizeRoutePart(destinationField);
 
 		if(
 			aircraftFlightField.length === 0 ||
@@ -84,6 +92,30 @@ const validateAircraftSearch = () => {
 		) {
 			invalidFields.add('aircraft_flight');
 			aircraftFlightField.addClass('invalid_field');
+		}
+
+		[
+			['aircraft_origin', originField, origin],
+			['aircraft_destination', destinationField, destination]
+		].forEach(([name, field, value]) => {
+
+			if(
+				field.length !== 1 ||
+				!field.hasClass('aircraft_selected') ||
+				!isValidRoutePart(value)
+			) {
+				invalidFields.add(name);
+				field.addClass('invalid_field');
+			}
+		});
+
+		if(
+			origin !== '' &&
+			destination !== '' &&
+			origin === destination
+		) {
+			invalidFields.add('aircraft_destination');
+			destinationField.addClass('invalid_field');
 		}
 
 		const formData = thisForm.serializeArray();
@@ -156,9 +188,6 @@ const validateAircraftSearch = () => {
 			return;
 		}
 
-		const origin = thisForm.find('#aircraft_origin').val();
-		const destination = thisForm.find('#aircraft_destination').val();
-
 		if(typeof gtag !== 'undefined') {
 
 
@@ -194,7 +223,7 @@ const validateAircraftSearch = () => {
 			fbq('track', 'Search');
 		}
 
-		const route = `${origin}-${destination}`;
+		const route = `${origin}-${destination}`.toLowerCase();
 		const action = atob(thisForm.attr('data-action'));
 		const newAction = new URL(action, window.location.origin);
 

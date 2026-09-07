@@ -45,10 +45,11 @@ class Dynamic_Aviation_Estimate_Page
 	public function add_rewrite_rule()
 	{
 		$pathname = preg_quote($this->pathname, '#');
+		$route_pattern = '([a-z0-9]{1,12}-[a-z0-9]{1,12})';
 
 		// /instant_quote/{value}
 		add_rewrite_rule(
-			'^' . $pathname . '/([^/]+)/?$',
+			'^' . $pathname . '/' . $route_pattern . '/?$',
 			'index.php?' . $this->pathname . '=$matches[1]',
 			'top'
 		);
@@ -78,7 +79,7 @@ class Dynamic_Aviation_Estimate_Page
 
 		// /{language}/instant_quote/{value}
 		add_rewrite_rule(
-			'^(?:' . $language_pattern . ')/' . $pathname . '/([^/]+)/?$',
+			'^(?:' . $language_pattern . ')/' . $pathname . '/' . $route_pattern . '/?$',
 			'index.php?' . $this->pathname . '=$matches[1]',
 			'top'
 		);
@@ -88,7 +89,7 @@ class Dynamic_Aviation_Estimate_Page
 	{
 		add_rewrite_tag(
 			'%' . $this->pathname . '%',
-			'([^&]+)'
+			'([a-z0-9]{1,12}-[a-z0-9]{1,12})'
 		);
 	}
 
@@ -128,15 +129,21 @@ class Dynamic_Aviation_Estimate_Page
 			: $title;
     }
 
-    public function modify_wp_title($title)
-    {        
-        return $this->validate_form_search() 
-			? sprintf( 
-					__('Find an Aircraft %s - %s | %s', 'dynamicaviation'), 
-					secure_get('aircraft_origin'),  
-					secure_get('aircraft_destination'),
-					$this->site_name
-				) 
+	public function modify_wp_title($title)
+	{
+		if(!$this->validate_form_search()) {
+			return $title;
+		}
+
+		$route = Dynamic_Aviation_Utilities::resolve_route();
+
+		return $route
+			? sprintf(
+				__('Find an Aircraft %s - %s | %s', 'dynamicaviation'),
+				$route->aircraft_origin,
+				$route->aircraft_destination,
+				$this->site_name
+			)
 			: $title;
     }
 
@@ -167,14 +174,15 @@ class Dynamic_Aviation_Estimate_Page
 		}
 
 		$output = true;
+		$route = Dynamic_Aviation_Utilities::resolve_route();
 		$required_params = [
-			'aircraft_origin' => function($name) { return !empty(secure_get($name)); },
-			'aircraft_destination' => function($name) { 
-
-				$aircraft_destination = secure_get('aircraft_destination');
-				$aircraft_origin = secure_get('aircraft_origin');
-				return !empty(secure_get('aircraft_destination')) && $aircraft_destination !== $aircraft_origin;
-			 },
+			'aircraft_origin' => function($name) use ($route) {
+				return $route !== null;
+			},
+			'aircraft_destination' => function($name) use ($route) {
+				return $route !== null
+					&& $route->aircraft_destination !== $route->aircraft_origin;
+			},
 			'pax_num' => function($name) { 
 				$pax_num = secure_get($name, 0, 'absint');
 				return $pax_num >= 1 && $pax_num <= 20;

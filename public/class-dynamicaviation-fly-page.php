@@ -96,8 +96,6 @@ class Dynamic_Aviation_Fly_Page {
 	public function add_rewrite_rule()
 	{
 		add_rewrite_rule('^fly/([a-z0-9-]+)[/]?$', 'index.php?fly=$matches[1]','top');
-		
-		add_rewrite_rule('^instant_quote/([a-z0-9-]+)[/]?$', 'index.php?instant_quote=$matches[1]','top');
 
 		$languages = $this->get_languages;
 		$arr = array();
@@ -114,20 +112,17 @@ class Dynamic_Aviation_Fly_Page {
 		{
 			$arr = implode('|', $arr);
 			add_rewrite_rule('('.$arr.')/fly/([a-z0-9-]+)[/]?$', 'index.php?fly=$matches[2]','top');
-			add_rewrite_rule('('.$arr.')/instant_quote/([a-z0-9-]+)[/]?$', 'index.php?instant_quote=$matches[2]','top');
 		}		
 	}
 
 	public function add_rewrite_tag()
 	{
 		add_rewrite_tag('%fly%', '([^&]+)');
-		add_rewrite_tag('%instant_quote%', '([^&]+)');
 	}
 
 	public function registering_custom_query_var($query_vars)
 	{
 		$query_vars[] = 'fly';
-		$query_vars[] = 'instant_quote';
 		return $query_vars;
 	}
 
