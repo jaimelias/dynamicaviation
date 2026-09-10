@@ -59,7 +59,7 @@ class Dynamic_Aviation_Fly_Page {
 		$airport_array = $this->utilities->airport_data_by_slug($slug);
 
 		if(!is_array($airport_array) || count($airport_array) === 0 ) {
-			dy_errors::add(__('Invalid Destination', 'dynamicaviation'));
+			dy_errors::add(__('Invalid Destination', 'dynamicaviation'), 404);
 		}
 	}
 
