@@ -28,7 +28,7 @@ class Dynamic_Aviation_Fly_Page {
         add_action('wp_head', array(&$this, 'meta_tags'));
 
 		//headers
-		add_action('template_redirect', array(&$this, 'return_404'), 999);
+		add_action('wp', array(&$this, 'return_404'), 999);
 
         //minimalizr theme
         add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);
@@ -48,48 +48,18 @@ class Dynamic_Aviation_Fly_Page {
         $this->current_language = current_language();		
     }
 
-	public function return_404() {
+	public function return_404() : void {
 
 		$slug = get_query_var( 'fly' );
 
-		if($slug) {
+		if($slug === '') {
+			return;
+		}
 
-			$airport_array = $this->utilities->airport_data_by_slug($slug);
+		$airport_array = $this->utilities->airport_data_by_slug($slug);
 
-			if(!is_array($airport_array) || count($airport_array) === 0 ) {
-
-				// Evita que WP haga su redirección canónica en esta ruta
-				add_filter('redirect_canonical', '__return_false', 99);
-
-				global $wp_query;
-				if (method_exists($wp_query, 'set_404')) {
-					$wp_query->set_404();
-				}				
-
-				status_header(404);
-				nocache_headers();
-
-				// Cargar plantilla 404 y cortar
-				$template_404 = get_query_template('404');
-				if ($template_404) {
-					include $template_404;
-				}
-				exit;
-			}
-
-			$url = current_url_full();
-			$path = parse_url($url, PHP_URL_PATH);
-
-			if ($path !== '/' && substr($path, -1) === '/') {
-				$unslashed_url = normalize_url($url);
-
-				if($unslashed_url && $unslashed_url !== $url) {
-					wp_safe_redirect($unslashed_url, 301);
-					exit;
-				}
-				
-			}
-
+		if(!is_array($airport_array) || count($airport_array) === 0 ) {
+			dy_errors::add(__('Invalid Destination', 'dynamicaviation'));
 		}
 	}
 
