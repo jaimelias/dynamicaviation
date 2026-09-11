@@ -36,7 +36,7 @@ class Dynamic_Aviation_Settings
 	
 	public function settings_init()
 	{ 
-		$languages = get_languages();
+		
 
 		register_setting( 'aircraft_settings', 'dy_email', 'sanitize_email');
 		register_setting( 'aircraft_settings', 'dy_whatsapp', 'intval');
@@ -104,6 +104,8 @@ class Dynamic_Aviation_Settings
 			'aircraft_settings_section',
 			array('name' => 'dy_tax_id', 'type' => 'text')
 		);
+
+		$languages = get_languages();
 
 		for($x = 0; $x < count($languages); $x++)
 		{

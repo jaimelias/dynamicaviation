@@ -16,9 +16,6 @@ class Dynamic_Aviation_Estimate_Page
 		$this->plugin_dir_url = plugin_dir_url(__DIR__);
 
 		$this->pathname = 'instant_quote';
-		$this->get_languages = get_languages();
-		$this->default_language = default_language();
-		$this->site_name = get_bloginfo('name');
 
 		// Filters custom WordPress outputs.
 		add_filter('pre_get_document_title', [$this, 'modify_wp_title'], 100);
@@ -57,11 +54,11 @@ class Dynamic_Aviation_Estimate_Page
 		$languages = array_values(
 			array_unique(
 				array_filter(
-					$this->get_languages,
+					get_languages(),
 					fn($language) =>
 						is_string($language)
 						&& $language !== ''
-						&& $language !== $this->default_language
+						&& $language !== default_language()
 				)
 			)
 		);
@@ -142,7 +139,7 @@ class Dynamic_Aviation_Estimate_Page
 				__('Find an Aircraft %s - %s | %s', 'dynamicaviation'),
 				$route->aircraft_origin,
 				$route->aircraft_destination,
-				$this->site_name
+				get_bloginfo('name')
 			)
 			: $title;
     }

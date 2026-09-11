@@ -8,9 +8,6 @@ class Dynamic_Aviation_Fly_Page {
         $this->utilities = $utilities;
 		$this->plugin_name = $plugin_name;
 
-		//init
-        add_action('init', array(&$this, 'init'));
-
 		//admin query vars
 		add_action('init', array(&$this, 'add_rewrite_rule'));
 		add_action('init', array(&$this, 'add_rewrite_tag'), 10, 0);
@@ -41,13 +38,6 @@ class Dynamic_Aviation_Fly_Page {
 		add_filter('pll_translation_url', array(&$this, 'pll_translation_url'), 100, 2);
     }
 
-    public function init()
-    {
-        $this->site_name = get_bloginfo('name');
-		$this->get_languages = get_languages();
-        $this->current_language = current_language();		
-    }
-
 	public function return_404() : void {
 
 		$slug = get_query_var( 'fly' );
@@ -67,7 +57,7 @@ class Dynamic_Aviation_Fly_Page {
 	{
 		add_rewrite_rule('^fly/([a-z0-9-]+)[/]?$', 'index.php?fly=$matches[1]','top');
 
-		$languages = $this->get_languages;
+		$languages = get_languages();
 		$arr = array();
 
 		for($x = 0; $x < count($languages); $x++)
@@ -119,9 +109,9 @@ class Dynamic_Aviation_Fly_Page {
 				$country = '';
 				if (
 					array_key_exists('country_names', $airport_array) &&
-					array_key_exists($this->current_language, $airport_array['country_names'])
+					array_key_exists(current_language(), $airport_array['country_names'])
 				) {
-					$country = sprintf(', %s', $airport_array['country_names'][$this->current_language]);
+					$country = sprintf(', %s', $airport_array['country_names'][current_language()]);
 				}
 
 				// Base airport label (either "Airport, City" or "Airport + country")
@@ -132,21 +122,21 @@ class Dynamic_Aviation_Fly_Page {
 				// Override with localized airport name if available
 				if (
 					array_key_exists('airport_names', $airport_array) &&
-					array_key_exists($this->current_language, $airport_array['airport_names'])
+					array_key_exists(current_language(), $airport_array['airport_names'])
 				) {
-					$airport = $airport_array['airport_names'][$this->current_language];
+					$airport = $airport_array['airport_names'][current_language()];
 				}
 
 				$title = sprintf(
 					'%s | %s',
 					sprintf(__('Charter Flights to %s', 'dynamicaviation'), $airport),
-					$this->site_name
+					get_bloginfo('name')
 				);
 			} else {
 				$title = sprintf(
 					'%s | %s',
 					__('Destination Not Found', 'dynamicaviation'),
-					$this->site_name
+					get_bloginfo('name')
 				);
 			}
 		}
@@ -172,9 +162,9 @@ class Dynamic_Aviation_Fly_Page {
 				// Override with localized airport name if available
 				if (
 					array_key_exists('airport_names', $airport_array) &&
-					array_key_exists($this->current_language, $airport_array['airport_names'])
+					array_key_exists(current_language(), $airport_array['airport_names'])
 				) {
-					$airport = $airport_array['airport_names'][$this->current_language];
+					$airport = $airport_array['airport_names'][current_language()];
 				}
 
 				$title = sprintf(
@@ -247,8 +237,8 @@ class Dynamic_Aviation_Fly_Page {
 			$airport .= ' ' . __('Airport', 'dynamicaviation');
 		}
 
-		$country_lang = $this->current_language
-			? ($country[$this->current_language] ?? $country['en'] ?? '')
+		$country_lang = current_language()
+			? ($country[current_language()] ?? $country['en'] ?? '')
 			: ($country['en'] ?? '');
 
 		ob_start();
@@ -314,8 +304,8 @@ class Dynamic_Aviation_Fly_Page {
 			$country_lang = ''; // keep default empty to preserve original behavior when language not set
 
 			// Localized airport name (if available)
-			if (!empty($airport_array['airport_names'][$this->current_language])) {
-				$airport_name = $airport_array['airport_names'][$this->current_language];
+			if (!empty($airport_array['airport_names'][current_language()])) {
+				$airport_name = $airport_array['airport_names'][current_language()];
 			}
 
 			// Address line
@@ -325,8 +315,8 @@ class Dynamic_Aviation_Fly_Page {
 			}
 
 			// Localized country (matches original logic; empty if language not provided)
-			if ($this->current_language) {
-				$country_lang = $country_names[$this->current_language] ?? ($country_names['en'] ?? '');
+			if (current_language()) {
+				$country_lang = $country_names[current_language()] ?? ($country_names['en'] ?? '');
 			}
 			$addressParts[] = $country_lang;
 
@@ -375,7 +365,7 @@ class Dynamic_Aviation_Fly_Page {
 					'country_names' => $country_names
 				] = $airport_array;				
 				
-				$lang = $this->current_language;
+				$lang = current_language();
 				$prices = array();
 				
 				$country_lang = $lang
@@ -448,7 +438,7 @@ class Dynamic_Aviation_Fly_Page {
 						'@type' => 'Product',
 						'brand' => array(
 							'@type' => 'Brand',
-							'name' => esc_html($this->site_name)
+							'name' => esc_html(get_bloginfo('name'))
 						),
 						'category' => esc_html(__('Charter Flights', 'dynamicaviation')),
 						'url' => esc_url($raw_url),

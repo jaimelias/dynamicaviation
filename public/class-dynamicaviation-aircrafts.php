@@ -12,8 +12,6 @@ class Dynamic_Aviation_Aircrafts {
         $this->pathname = 'aircrafts';
         $this->post_type = $this->pathname;
 
-        //init
-        add_action('init', array(&$this, 'init'));
         add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'), 1);
 
 		//filters custom wordpress outputs
@@ -38,12 +36,6 @@ class Dynamic_Aviation_Aircrafts {
         add_action( 'wp', array( &$this, 'load_scripts' ), 100);
 	}
 
-    public function init()
-    {
-		$this->site_name = get_bloginfo('name');
-		$this->current_language = current_language();
-		$this->get_languages = get_languages();
-    }
 
 	public function admin_enqueue_scripts()
 	{
@@ -151,7 +143,7 @@ class Dynamic_Aviation_Aircrafts {
             $title = sprintf(
                 '%s | %s',
                 sprintf(__('%s %s %s in %s', 'dynamicaviation'), $label, $aircraft_type, get_the_title(), $city),
-                $this->site_name
+                get_bloginfo('name')
             );
         }
 

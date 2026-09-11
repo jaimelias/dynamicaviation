@@ -14,17 +14,10 @@ class Dynamic_Aviation_Public {
 		$this->utilities =  $utilities;
 		$this->plugin_dir_url = plugin_dir_url( __FILE__ );
 		$this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
-		add_action('init', [$this, 'init']);
 		add_filter('dy_sitemap', [$this, 'sitemap'], 10);
 		add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
 		add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
 		add_action('wp_head', [$this, 'plugin_public_args']);
-	}
-
-	public function init()
-	{
-		$this->get_languages = get_languages();
-		$this->home_lang = home_lang();
 	}
 
 	public function plugin_public_args()
@@ -44,7 +37,7 @@ class Dynamic_Aviation_Public {
 				'mapbox_map_zoom' => (int) get_option('mapbox_map_zoom'),
 				'mapbox_base_lat' => (float) get_option('mapbox_base_lat'),
 				'mapbox_base_lon' => (float) get_option('mapbox_base_lon'), 
-				'home_url' => $this->home_lang,
+				'home_url' => home_lang(),
 			];
 
 			return 'function mapbox_vars(){return '.json_encode($mapbox_vars).';}';
@@ -68,7 +61,7 @@ class Dynamic_Aviation_Public {
 
 			$language_list = array_values(
 				array_filter(
-					$this->get_languages,
+					get_languages(),
 					fn($language) => $language !== $default_language
 				)
 			);
