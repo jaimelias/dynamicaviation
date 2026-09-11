@@ -60,10 +60,9 @@ class Dynamic_Aviation_Price_Table {
 		}
 
 		$wp_query = new WP_Query($args);
+		$routes = array();
 
 		if ($wp_query->have_posts()) {
-			$routes = array();
-			
 			if (!is_array($all_airports_data)) {
 				return __('Database is invalid.', 'dynamicaviation');
 			}
@@ -244,7 +243,7 @@ class Dynamic_Aviation_Price_Table {
 					// simple reposition add-on (display-only)
 					$reposition_price = 0.0;
 
-					if (!empty($base_iata) && $base_iata !== $origin_iata && is_array($table_price)) {
+					if ($base_iata !== $origin_iata) {
 						foreach ($table_price as $r) {
 							if (($r[0] ?? '') === $base_iata && ($r[1] ?? '') === $origin_iata) {
 								$reposition_price = (float) ($r[3] ?? 0);
@@ -284,7 +283,7 @@ class Dynamic_Aviation_Price_Table {
 		}
 
 		if ($count > 0) {
-			foreach ($routes as $k => $v) {
+			foreach ($routes as $v) {
 				$origin = $v['origin'];
 				$destination = $v['destination'];
 

@@ -166,14 +166,15 @@ class Dynamic_Aviation_Estimate_Confirmation
         }
 
         $price = secure_post('charter_price', 0, 'floatval');
+        $email_template = '';
 
         if (post_has('aircraft_id') && $price > 0)
         {
-            require_once($this->plugin_dir_path . 'public/email_templates/quote.php');
+            require($this->plugin_dir_path . 'public/email_templates/quote.php');
         }
         else
         {
-            require_once($this->plugin_dir_path . 'public/email_templates/general.php');
+            require($this->plugin_dir_path . 'public/email_templates/general.php');
         }
 
         $email = secure_post('email', '', 'sanitize_email');

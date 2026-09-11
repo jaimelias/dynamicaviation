@@ -269,7 +269,7 @@ class Dynamic_Aviation_Utilities {
                 }
             });
 
-            if($row > 0)
+            if(!empty($row))
             {
                 array_push($rows, ...$row);
             }

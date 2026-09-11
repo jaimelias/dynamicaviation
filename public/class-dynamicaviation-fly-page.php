@@ -247,13 +247,9 @@ class Dynamic_Aviation_Fly_Page {
 			$airport .= ' ' . __('Airport', 'dynamicaviation');
 		}
 
-		if ($this->current_language) {
-			if (array_key_exists($this->current_language, $country)) {
-				$country_lang = $country[$this->current_language];
-			} else {
-				$country_lang = $country['en'];
-			}
-		}
+		$country_lang = $this->current_language
+			? ($country[$this->current_language] ?? $country['en'] ?? '')
+			: ($country['en'] ?? '');
 
 		ob_start();
 		?>
@@ -262,13 +258,11 @@ class Dynamic_Aviation_Fly_Page {
 
 				<div class="pure-u-1 pure-u-sm-1-1 pure-u-md-1-3">
 					<table class="airport_description pure-table pure-table-striped bottom-20 small width-100">
-						<?php if ($iata != null && $icao != null): ?>
-							<?php if ($iata != null): ?>
-							<tr><td>IATA</td><td><?php echo esc_html($iata); ?></td></tr>
-							<?php endif; ?>
-							<?php if ($icao != null): ?>
-							<tr><td>ICAO</td><td><?php echo esc_html($icao); ?></td></tr>
-							<?php endif; ?>
+						<?php if ($iata != null): ?>
+						<tr><td>IATA</td><td><?php echo esc_html($iata); ?></td></tr>
+						<?php endif; ?>
+						<?php if ($icao != null): ?>
+						<tr><td>ICAO</td><td><?php echo esc_html($icao); ?></td></tr>
 						<?php endif; ?>
 						<tbody>
 							<tr><td><?php echo esc_html(__('City', 'dynamicaviation')); ?></td><td><?php echo esc_html($city); ?></td></tr>
@@ -384,17 +378,9 @@ class Dynamic_Aviation_Fly_Page {
 				$lang = $this->current_language;
 				$prices = array();
 				
-				if($lang)
-				{
-					if(array_key_exists($lang, $country_names))
-					{
-						$country_lang = $country_names[$lang];
-					}
-					else
-					{
-						$country_lang = $country_names['en'];
-					}
-				}
+				$country_lang = $lang
+					? ($country_names[$lang] ?? $country_names['en'] ?? '')
+					: ($country_names['en'] ?? '');
 				
 				$addressArray = array(($airport.' ('.$iata.')'), $city, $country_lang);
 				$address = implode(', ', $addressArray);

@@ -80,7 +80,9 @@ class Dynamic_Aviation_Training_Data {
 
     public function get_training_data($aircraft_id) {
 
-        if (empty($aircraft_id) || !get_post($aircraft_id)) {
+        $post = get_post($aircraft_id);
+
+        if (empty($aircraft_id) || !$post) {
             wp_die('Invalid aircraft_id.');
         }
 
@@ -90,9 +92,8 @@ class Dynamic_Aviation_Training_Data {
         $languages         = function_exists('get_languages') ? (array) get_languages() : (function_exists('pll_languages_list') ? pll_languages_list(['fields' => 'slug']) : [$current_language]);
         $default_language  = function_exists('default_language') ? (string) default_language() : (function_exists('pll_default_language') ? pll_default_language('slug') : $current_language);
 
-        $post                = get_post($aircraft_id);
-        $aircraft_name       = $post ? $post->post_title : '';
-        $aircraft_slug       = $post ? $post->post_name : (string) $aircraft_id;
+        $aircraft_name       = $post->post_title;
+        $aircraft_slug       = $post->post_name;
         $aircraft_type       = $this->utilities->aircraft_type(aviation_field('aircraft_type', $aircraft_id));
         $aircraft_base_iata  = (string) aviation_field('aircraft_base_iata', $aircraft_id);
         $aircraft_passengers = (int) aviation_field('aircraft_passengers', $aircraft_id);
