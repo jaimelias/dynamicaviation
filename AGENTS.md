@@ -2,24 +2,5 @@
 
 `dynamicaviation`: WordPress plugin for private charter flight operations and reservations.
 
-## `submodules/dy-core` folder
-- Never modify or delete anything here.
-- This folder is a remote dependency.
-
-## Before Coding
-- Implement the minimum surgical code required to solve the request correctly.
-- Do not start by changing code until the relevant behavior and existing implementation are understood.
-- Write simple modern code, easy to be understood.
-
-## PHP preferences:
-- Read `composer.json` for useful tools and project configs.
-- Use `submodules/dy-core/security/queries.php` for handing $_GET, $_POST, $_REQUEST, $_COOKIE, $_SERVER
-- Write modern PHP 8.1 code
-- Prefer `[]` array syntax
-- Type new methods, functions and its params
-- Add protection to new methods: `private`, `protected`, `public`, `static`
-- Avoid unnecessary recurrent DB calls or heavy computation with `static cache`
-- Avoid unnecessary use of `try{} catch(){}` with strong guards
-
-## JS preferences:
-- write modern JS code compatible with es6, jQuery Slim, arrow functions
+- Before coding, read `../dynamicpackages/dy-core/docs/CODING.md`; its rules are mandatory project-wide. Resolve documentation links relative to their containing file; project paths start at this repository root.
+- `submodules/dy-core/` is this project's shared library dependency. Never modify or delete its contents.
