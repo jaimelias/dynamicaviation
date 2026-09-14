@@ -99,6 +99,7 @@ function aviation_field($name, $this_id = null)
     $value = get_post_meta($this_id, $name, true);
 
     if (is_array($value)) {
+        write_log("is array: $name");
         return $cache[$cache_key] = $value; // don't force-cast arrays to string
     }
 
