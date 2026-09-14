@@ -148,7 +148,7 @@ class Dynamic_Aviation_Estimate_Page
 	{
 		if($this->validate_form_search())
 		{
-			wp_enqueue_script($this->plugin_name.'_'.$this->pathname, $this->plugin_dir_url . 'public/js/estimate-page.js', ['jquery', 'turnstile-compat', 'dy-core-utilities'], $this->version, true );
+			wp_enqueue_script($this->plugin_name.'_'.$this->pathname, $this->plugin_dir_url . 'public/js/estimate-page.js', ['jquery', 'cloudflare-turnstile', 'dy-core-utilities'], $this->version, true );
 		}
 	}
 
