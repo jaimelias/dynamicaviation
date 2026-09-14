@@ -443,17 +443,19 @@ class Dynamic_Aviation_Estimate_Table {
 
                                     
                     <div class="hidden">
+                        <input type="text" name="dy_request" value="aircraft_estimate" />
                         <div id="aircraft_fields"></div>                    
                         <?php echo $this->obj_to_inputs(); ?>
                     </div>
                     
-                    <?php if(get_option('dy_cf_turnstile_site_key')): ?>
-                            <div
-                                class="cf-turnstile"
-                                data-sitekey="<?php echo esc_attr(get_option('dy_cf_turnstile_site_key')); ?>"
-                                data-retry="auto"
-                                data-refresh-expired="auto">
+                    <?php if(get_turnstile_site_key()): ?>
+
+                            <div class="bottom-20">
+                                <div id="turnstile-container-1"></div>
+                                <div id="turnstile-container-2"></div>
                             </div>
+
+
                             <button 
                                 type="button" 
                                 onClick="validateAviationEstimateRequest(); return false;" 
