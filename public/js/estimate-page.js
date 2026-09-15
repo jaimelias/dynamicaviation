@@ -1,126 +1,113 @@
 jQuery(() => {
 	validate_instant_quote();
-});	
+	jQuery('#aircraft_booking_request').on('submit.aviationEstimate', event => {
+		event.preventDefault();
+		validateAviationEstimateRequest();
+	});
+});
 
-
-// leave all function for algolia
-const validateAviationEstimateRequest  = async () => {
-	
-	let invalids = [];
+const validateAviationEstimateRequest = async () => {
 	const thisForm = jQuery('#aircraft_booking_request');
 
-	if(thisForm.length === 0) {
-		return;
-	}
-
-	//Because the widget is inside #dy_package_request_form, Turnstile creates "cf-turnstile-response" field
-	const turnstileToken = thisForm
-		.find('[name="cf-turnstile-response"]')
-		.val();
-
-	if(!turnstileToken)
-	{
-		console.warn('Turnstile token is missing or expired.');
+	if (thisForm.length === 0 || thisForm.data('submitting')) {
 		return false;
 	}
 
-	const inputs = thisForm.find('input').add('select').add('textarea');
-	const isOneWay = (parseInt(thisForm.find('input[name="aircraft_flight"]').val()) === 0) ? true : false;
-	const requiredOnRoundTrip = ['end_date', 'end_time', 'end_itinerary'];
+	const invalids = [];
+	const isOneWay = Number.parseInt(thisForm.find('[name="aircraft_flight"]').val(), 10) === 0;
+	const returnFields = ['end_date', 'end_time', 'end_itinerary'];
+	const generatedFields = ['cf-turnstile-response', 'unique_tx_id', 'lang'];
+	const formFields = formToArray(thisForm).filter(({name}) => name && !generatedFields.includes(name));
 
-	inputs.each(function(){	
-		
-		const thisField = jQuery(this);
-		const thisName = thisField.attr('name');
-		const thisVal = thisField.val();
+	formFields.forEach(({name, value}) => {
+		const field = thisForm.find('[name]').filter((_, input) => input.name === name);
+		field.removeClass('invalid_field');
 
-		if(thisVal === '')
-		{
-			if(isOneWay)
-			{
-				if(requiredOnRoundTrip.includes(thisName))
-				{
-					thisField.removeClass('invalid_field');
-				}
-				else
-				{
-					thisField.addClass('invalid_field');
-					invalids.push(thisName);
-				}				
-			}
-			else {
-				thisField.addClass('invalid_field');
-				invalids.push(thisName);				
-			}
+		if (isOneWay && returnFields.includes(name)) {
+			return;
 		}
-		else
-		{
-			if(thisField.val() == '--')
-			{
-				thisField.addClass('invalid_field');
-				invalids.push(thisName);
-			}
-			else
-			{
-				if(thisName === 'repeat_email')
-				{
-					if(thisVal !== thisForm.find('input[name="email"]').val())
-					{
-						thisField.addClass('invalid_field');
-						invalids.push(thisName);
-					}
-					else
-					{
-						thisField.removeClass('invalid_field');
-					}
-				}
-				else
-				{
-					thisField.removeClass('invalid_field');
-				}
-			}
+
+		if (!value || value === '--' || !isValidValue({name, value, thisForm})) {
+			field.addClass('invalid_field');
+			invalids.push(name);
 		}
 	});
-			
-	if(invalids.length === 0)
-	{
-		const findAmount = formToArray(thisForm).find(i => i.name === 'charter_price');
-		const amount = (findAmount) ? (findAmount.value) ? parseFloat(findAmount.value) : 0 : 0;
 
-		if(typeof fbq !== typeof undefined)
-		{
-			fbq('track', 'Lead');
+	if (invalids.length > 0) {
+		thisForm.find('.invalid_field').first().trigger('focus');
+		return false;
+	}
+
+	if (!hasTurnstileWidgets()) {
+		alert(dyAviationEstimateArgs.turnstileUnavailable);
+		return false;
+	}
+
+	thisForm.data('submitting', true);
+	thisForm.find('button').prop('disabled', true);
+
+	try {
+		// Use one snapshot for signing and submission, even if fields change while waiting.
+		const values = Object.fromEntries(formFields.map(({name, value}) => [name, value]));
+		const {turnstileWidget1, turnstileWidget2} = window.dyTurnstileWidgets;
+		const signUrl = new URL(`${dyAviationEstimateArgs.transactionsUrl.replace(/\/$/, '')}/${values.dy_id}`);
+		const unique_tx_id = await signDyTransaction({
+			signUrl,
+			signRequest: {
+				dy_request: values.dy_request,
+				email: values.email,
+				action: 'sign-transaction'
+			},
+			widgetId: turnstileWidget1
+		});
+		const token = await executeTurnstileWithRetry(turnstileWidget2);
+		const {dy_nonce} = (await getNonce()) ?? {};
+
+		if (typeof dy_nonce !== 'string' || !dy_nonce) {
+			throw new Error('The confirmation nonce is missing.');
 		}
 
-		if(typeof gtag !== 'undefined' && amount)
-		{
-			//send to call
-			gtag('event', 'generate_lead', {
-				value: parseFloat(amount),
-				currency: 'USD'
+		// Keep the base action unchanged so a failed attempt can be retried.
+		const action = new URL(atob(thisForm.attr('data-action')), window.location.origin);
+		action.pathname = `${action.pathname.replace(/\/$/, '')}/${dy_nonce}`;
+
+		formFields.push(
+			{name: 'lang', value: dyCoreArgs.lang},
+			{name: 'unique_tx_id', value: unique_tx_id},
+			{name: 'cf-turnstile-response', value: token}
+		);
+
+		if (typeof Storage !== 'undefined') {
+			formFields.forEach(({name, value}) => {
+				if (storeFieldNames.includes(name)) {
+					sessionStorage.setItem(name, value);
+				}
 			});
 		}
 
-		const {dy_nonce} = (await getNonce()) ?? {};
-		const action = atob(thisForm.attr('data-action'));
-		const newAction = new URL(action, window.location.origin);
+		handleSubmitButton(thisForm);
 
-		newAction.pathname = `${newAction.pathname.replace(/\/$/, '')}/${dy_nonce}`;
-
-		thisForm.attr('data-action', btoa(newAction.href));
-
-		createFormSubmit(thisForm);
-	}
-	else
-	{
-		console.log({invalids});
-
-		if(typeof turnstile !== 'undefined')
-		{
-			turnstile.reset();
+		if (typeof fbq !== 'undefined') {
+			fbq('track', 'Lead');
 		}
+
+		const amount = Number.parseFloat(values.charter_price);
+		if (typeof gtag !== 'undefined' && amount) {
+			gtag('event', 'generate_lead', {value: amount, currency: 'USD'});
+		}
+
+		// The shared createFormSubmit signs against a page-based endpoint; aviation
+		// signs against its own endpoint above and uses the shared final POST helper.
+		formSubmit({method: 'post', action: action.href, formFields});
+		return true;
+	} catch (error) {
+		console.error('Aviation estimate submission failed:', error);
+		thisForm.data('submitting', false);
+		thisForm.find('button').prop('disabled', false);
+		alert(dyAviationEstimateArgs.submitError);
+		return false;
 	}
-}
+};
 
 const formArrayToParams = () => {
 
@@ -166,6 +153,7 @@ const validate_instant_quote = () =>
 		let inputs = jQuery(this).attr('data-aircraft');
 
 		inputs = JSON.parse(inputs);
+		jQuery('#aircraft_booking_request').find('[name="dy_id"]').val(inputs.aircraft_id);
 
 		jQuery(aircraft_fields).text('');
 		
@@ -196,6 +184,9 @@ const validate_instant_quote = () =>
 	});
 	
 	jQuery('#aircraft_booking_container').find('.close').click(function(){
+		if (jQuery('#aircraft_booking_request').data('submitting')) {
+			return;
+		}
 		jQuery('#aircraft_booking_container').addClass('hidden');
 		jQuery('.instant_quote_table').removeClass('hidden');
 	});	

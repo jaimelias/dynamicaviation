@@ -389,7 +389,7 @@ class Dynamic_Aviation_Estimate_Table {
 
             <div id="aircraft_booking_container" class="<?php echo ($hide_contact_form) ? 'hidden' : ''; ?> animate-fade">
 
-                <form data-method="post" id="aircraft_booking_request" data-action="<?php echo esc_attr(base64_encode(normalize_url($this->home_lang.'/request_submitted')));?>">
+                <form method="post" data-method="post" id="aircraft_booking_request" novalidate data-action="<?php echo esc_attr(base64_encode(normalize_url($this->home_lang.'/request_submitted')));?>">
 
                     <div class="modal-header clearfix">
                         <h3 class="pull-left inline-block text-center uppercase linkcolor"><?php echo esc_html(__('Request a Quote', 'dynamicaviation')); ?></h3>
@@ -443,7 +443,8 @@ class Dynamic_Aviation_Estimate_Table {
 
                                     
                     <div class="hidden">
-                        <input type="text" name="dy_request" value="aircraft_estimate" />
+                        <input type="text" name="dy_request" value="estimate_request" />
+                        <input type="hidden" name="dy_id" value="<?php echo esc_attr(get_the_ID()); ?>" />
                         <div id="aircraft_fields"></div>                    
                         <?php echo $this->obj_to_inputs(); ?>
                     </div>
@@ -457,8 +458,7 @@ class Dynamic_Aviation_Estimate_Table {
 
 
                             <button 
-                                type="button" 
-                                onClick="validateAviationEstimateRequest(); return false;" 
+                                type="submit"
                                 class="pure-button pure-button-primary" >
                                 <span class="dashicons dashicons-airplane"></span> <?php echo esc_html(__('Send Request', 'dynamicaviation'));?>
                             </button>	

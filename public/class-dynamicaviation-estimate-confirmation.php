@@ -185,12 +185,20 @@ class Dynamic_Aviation_Estimate_Confirmation
 
         $subject = (string) apply_filters('dy_aviation_estimate_subject', '');
 
-        wp_mail(
+        $sent = wp_mail(
             $email,
             $subject,
             $email_template,
             $headers
         );
+
+        if (!$sent) {
+            dy_errors::add(__('Unable to send your request. Please try again.', 'dynamicaviation'), 502);
+            self::$cache['validate_form_submit'] = false;
+            return self::$cache[$cache_key] = false;
+        }
+
+        dy_transactions::update(secure_post('unique_tx_id'), 'success');
 
         return self::$cache[$cache_key] = true;
     }
@@ -204,13 +212,23 @@ class Dynamic_Aviation_Estimate_Confirmation
             return self::$cache[$cache_key];
         }
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST')
+        if (secure_server('REQUEST_METHOD') !== 'POST')
         {
             return self::$cache[$cache_key] = false;
         }
 
         if (!get_query_var($this->pathname))
         {
+            return self::$cache[$cache_key] = false;
+        }
+
+        if (!wp_verify_nonce(get_query_var($this->pathname), 'dy_nonce')) {
+            dy_errors::add(__('Invalid request. Please reload the quote and try again.', 'dynamicaviation'), 400);
+            return self::$cache[$cache_key] = false;
+        }
+
+        if (!$this->validate_unique_tx_id()) {
+            dy_errors::add(__('Invalid or expired transaction. Please submit a new request.', 'dynamicaviation'), 400);
             return self::$cache[$cache_key] = false;
         }
 
@@ -232,6 +250,11 @@ class Dynamic_Aviation_Estimate_Confirmation
             'phone' => function($name) { return secure_post($name, 0, 'absint') > 0; },
             'country_calling_code' => function($name) { return secure_post($name, 0, 'absint') > 0; },
             'aircraft_id' => function($name) { 
+                // The general request form has no selected aircraft.
+                if (!post_has($name)) {
+                    return true;
+                }
+
                 $aircraft_id = secure_post($name, 0, 'absint');
 
                 if($aircraft_id === 0)
@@ -260,9 +283,42 @@ class Dynamic_Aviation_Estimate_Confirmation
 			dy_errors::add($invalids, 400);
 		}
 
-
+		if ($output && !validate_turnstile(secure_post('cf-turnstile-response'), 'submit-transaction')) {
+			$output = false;
+		}
 
 		return self::$cache[$cache_key] = $output;
+    }
+
+    public function validate_unique_tx_id(): bool
+    {
+        $unique_tx_id = secure_post('unique_tx_id');
+        $email = secure_post('email', '', 'sanitize_email');
+        $dy_request = secure_post('dy_request', '', 'sanitize_key');
+        $dy_id = secure_post('dy_id', 0, 'absint');
+
+        if (!is_string($unique_tx_id) || $unique_tx_id === '' || !is_email($email) || $dy_id <= 0 || $dy_request !== 'estimate_request') {
+            return false;
+        }
+
+        $post = get_post($dy_id);
+        $has_aircraft = post_has('aircraft_id');
+        $post_type = $has_aircraft ? 'aircrafts' : 'page';
+
+        if (
+            !$post instanceof WP_Post
+            || $post->post_type !== $post_type
+            || !(is_post_publicly_viewable($post) || current_user_can('read_post', $dy_id))
+            || ($has_aircraft && secure_post('aircraft_id', 0, 'absint') !== $dy_id)
+        ) {
+            return false;
+        }
+
+        if (!dy_transactions::validate($unique_tx_id, [$unique_tx_id, $email, $dy_request, $dy_id])) {
+            return false;
+        }
+
+        return dy_transactions::get($unique_tx_id)?->status === 'started';
     }
 
     public function estimate_notes()
