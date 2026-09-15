@@ -198,7 +198,7 @@ class Dynamic_Aviation_Estimate_Confirmation
             return self::$cache[$cache_key] = false;
         }
 
-        dy_transactions::update(secure_post('unique_tx_id'), 'success');
+        dy_tx::update(secure_post('unique_tx_id'), 'success');
 
         return self::$cache[$cache_key] = true;
     }
@@ -314,11 +314,11 @@ class Dynamic_Aviation_Estimate_Confirmation
             return false;
         }
 
-        if (!dy_transactions::validate($unique_tx_id, [$unique_tx_id, $email, $dy_request, $dy_id])) {
+        if (!dy_tx::validate($unique_tx_id, [$unique_tx_id, $email, $dy_request, $dy_id])) {
             return false;
         }
 
-        return dy_transactions::get($unique_tx_id)?->status === 'started';
+        return dy_tx::get($unique_tx_id)?->status === 'started';
     }
 
     public function estimate_notes()
