@@ -75,7 +75,7 @@ class Dynamic_Aviation_WP_JSON {
 
         $unique_tx_id = wp_generate_uuid4();
         if (!dy_tx::create($unique_tx_id, [
-            'email' => sanitize_email($request['email']),
+            'email' => dy_sanitize_email((string) $request['email']),
             'dy_request' => 'estimate_request',
             'dy_id' => $dy_id,
         ])) {
