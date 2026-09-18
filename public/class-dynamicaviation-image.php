@@ -5,9 +5,9 @@ class Dynamic_Aviation_Image {
 
     static $cache = [];
 
-    public function __construct( $plugin_name, $version, $utilities ) 
+    public function __construct( $id, $version, $utilities ) 
     {
-        $this->plugin_name = $plugin_name;
+        $this->id = $id;
         $this->version = $version;
         $this->utilities = $utilities;
         add_action('init', [$this, 'add_rewrite_rule']);

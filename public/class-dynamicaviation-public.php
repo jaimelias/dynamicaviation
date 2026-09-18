@@ -4,12 +4,12 @@
 class Dynamic_Aviation_Public {
 
 
-	private $plugin_name;
+	private $id;
 	private $version;
 
-	public function __construct( $plugin_name, $version, $utilities ) {
+	public function __construct( $id, $version, $utilities ) {
 
-		$this->plugin_name = $plugin_name;
+		$this->id = $id;
 		$this->version = $version;
 		$this->utilities =  $utilities;
 		$this->plugin_dir_url = plugin_dir_url( __FILE__ );
@@ -131,7 +131,7 @@ class Dynamic_Aviation_Public {
 
 		if(isset($dy_aviation_load_algolia))
 		{
-			wp_enqueue_style($this->plugin_name, $this->plugin_dir_url . 'css/dynamicaviation-public.css', array(), $this->version, 'all');
+			wp_enqueue_style($this->id, $this->plugin_dir_url . 'css/dynamicaviation-public.css', array(), $this->version, 'all');
 		}
 
 		if(isset($dy_aviation_load_mapbox))
@@ -168,7 +168,7 @@ class Dynamic_Aviation_Public {
 				wp_add_inline_script('mapbox', get_inline_file($this->plugin_dir_path . 'public/js/dynamicaviation-mapbox.js'), 'after');
 			}
 			
-			wp_enqueue_script($this->plugin_name, $this->plugin_dir_url . 'js/dynamicaviation-public.js', $dep, $this->version, true );
+			wp_enqueue_script($this->id, $this->plugin_dir_url . 'js/dynamicaviation-public.js', $dep, $this->version, true );
 		}
 
 	}

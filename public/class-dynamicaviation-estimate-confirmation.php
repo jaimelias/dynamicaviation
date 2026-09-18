@@ -5,9 +5,9 @@ class Dynamic_Aviation_Estimate_Confirmation
 {
     static $cache = [];
 
-    public function __construct($plugin_name, $version, $utilities)
+    public function __construct($id, $version, $utilities)
     {
-        $this->plugin_name = $plugin_name;
+        $this->id = $id;
         $this->utilities = $utilities;
         $this->plugin_dir_path = plugin_dir_path(dirname(__FILE__));
         $this->pathname = 'request_submitted';

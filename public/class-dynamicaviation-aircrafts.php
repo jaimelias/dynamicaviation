@@ -4,8 +4,8 @@
 class Dynamic_Aviation_Aircrafts {
 
 
-	public function __construct($plugin_name, $version, $utilities) {
-		$this->plugin_name = $plugin_name;
+	public function __construct($id, $version, $utilities) {
+		$this->id = $id;
         $this->utilities = $utilities;
         $this->plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );        
         $this->utilities = $utilities;

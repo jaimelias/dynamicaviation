@@ -6,9 +6,9 @@ class Dynamic_Aviation_Estimate_Page
 
 	static $cache = [];
 
-	public function __construct($plugin_name, $version, $utilities)
+	public function __construct($id, $version, $utilities)
 	{
-		$this->plugin_name = $plugin_name;
+		$this->id = $id;
 		$this->version = $version;
 		$this->utilities = $utilities;
 
@@ -148,10 +148,10 @@ class Dynamic_Aviation_Estimate_Page
 	{
 		if($this->validate_form_search())
 		{
-			$handle = $this->plugin_name . '_' . $this->pathname;
+			$handle = $this->id . '_' . $this->pathname;
 			wp_enqueue_script($handle, $this->plugin_dir_url . 'public/js/estimate-page.js', ['jquery', 'cloudflare-turnstile-widgets', 'dy-core-utilities', 'dy-core-request-form-utilities'], $this->version, true);
 			wp_localize_script($handle, 'dyAviationEstimateArgs', [
-				'transactionsUrl' => rest_url($this->plugin_name . '/transactions/'),
+				'transactionsUrl' => rest_url($this->id . '/transactions/'),
 				'submitError' => __('Unable to send your request. Please try again.', 'dynamicaviation'),
 				'turnstileUnavailable' => __('Verification is still loading. Please try again in a moment.', 'dynamicaviation'),
 			]);

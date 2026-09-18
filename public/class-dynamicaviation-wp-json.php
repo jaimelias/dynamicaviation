@@ -7,9 +7,9 @@ if ( !defined( 'WPINC' ) ) exit;
 class Dynamic_Aviation_WP_JSON {
 
 
-    public function __construct($plugin_name, $plugin_version, $utilities)
+    public function __construct($id, $plugin_version, $utilities)
     {
-		$this->plugin_name = $plugin_name;
+		$this->id = $id;
         $this->utilities = $utilities;
         add_action( 'rest_api_init', array(&$this, 'core_args') );
         add_action('rest_api_init', [$this, 'register_transactions_route']);
@@ -17,7 +17,7 @@ class Dynamic_Aviation_WP_JSON {
 
     public function register_transactions_route(): void
     {
-        register_rest_route($this->plugin_name, '/transactions/(?P<dy_id>\d+)', [
+        register_rest_route($this->id, '/transactions/(?P<dy_id>\d+)', [
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => [$this, 'transactions_endpoint'],
             'permission_callback' => '__return_true',
@@ -93,7 +93,7 @@ class Dynamic_Aviation_WP_JSON {
 
     public function core_args()
     {
-        register_rest_route( $this->plugin_name, 'airports.json', array(
+        register_rest_route( $this->id, 'airports.json', array(
             'methods' => 'GET',
             'callback' => array(&$this, 'core_args_callback'),
             'permission_callback' => '__return_true'

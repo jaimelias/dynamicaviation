@@ -3,10 +3,10 @@
 #[AllowDynamicProperties]
 class Dynamic_Aviation_Fly_Page {
     
-    public function __construct($plugin_name, $version, $utilities)
+    public function __construct($id, $version, $utilities)
     {
         $this->utilities = $utilities;
-		$this->plugin_name = $plugin_name;
+		$this->id = $id;
 
 		//admin query vars
 		add_action('init', array(&$this, 'add_rewrite_rule'));
