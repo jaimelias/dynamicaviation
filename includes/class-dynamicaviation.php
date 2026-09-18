@@ -3,7 +3,6 @@
 #[AllowDynamicProperties]
 class Dynamic_Aviation_Core {
 
-	protected $loader;
 	protected $id;
 	protected $version;
 
@@ -36,7 +35,6 @@ class Dynamic_Aviation_Core {
 		$plugin_dir_path = plugin_dir_path( dirname( __FILE__ ) );
 
 		//includes
-		require_once $plugin_dir_path . 'includes/class-dynamicaviation-loader.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-fields.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-utilities.php';
 
@@ -60,7 +58,6 @@ class Dynamic_Aviation_Core {
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-wp-json.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-training-data.php';
 
-		$this->loader = new Dynamic_Aviation_Loader();
 	}
 
 	public function load_plugin_textdomain() {

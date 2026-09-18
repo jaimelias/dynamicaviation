@@ -8,7 +8,7 @@ class Dynamic_Core_Admin {
     public function __construct(int|string $version)
     {
 		$this->version = $version;
-        $this->id = 'Dynamic Core';
+        $this->plugin_name = 'Dynamic Core';
         $this->slug = 'dy-core';
         $this->setting_id = 'dy_core_settings';
         $this->section_company = 'dy_core_section_company';
@@ -339,8 +339,8 @@ class Dynamic_Core_Admin {
     public  function admin_menu()
     {
         add_menu_page(
-            $this->id, 
-            $this->id, 
+            $this->plugin_name, 
+            $this->plugin_name, 
             'manage_options',  
             $this->slug, 
             function() { $this->settings_page($this->page_company); },
@@ -372,7 +372,7 @@ class Dynamic_Core_Admin {
 		?><div class="wrap">
 		<form action="options.php" method="post">
 			
-			<h1><?php echo esc_html($this->id); ?></h1>	
+			<h1><?php echo esc_html($this->plugin_name); ?></h1>	
 			<?php
 				settings_fields( $this->setting_id );
 				do_settings_sections( $page );
