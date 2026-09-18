@@ -1,25 +1,33 @@
 <?php
 
 #[AllowDynamicProperties]
-class Dynamic_Aviation {
+class Dynamic_Aviation_Core {
 
 	protected $loader;
 	protected $plugin_name;
 	protected $version;
 
-	public function __construct() {
+	public function __construct($main_plugin_file) {
 
 		$this->plugin_name = 'dynamicaviation';
 		$this->load_dependencies();
 
 		$this->version = is_local_host() ? time() : DYNAMICAVIATION_VERSION;
 
-		$this->set_locale();
+		add_action('init', [$this, 'load_plugin_textdomain'], PHP_INT_MAX);
 
 		$utilities = new Dynamic_Aviation_Utilities();
 
 		$this->define_admin_hooks($utilities);
 		$this->define_public_hooks($utilities);
+
+		register_activation_hook( $main_plugin_file, function() {
+			Dynamic_Aviation_Activator::activate();
+		} );
+
+		register_deactivation_hook($main_plugin_file, function() {
+			Dynamic_Aviation_Deactivator::deactivate();
+		} );
 	}
 
 	private function load_dependencies() {
@@ -29,6 +37,7 @@ class Dynamic_Aviation {
 		//includes
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-loader.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-i18n.php';
+		require_once $plugin_dir_path . 'includes/class-dynamicaviation-fields.php';
 		require_once $plugin_dir_path . 'includes/class-dynamicaviation-utilities.php';
 
 		//admin
@@ -54,16 +63,24 @@ class Dynamic_Aviation {
 		$this->loader = new Dynamic_Aviation_Loader();
 	}
 
-	private function set_locale()
-	{
-		$plugin_i18n = new Dynamic_Aviation_i18n();
-		$plugin_i18n->set_domain( $this->get_plugin_name() );
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
+	public function load_plugin_textdomain() {
+
+		$dir = dirname( plugin_basename( dirname( __FILE__ ) ) ) . '/languages';
+		
+		load_plugin_textdomain(
+			$this->plugin_name,
+			false,
+			$dir
+		);
+
+		if(function_exists('pll_register_string')) {
+			pll_register_string('charter_flights', 'Charter Flights %s', $this->plugin_name);
+		}
 	}
 
 	private function define_admin_hooks($utilities) {
 
-		new Dynamic_Aviation_Admin( $this->get_plugin_name(), $this->get_version(),  $utilities);
+		new Dynamic_Aviation_Admin( $this->plugin_name, $this->version,  $utilities);
 		new Dynamic_Aviation_Settings($utilities);
 		new Dynamic_Aviation_Post_Type();
 		new Dynamic_Aviation_Meta_Box();	
@@ -71,7 +88,7 @@ class Dynamic_Aviation {
 
 	private function define_public_hooks($utilities) 
 	{
-		new Dynamic_Aviation_Public( $this->get_plugin_name(), $this->get_version(), $utilities);
+		new Dynamic_Aviation_Public( $this->plugin_name, $this->version, $utilities);
 
 		new Dynamic_Aviation_Search_Form($utilities);
 
@@ -79,19 +96,19 @@ class Dynamic_Aviation {
 
 		new Dynamic_Aviation_Shortcodes();		
 		
-		new Dynamic_Aviation_Aircrafts($this->get_plugin_name(), $this->get_version(), $utilities);
+		new Dynamic_Aviation_Aircrafts($this->plugin_name, $this->version, $utilities);
 
 		new Dynamic_Aviation_Estimate_Table($utilities);
 
-		new Dynamic_Aviation_Fly_Page($this->get_plugin_name(), $this->get_version(), $utilities);
+		new Dynamic_Aviation_Fly_Page($this->plugin_name, $this->version, $utilities);
 
-		new Dynamic_Aviation_Estimate_Confirmation($this->get_plugin_name(), $this->get_version(), $utilities);
+		new Dynamic_Aviation_Estimate_Confirmation($this->plugin_name, $this->version, $utilities);
 		
-		new Dynamic_Aviation_Estimate_Page($this->get_plugin_name(), $this->get_version(), $utilities);
+		new Dynamic_Aviation_Estimate_Page($this->plugin_name, $this->version, $utilities);
 
-		new Dynamic_Aviation_Image($this->get_plugin_name(), $this->get_version(), $utilities);
+		new Dynamic_Aviation_Image($this->plugin_name, $this->version, $utilities);
 
-		new Dynamic_Aviation_WP_JSON($this->get_plugin_name(), $this->get_version(), $utilities);
+		new Dynamic_Aviation_WP_JSON($this->plugin_name, $this->version, $utilities);
 
 		new Dynamic_Aviation_Training_Data($utilities);
 	}
