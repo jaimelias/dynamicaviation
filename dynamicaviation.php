@@ -16,7 +16,7 @@
  * Plugin Name: Dynamic Aviation
  * Plugin URI: https://www.jaimelias.com
  * Description: This is a short description of what the plugin does. It's displayed in the WordPress admin area.
- * Version: 1.0.60
+ * Version: 1.0.61
  * Author: Jaimelías
  * Author URI: https://jaimelias.com
  * License: GPL-2.0+
@@ -30,7 +30,7 @@ if ( ! defined( 'WPINC' ) ) exit;
 
 if(defined('DYNAMICAVIATION_VERSION')) exit;
 
-define('DYNAMICAVIATION_VERSION', '1.0.60');
+define('DYNAMICAVIATION_VERSION', '1.0.61');
 define('DY_AVIATION_IMAGE_PATHNAME', 'cacheimg');
 
 add_action('plugins_loaded', static function (): void {

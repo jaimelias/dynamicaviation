@@ -10,7 +10,7 @@ class Dynamic_Aviation_Submit
         $this->id = $id;
         $this->utilities = $utilities;
         $this->plugin_dir_path = plugin_dir_path(dirname(__FILE__));
-        $this->pathname = 'request_submitted';
+        $this->pathname = 'tx-submit';
         $this->default_language = default_language();
         $this->site_name = get_bloginfo('name');
 
