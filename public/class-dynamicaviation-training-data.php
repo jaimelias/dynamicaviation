@@ -5,8 +5,8 @@ class Dynamic_Aviation_Training_Data {
 
     public function __construct($utilities)
     {
-        add_action('wp', array(&$this, 'export_single_file'));
-        add_filter('wp_headers', array(&$this, 'single_file_headers'), 999);
+        add_action('wp', array($this, 'export_single_file'));
+        add_filter('wp_headers', array($this, 'single_file_headers'), 999);
 
         $this->utilities = $utilities;
         $this->alt_formats = ['text', 'json', 'html', 'markdown'];

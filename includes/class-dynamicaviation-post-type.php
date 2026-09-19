@@ -6,7 +6,7 @@ class Dynamic_Aviation_Post_Type
 
 	public function __construct()
 	{
-		add_action( 'init', array(&$this, 'aircraft_post_type'), 0);
+		add_action( 'init', array($this, 'aircraft_post_type'), 0);
 	}
 
 	public function aircraft_post_type() {

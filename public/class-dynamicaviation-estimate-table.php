@@ -6,7 +6,7 @@ class Dynamic_Aviation_Estimate_Table {
     public function __construct($utilities) {
         $this->utilities = $utilities;
         $this->get = (object) [];
-        add_action('init', array(&$this, 'init'));
+        add_action('init', array($this, 'init'));
 	}
 
     public function init()
@@ -14,7 +14,7 @@ class Dynamic_Aviation_Estimate_Table {
         $this->current_language = current_language();
         $this->is_mobile = wp_is_mobile();
         $this->home_lang = home_lang();
-        add_filter('dy_aviation_aircrafts_table', array(&$this, 'template'));
+        add_filter('dy_aviation_aircrafts_table', array($this, 'template'));
     }
 
     public function set_params()

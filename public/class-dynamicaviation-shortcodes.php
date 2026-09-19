@@ -11,8 +11,8 @@ class Dynamic_Aviation_Shortcodes {
 
     public function init()
     {
-		add_shortcode( 'aviation_search_form', array(&$this, 'search_form'));
-		add_shortcode( 'aviation_table', array(&$this, 'table'));
+		add_shortcode( 'aviation_search_form', array($this, 'search_form'));
+		add_shortcode( 'aviation_table', array($this, 'table'));
 
         //load core scripts
         add_action( 'wp', array( &$this, 'load_scripts' ), 100);

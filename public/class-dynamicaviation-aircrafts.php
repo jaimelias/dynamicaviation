@@ -12,25 +12,24 @@ class Dynamic_Aviation_Aircrafts {
         $this->pathname = 'aircrafts';
         $this->post_type = $this->pathname;
 
-        add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'), 1);
+        add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'), 1);
 
 		//filters custom wordpress outputs
-        add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);
-		add_filter('wp_title', array(&$this, 'modify_wp_title'), 100);
-        add_filter('the_title', array(&$this, 'modify_title'), 100);
-        add_filter('the_content', array(&$this, 'modify_content'), 100);
-        add_filter('the_excerpt', array(&$this, 'modify_excerpt'));
+        add_filter( 'pre_get_document_title', array($this, 'modify_wp_title'), 100);
+        add_filter('the_title', array($this, 'modify_title'), 100);
+        add_filter('the_content', array($this, 'modify_content'), 100);
+        add_filter('the_excerpt', array($this, 'modify_excerpt'));
 
-        add_filter('wp_head', array(&$this, 'meta_tags'));
-        add_filter('template_include', array(&$this, 'locate_template'), 100 );
+        add_filter('wp_head', array($this, 'meta_tags'));
+        add_filter('template_include', array($this, 'locate_template'), 100 );
 
 
-        add_action('pre_get_posts', array(&$this, 'main_wp_query'), 100);
+        add_action('pre_get_posts', array($this, 'main_wp_query'), 100);
 
         // minimalizr theme conection
-		add_filter('minimal_posted_on', array(&$this, 'minimalizr_hide_posted_on'), 100);
-		add_filter('minimal_archive_excerpt', array(&$this, 'minimalizr_modify_archive_excerpt'), 100);
-		add_filter('minimal_archive_title', array(&$this, 'minimalizr_modify_archive_title'), 100);
+		add_filter('minimal_posted_on', array($this, 'minimalizr_hide_posted_on'), 100);
+		add_filter('minimal_archive_excerpt', array($this, 'minimalizr_modify_archive_excerpt'), 100);
+		add_filter('minimal_archive_title', array($this, 'minimalizr_modify_archive_title'), 100);
         
         //load core scripts
         add_action( 'wp', array( &$this, 'load_scripts' ), 100);

@@ -7,9 +7,9 @@ class Dynamic_Aviation_Price_Table {
     public function __construct($utilities)
     {
 		$this->utilities = $utilities;
-		add_filter('init', array(&$this, 'init'));
-		add_filter('admin_init', array(&$this, 'init'));
-        add_filter('dy_aviation_price_table', array(&$this, 'table'), 1, 1);
+		add_filter('init', array($this, 'init'));
+		add_filter('admin_init', array($this, 'init'));
+        add_filter('dy_aviation_price_table', array($this, 'table'), 1, 1);
     }
 
     public function init()

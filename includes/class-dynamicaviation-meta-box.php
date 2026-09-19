@@ -15,7 +15,7 @@ class Dynamic_Aviation_Meta_Box
 		add_meta_box(
 			'aircraft_settings',
 			__( 'Flights', 'dynamicaviation' ),
-			array(&$this, 'aircraft_fields'),
+			array($this, 'aircraft_fields'),
 			'aircrafts',
 			'normal',
 			'default'

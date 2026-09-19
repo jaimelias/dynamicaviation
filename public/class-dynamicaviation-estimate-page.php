@@ -19,7 +19,6 @@ class Dynamic_Aviation_Estimate_Page
 
 		// Filters custom WordPress outputs.
 		add_filter('pre_get_document_title', [$this, 'modify_wp_title'], 100);
-		add_filter('wp_title', [$this, 'modify_wp_title'], 100);
 		add_filter('the_title', [$this, 'modify_title'], 100);
 		add_filter('the_content', [$this, 'modify_content'], 100);
 

@@ -7,8 +7,8 @@ class Dynamic_Aviation_Search_Form {
     public function __construct($utilities)
     {
         $this->utilities = $utilities;
-        add_filter('dy_aviation_full_search_form', array(&$this, 'full_search_form'));
-        add_filter('dy_aviation_search_form', array(&$this, 'search_form'));        
+        add_filter('dy_aviation_full_search_form', array($this, 'full_search_form'));
+        add_filter('dy_aviation_search_form', array($this, 'search_form'));        
     }
 
 	public function full_search_form($is_two_cols = true)

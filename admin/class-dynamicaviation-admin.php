@@ -13,8 +13,8 @@ class Dynamic_Aviation_Admin {
 		$this->utilities = $utilities;
 		$this->plugin_dir_url = plugin_dir_url( __FILE__ );
 
-		add_action( 'admin_enqueue_scripts', array(&$this, 'enqueue_styles'));
-		add_action( 'admin_enqueue_scripts',  array(&$this, 'enqueue_scripts'), 10);
+		add_action( 'admin_enqueue_scripts', array($this, 'enqueue_styles'));
+		add_action( 'admin_enqueue_scripts',  array($this, 'enqueue_scripts'), 10);
 	}
 
 	public function enqueue_styles()

@@ -10,13 +10,13 @@ class Dynamic_Aviation_Settings
 	}
 	public function init()
 	{
-		add_action('admin_menu', array(&$this, 'add_settings_page'));
-		add_action('admin_init', array(&$this, 'settings_init'));
+		add_action('admin_menu', array($this, 'add_settings_page'));
+		add_action('admin_init', array($this, 'settings_init'));
 	}
 
 	public function add_settings_page()
 	{
-		add_submenu_page('edit.php?post_type=aircrafts', 'Dynamic Aviation - Settings', 'Settings', 'manage_options', 'dynamicaviation', array(&$this, 'settings_page'));
+		add_submenu_page('edit.php?post_type=aircrafts', 'Dynamic Aviation - Settings', 'Settings', 'manage_options', 'dynamicaviation', array($this, 'settings_page'));
 	}
 	public function settings_page()
 		 { 
@@ -63,7 +63,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'dy_email', 
 			esc_html(__( 'Company Email', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'dy_email', 'type' => 'text')
@@ -72,7 +72,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'dy_whatsapp', 
 			esc_html(__( 'Company Whatsapp', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'dy_whatsapp', 'type' => 'text')
@@ -81,7 +81,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'dy_phone', 
 			esc_html(__( 'Company Phone', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'dy_phone', 'type' => 'text')
@@ -90,7 +90,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'dy_address', 
 			esc_html(__( 'Company Address', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'dy_address', 'type' => 'text')
@@ -99,7 +99,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'dy_tax_id', 
 			esc_html(__( 'Company Tax ID', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'dy_tax_id', 'type' => 'text')
@@ -115,7 +115,7 @@ class Dynamic_Aviation_Settings
 			add_settings_field( 
 				$estimate_note_name, 
 				esc_html(sprintf(__( 'Estimate Notes in %s language', 'dynamicaviation' ), strtoupper($languages[$x]))), 
-				array(&$this, 'textarea'), 
+				array($this, 'textarea'), 
 				'aircraft_settings', 
 				'aircraft_settings_section',
 				array('name' => $estimate_note_name, 'rows' => 4, 'cols' => 50)
@@ -125,7 +125,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'mapbox_token', 
 			esc_html(__( 'Mapbox Token', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'mapbox_token', 'type' => 'text')
@@ -156,7 +156,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'mapbox_map_id', 
 			esc_html(__( 'Map ID', 'dynamicaviation' )), 
-			array(&$this, 'select'), 
+			array($this, 'select'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			$mapbox_map_id_args
@@ -165,7 +165,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'mapbox_map_zoom', 
 			esc_html(__( 'Mapbox Map Zoom', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'mapbox_map_zoom', 'type' => 'number')
@@ -174,7 +174,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'mapbox_base_lat', 
 			esc_html(__( 'Base Latitud', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'mapbox_base_lat', 'type' => 'text')
@@ -183,7 +183,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'mapbox_base_lon', 
 			esc_html(__( 'Base Longitud', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'mapbox_base_lon', 'type' => 'text')
@@ -192,7 +192,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'algolia_token', 
 			esc_html(__( 'Algolia Api Key', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'algolia_token', 'type' => 'text')
@@ -201,7 +201,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'algolia_index', 
 			esc_html(__( 'Algolia Index Name', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'algolia_index', 'type' => 'text')
@@ -209,7 +209,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'algolia_id', 
 			esc_html(__( 'Algolia Api Id', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'algolia_id', 'type' => 'text')
@@ -218,7 +218,7 @@ class Dynamic_Aviation_Settings
 		add_settings_field( 
 			'aircraft_webhook', 
 			esc_html(__( 'Webhook', 'dynamicaviation' )), 
-			array(&$this, 'input_text'), 
+			array($this, 'input_text'), 
 			'aircraft_settings', 
 			'aircraft_settings_section',
 			array('name' => 'aircraft_webhook', 'type' => 'text')

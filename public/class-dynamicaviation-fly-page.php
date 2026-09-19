@@ -9,33 +9,32 @@ class Dynamic_Aviation_Fly_Page {
 		$this->id = $id;
 
 		//admin query vars
-		add_action('init', array(&$this, 'add_rewrite_rule'));
-		add_action('init', array(&$this, 'add_rewrite_tag'), 10, 0);
-		add_filter('query_vars', array(&$this, 'registering_custom_query_var'));
+		add_action('init', array($this, 'add_rewrite_rule'));
+		add_action('init', array($this, 'add_rewrite_tag'), 10, 0);
+		add_filter('query_vars', array($this, 'registering_custom_query_var'));
 
 
         //filters custom wordpress outputs
-        add_action('pre_get_posts', array(&$this, 'main_wp_query'), 100);
-		add_filter( 'pre_get_document_title', array(&$this, 'modify_wp_title'), 100);		
-		add_filter('wp_title', array(&$this, 'modify_wp_title'), 100);
-        add_filter('the_title', array(&$this, 'modify_title'));
-        add_filter('the_content', array(&$this, 'modify_content'), 100);
+        add_action('pre_get_posts', array($this, 'main_wp_query'), 100);
+		add_filter( 'pre_get_document_title', array($this, 'modify_wp_title'), 100);		
+        add_filter('the_title', array($this, 'modify_title'));
+        add_filter('the_content', array($this, 'modify_content'), 100);
 
         //meta tags
-        add_action('wp_head', array(&$this, 'meta_tags'));
+        add_action('wp_head', array($this, 'meta_tags'));
 
 		//headers
-		add_action('wp', array(&$this, 'return_404'), 999);
+		add_action('wp', array($this, 'return_404'), 999);
 
         //minimalizr theme
-        add_filter('minimal_ld_json', array(&$this, 'ld_json'), 100);
-        add_filter('template_include', array(&$this, 'locate_template'), 100 );
+        add_filter('minimal_ld_json', array($this, 'ld_json'), 100);
+        add_filter('template_include', array($this, 'locate_template'), 100 );
 
         //enqueue logic in public.php
         add_action( 'wp', array( &$this, 'load_scripts' ), 100);
 
 		//polylang
-		add_filter('pll_translation_url', array(&$this, 'pll_translation_url'), 100, 2);
+		add_filter('pll_translation_url', array($this, 'pll_translation_url'), 100, 2);
     }
 
 	public function return_404() : void {

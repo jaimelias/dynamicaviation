@@ -52,7 +52,7 @@ class Dynamic_Aviation_Core {
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-table.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-fly-page.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-page.php';
-		require_once $plugin_dir_path . 'public/class-dynamicaviation-estimate-confirmation.php';
+		require_once $plugin_dir_path . 'public/class-dynamicaviation-submit.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-image.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-wp-json.php';
 		require_once $plugin_dir_path . 'public/class-dynamicaviation-training-data.php';
@@ -98,7 +98,7 @@ class Dynamic_Aviation_Core {
 
 		new Dynamic_Aviation_Fly_Page($this->id, $this->version, $utilities);
 
-		new Dynamic_Aviation_Estimate_Confirmation($this->id, $this->version, $utilities);
+		new Dynamic_Aviation_Submit($this->id, $this->version, $utilities);
 		
 		new Dynamic_Aviation_Estimate_Page($this->id, $this->version, $utilities);
 

@@ -54,7 +54,7 @@ const validateAviationEstimateRequest = async () => {
 		const values = Object.fromEntries(formFields.map(({name, value}) => [name, value]));
 		const {turnstileWidget1, turnstileWidget2} = window.dyTurnstileWidgets;
 		const {wpJsonUrl, txSignSlug, post_id} = dyCoreArgs;
-		const signUrl = new URL(`${wpJsonUrl}/${txSignSlug}/${post_id}`);
+		const signUrl = new URL(`${wpJsonUrl}/${txSignSlug}/${values.dy_id}`);
 
 		const unique_tx_id = await signDyTransaction({
 			signUrl,

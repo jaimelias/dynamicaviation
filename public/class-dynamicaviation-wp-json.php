@@ -11,14 +11,14 @@ class Dynamic_Aviation_WP_JSON {
     {
 		$this->id = $id;
         $this->utilities = $utilities;
-        add_action( 'rest_api_init', array(&$this, 'register_aviation_core_args') );
+        add_action( 'rest_api_init', array($this, 'register_aviation_core_args') );
     }
 
     public function register_aviation_core_args()
     {
         register_rest_route( $this->id, 'airports.json', array(
             'methods' => 'GET',
-            'callback' => array(&$this, 'core_args_callback'),
+            'callback' => array($this, 'core_args_callback'),
             'permission_callback' => '__return_true'
         ));
     }
