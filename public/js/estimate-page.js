@@ -16,7 +16,7 @@ const validateAviationEstimateRequest = async () => {
 	const invalids = [];
 	const isOneWay = Number.parseInt(thisForm.find('[name="aircraft_flight"]').val(), 10) === 0;
 	const returnFields = ['end_date', 'end_time', 'end_itinerary'];
-	const generatedFields = ['cf-turnstile-response', 'unique_tx_id', 'lang'];
+	const generatedFields = ['cf-turnstile-response', 'tx_id', 'lang'];
 	const formFields = formToArray(thisForm).filter(({name}) => name && !generatedFields.includes(name));
 
 	formFields.forEach(({name, value}) => {
@@ -56,7 +56,7 @@ const validateAviationEstimateRequest = async () => {
 		const {wpJsonUrl, txSignSlug, post_id} = dyCoreArgs;
 		const signUrl = new URL(`${wpJsonUrl}/${txSignSlug}/${values.dy_id}`);
 
-		const unique_tx_id = await signDyTransaction({
+		const tx_id = await signDyTransaction({
 			signUrl,
 			signRequest: {
 				dy_request: 'estimate_request',
@@ -66,20 +66,14 @@ const validateAviationEstimateRequest = async () => {
 			widgetId: turnstileWidget1
 		});
 		const token = await executeTurnstileWithRetry(turnstileWidget2);
-		const {dy_nonce} = (await getNonce()) ?? {};
-
-		if (typeof dy_nonce !== 'string' || !dy_nonce) {
-			throw new Error('The confirmation nonce is missing.');
-		}
 
 		// Keep the base action unchanged so a failed attempt can be retried.
 		const action = new URL(atob(thisForm.attr('data-action')), window.location.origin);
-		action.pathname = `${action.pathname.replace(/\/$/, '')}/${dy_nonce}`;
+		action.pathname = `${action.pathname.replace(/\/$/, '')}/${token}`;
 
 		formFields.push(
 			{name: 'lang', value: dyCoreArgs.lang},
-			{name: 'unique_tx_id', value: unique_tx_id},
-			{name: 'cf-turnstile-response', value: token}
+			{name: 'tx_id', value: tx_id}
 		);
 
 		if (typeof Storage !== 'undefined') {

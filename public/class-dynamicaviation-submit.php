@@ -197,7 +197,7 @@ class Dynamic_Aviation_Submit
             return self::$cache[$cache_key] = false;
         }
 
-        dy_tx::update(secure_post('unique_tx_id'), 'success');
+        dy_tx::update(secure_post('tx_id'), 'success');
 
         return self::$cache[$cache_key] = true;
     }
@@ -221,15 +221,15 @@ class Dynamic_Aviation_Submit
             return self::$cache[$cache_key] = false;
         }
 
-        if (!wp_verify_nonce(get_query_var($this->pathname), 'dy_nonce')) {
-            dy_errors::add(__('Invalid request. Please reload the quote and try again.', 'dynamicaviation'), 400);
+        if(!validate_turnstile(get_query_var($this->pathname), 'submit-transaction')) {
             return self::$cache[$cache_key] = false;
         }
 
-        if (!$this->validate_unique_tx_id()) {
+        if (!$this->validate_tx_id()) {
             dy_errors::add(__('Invalid or expired transaction. Please submit a new request.', 'dynamicaviation'), 400);
             return self::$cache[$cache_key] = false;
         }
+
 
         $output = true;
 
@@ -282,21 +282,18 @@ class Dynamic_Aviation_Submit
 			dy_errors::add($invalids, 400);
 		}
 
-		if ($output && !validate_turnstile(secure_post('cf-turnstile-response'), 'submit-transaction')) {
-			$output = false;
-		}
 
 		return self::$cache[$cache_key] = $output;
     }
 
-    public function validate_unique_tx_id(): bool
+    public function validate_tx_id(): bool
     {
-        $unique_tx_id = secure_post('unique_tx_id');
+        $tx_id = secure_post('tx_id');
         $email = secure_post('email', '', 'sanitize_email');
         $dy_request = secure_post('dy_request', '', 'sanitize_key');
         $dy_id = secure_post('dy_id', 0, 'absint');
 
-        if (!is_string($unique_tx_id) || $unique_tx_id === '' || !is_email($email) || $dy_id <= 0 || $dy_request !== 'estimate_request') {
+        if (!is_string($tx_id) || $tx_id === '' || !is_email($email) || $dy_id <= 0 || $dy_request !== 'estimate_request') {
             return false;
         }
 
@@ -313,11 +310,11 @@ class Dynamic_Aviation_Submit
             return false;
         }
 
-        if (!dy_tx::validate($unique_tx_id, [$unique_tx_id, $email, $dy_request, $dy_id])) {
+        if (!dy_tx::validate($tx_id, [$tx_id, $email, $dy_request, $dy_id])) {
             return false;
         }
 
-        return dy_tx::get($unique_tx_id)?->status === 'started';
+        return dy_tx::get($tx_id)?->status === 'started';
     }
 
     public function estimate_notes()
