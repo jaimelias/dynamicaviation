@@ -15,3 +15,9 @@
 - Frontend booking flow: `public/`
 - Shared helpers: `includes/`
 - Canonical shared library: `submodules/dy-core/`
+
+## DEV Tools
+- Local site: `http://localhost:8888/wordpress`
+- Read the project's `composer.json` for tools and configuration.
+- Runtime: PHP 8.1 (Apache)
+- Diagnostics: `Query Monitor` is installed; use it when investigating runtime notices, queries, and asset dependencies.

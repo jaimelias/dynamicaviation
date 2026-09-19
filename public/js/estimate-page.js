@@ -39,22 +39,27 @@ const validateAviationEstimateRequest = async () => {
 	}
 
 	if (!hasTurnstileWidgets()) {
-		alert(dyAviationEstimateArgs.turnstileUnavailable);
+		dyAlert(
+			dyAviationEstimateArgs.turnstileUnavailable,
+			dyAviationEstimateArgs.alertButton
+		);
 		return false;
 	}
 
 	thisForm.data('submitting', true);
-	thisForm.find('button').prop('disabled', true);
+	handleSubmitButton(thisForm);
 
 	try {
 		// Use one snapshot for signing and submission, even if fields change while waiting.
 		const values = Object.fromEntries(formFields.map(({name, value}) => [name, value]));
 		const {turnstileWidget1, turnstileWidget2} = window.dyTurnstileWidgets;
-		const signUrl = new URL(`${dyAviationEstimateArgs.transactionsUrl.replace(/\/$/, '')}/${values.dy_id}`);
+		const {wpJsonUrl, txSignSlug, post_id} = dyCoreArgs;
+		const signUrl = new URL(`${wpJsonUrl}/${txSignSlug}/${post_id}`);
+
 		const unique_tx_id = await signDyTransaction({
 			signUrl,
 			signRequest: {
-				dy_request: values.dy_request,
+				dy_request: 'estimate_request',
 				email: values.email,
 				action: 'sign-transaction'
 			},
@@ -85,6 +90,8 @@ const validateAviationEstimateRequest = async () => {
 			});
 		}
 
+
+		
 		handleSubmitButton(thisForm);
 
 		if (typeof fbq !== 'undefined') {
@@ -96,15 +103,20 @@ const validateAviationEstimateRequest = async () => {
 			gtag('event', 'generate_lead', {value: amount, currency: 'USD'});
 		}
 
-		// The shared createFormSubmit signs against a page-based endpoint; aviation
-		// signs against its own endpoint above and uses the shared final POST helper.
-		formSubmit({method: 'post', action: action.href, formFields});
+		formSubmit({
+			method: String(thisForm.attr('data-method')).toLowerCase(),
+			action: action.href,
+			formFields
+		});
 		return true;
 	} catch (error) {
 		console.error('Aviation estimate submission failed:', error);
 		thisForm.data('submitting', false);
 		thisForm.find('button').prop('disabled', false);
-		alert(dyAviationEstimateArgs.submitError);
+		dyAlert(
+			dyAviationEstimateArgs.submitError,
+			dyAviationEstimateArgs.alertButton
+		);
 		return false;
 	}
 };

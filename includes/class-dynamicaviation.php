@@ -9,7 +9,6 @@ class Dynamic_Aviation_Core {
 	public function __construct($main_plugin_file) {
 
 		$this->id = 'dynamicaviation';
-		$this->id = 'Dynamic Aviation';
 		$this->load_dependencies();
 
 		$this->version = is_local_host() ? time() : DYNAMICAVIATION_VERSION;

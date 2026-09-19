@@ -151,9 +151,9 @@ class Dynamic_Aviation_Estimate_Page
 			$handle = $this->id . '_' . $this->pathname;
 			wp_enqueue_script($handle, $this->plugin_dir_url . 'public/js/estimate-page.js', ['jquery', 'cloudflare-turnstile-widgets', 'dy-core-utilities', 'dy-core-request-form-utilities'], $this->version, true);
 			wp_localize_script($handle, 'dyAviationEstimateArgs', [
-				'transactionsUrl' => rest_url($this->id . '/transactions/'),
 				'submitError' => __('Unable to send your request. Please try again.', 'dynamicaviation'),
 				'turnstileUnavailable' => __('Verification is still loading. Please try again in a moment.', 'dynamicaviation'),
+				'alertButton' => __('OK', 'dynamicaviation'),
 			]);
 		}
 	}
