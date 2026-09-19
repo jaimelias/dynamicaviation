@@ -286,7 +286,7 @@ class Dynamic_Aviation_Submit
             return false;
         }
 
-        return dy_tx::get($tx_id)?->status === 'started';
+        return dy_tx::get_stored_tx($tx_id)?->status === 'started';
     }
 
     public function estimate_notes()
