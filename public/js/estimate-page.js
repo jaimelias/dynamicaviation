@@ -53,7 +53,7 @@ const validateAviationEstimateRequest = async () => {
 		// Use one snapshot for signing and submission, even if fields change while waiting.
 		const values = Object.fromEntries(formFields.map(({name, value}) => [name, value]));
 		const {turnstileWidget1, turnstileWidget2} = window.dyTurnstileWidgets;
-		const {wpJsonUrl, txSignSlug, post_id} = dyCoreArgs;
+		const {wpJsonUrl, txSignSlug} = dyCoreArgs;
 		const signUrl = new URL(`${wpJsonUrl}/${txSignSlug}/${values.dy_id}`);
 
 		const tx_id = await signDyTransaction({
@@ -69,11 +69,11 @@ const validateAviationEstimateRequest = async () => {
 
 		// Keep the base action unchanged so a failed attempt can be retried.
 		const action = new URL(atob(thisForm.attr('data-action')), window.location.origin);
-		action.pathname = `${action.pathname.replace(/\/$/, '')}/${token}`;
+		action.pathname = `${action.pathname.replace(/\/$/, '')}/${tx_id}`;
 
 		formFields.push(
 			{name: 'lang', value: dyCoreArgs.lang},
-			{name: 'tx_id', value: tx_id}
+			{name: 'cf-turnstile-response', value: token}
 		);
 
 		if (typeof Storage !== 'undefined') {

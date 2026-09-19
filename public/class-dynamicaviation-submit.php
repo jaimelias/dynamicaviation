@@ -14,17 +14,6 @@ class Dynamic_Aviation_Submit
         $this->default_language = default_language();
         $this->site_name = get_bloginfo('name');
 
-        // Filters custom WordPress outputs
-        add_filter('pre_get_document_title', [$this, 'modify_wp_title'], 100);
-        add_filter('the_title', [$this, 'modify_title'], 100);
-        add_filter('the_content', [$this, 'modify_content'], 100);
-
-        // Changes the template to page.php in the theme
-        add_filter('template_include', [$this, 'locate_template'], 100);
-
-        // Sets custom params to the post before wp_query
-        add_action('pre_get_posts', [$this, 'main_wp_query'], 100);
-
         // Adds the query var
         add_filter('query_vars', [$this, 'registering_custom_query_var']);
         add_action('init', [$this, 'add_rewrite_rule'], 100);
@@ -81,43 +70,6 @@ class Dynamic_Aviation_Submit
         $query_vars[] = $this->pathname;
 
         return $query_vars;
-    }
-
-    public function main_wp_query($query)
-    {
-        if ($query->is_main_query() && isset($query->query_vars[$this->pathname]))
-        {
-            $query->set('post_type', 'page');
-            $query->set('posts_per_page', 1);
-        }
-    }
-
-    public function locate_template($template)
-    {
-        return get_query_var($this->pathname)
-            ? locate_template(['page.php'])
-            : $template;
-    }
-
-    public function modify_content($content)
-    {
-        return $this->validate_form_submit()
-            ? '<p class="minimal_success">' . esc_html(__('Request received. Our sales team will be in touch with you soon.', 'dynamicaviation')) . '</p>'
-            : $content;
-    }
-
-    public function modify_title($title)
-    {
-        return in_the_loop() && $this->validate_form_submit()
-            ? esc_html(__('Request Submitted', 'dynamicaviation'))
-            : $title;
-    }
-
-    public function modify_wp_title($title)
-    {
-        return $this->validate_form_submit()
-            ? __('Request Submitted', 'dynamicaviation') . ' | ' . $this->site_name
-            : $title;
     }
 
     public function subject($output)
@@ -197,9 +149,29 @@ class Dynamic_Aviation_Submit
             return self::$cache[$cache_key] = false;
         }
 
-        dy_tx::update(secure_post('tx_id'), 'success');
+        $tx_id = (string) get_query_var($this->pathname);
+        $tx = (object) [
+            'tx_id' => $tx_id,
+            'email' => secure_post('email', '', 'sanitize_email'),
+            'dy_request' => secure_post('dy_request', '', 'sanitize_key'),
+            'dy_id' => secure_post('dy_id', 0, 'absint'),
+            'status' => 'success',
+            'confirmation' => [
+                'title' => __('Request Submitted', 'dynamicaviation'),
+                'content' => '<p class="minimal_success">' . esc_html(__('Request received. Our sales team will be in touch with you soon.', 'dynamicaviation')) . '</p>',
+                'excerpt' => '',
+                'events' => [],
+            ],
+        ];
 
-        return self::$cache[$cache_key] = true;
+        if (!dy_tx::update($tx)) {
+            dy_errors::add(__('Unable to send your request. Please try again.', 'dynamicaviation'), 502);
+            self::$cache['validate_form_submit'] = false;
+            return self::$cache[$cache_key] = false;
+        }
+
+        wp_safe_redirect(home_url(DY_CORE_CONFIRMATION_PAGE_SLUG . '/' . $tx_id));
+        exit;
     }
 
     public function validate_form_submit()
@@ -221,7 +193,7 @@ class Dynamic_Aviation_Submit
             return self::$cache[$cache_key] = false;
         }
 
-        if(!validate_turnstile(get_query_var($this->pathname), 'submit-transaction')) {
+        if (!validate_turnstile(secure_post('cf-turnstile-response'), 'submit-transaction')) {
             return self::$cache[$cache_key] = false;
         }
 
@@ -288,12 +260,12 @@ class Dynamic_Aviation_Submit
 
     public function validate_tx_id(): bool
     {
-        $tx_id = secure_post('tx_id');
+        $tx_id = get_query_var($this->pathname);
         $email = secure_post('email', '', 'sanitize_email');
         $dy_request = secure_post('dy_request', '', 'sanitize_key');
         $dy_id = secure_post('dy_id', 0, 'absint');
 
-        if (!is_string($tx_id) || $tx_id === '' || !is_email($email) || $dy_id <= 0 || $dy_request !== 'estimate_request') {
+        if (!is_string($tx_id) || !wp_is_uuid($tx_id, 4) || !is_email($email) || $dy_id <= 0 || $dy_request !== 'estimate_request') {
             return false;
         }
 
